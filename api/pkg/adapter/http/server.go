@@ -52,7 +52,7 @@ func New(cfg *config.HttpConfig) *server {
 	// TODO: Attach middlewares
 
 	apiV1 := r.PathPrefix("/api/v1").Subrouter()
-	apiV1.HandleFunc("/greeting/{name}", getGreeting)
+	apiV1.HandleFunc("/greeting/{name}", getGreeting).Methods("GET")
 
 	return &server{
 		server: &http.Server{
