@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/isutare412/imageer/api/pkg/config"
+	"github.com/isutare412/imageer/api/internal/config"
 )
 
 type server struct {

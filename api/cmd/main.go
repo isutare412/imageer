@@ -9,8 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/isutare412/imageer/api/pkg/adapter/http"
-	"github.com/isutare412/imageer/api/pkg/config"
+	"github.com/isutare412/imageer/api/internal/adapter/http"
+	"github.com/isutare412/imageer/api/internal/config"
 )
 
 func main() {
@@ -26,15 +26,12 @@ func main() {
 	}
 	setLogger(cfg.Server.Mode)
 
-	// Start HTTP server
 	s := http.New(&cfg.Server.Http)
 	sErrChan := s.Start()
 
-	// Watch signals
 	sigChan := make(chan os.Signal, 3)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 
-	// Wait for errors or signals
 	select {
 	case err := <-sErrChan:
 		log.Errorf("Got error from http server: %v", err)
@@ -42,7 +39,6 @@ func main() {
 		log.Infof("Caught signal: %s", sig.String())
 	}
 
-	// Start shutdown processes
 	s.Shutdown()
 }
 
