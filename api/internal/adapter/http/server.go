@@ -17,20 +17,20 @@ type server struct {
 }
 
 func (s *server) Start() <-chan error {
-	errChan := make(chan error)
+	errors := make(chan error)
 
 	go func() {
-		defer close(errChan)
+		defer close(errors)
 
 		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			errChan <- fmt.Errorf("on server.Start: %v", err)
+			errors <- fmt.Errorf("on server.Start: %v", err)
 			return
 		}
 		log.Info("HTTP server finished serving")
 	}()
 
 	log.Infof("HTTP server started on %s", s.server.Addr)
-	return errChan
+	return errors
 }
 
 func (s *server) Shutdown() {

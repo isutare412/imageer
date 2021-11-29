@@ -26,20 +26,20 @@ func main() {
 	}
 	setLogger(cfg.Server.Mode)
 
-	s := http.New(&cfg.Server.Http)
-	sErrChan := s.Start()
+	server := http.New(&cfg.Server.Http)
+	sErr := server.Start()
 
-	sigChan := make(chan os.Signal, 3)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+	sig := make(chan os.Signal, 3)
+	signal.Notify(sig, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 
 	select {
-	case err := <-sErrChan:
-		log.Errorf("Got error from http server: %v", err)
-	case sig := <-sigChan:
-		log.Infof("Caught signal: %s", sig.String())
+	case e := <-sErr:
+		log.Errorf("Got error from http server: %v", e)
+	case s := <-sig:
+		log.Infof("Caught signal: %s", s.String())
 	}
 
-	s.Shutdown()
+	server.Shutdown()
 }
 
 func readConfig(path string) (*config.Config, error) {
