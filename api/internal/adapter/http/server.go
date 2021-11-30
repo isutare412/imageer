@@ -49,7 +49,7 @@ func (s *server) Shutdown() {
 func New(cfg *config.HttpConfig) *server {
 	r := mux.NewRouter()
 
-	// TODO: Attach middlewares
+	r.Use(logRequest, allowCORS)
 
 	apiV1 := r.PathPrefix("/api/v1").Subrouter()
 	apiV1.HandleFunc("/greeting/{name}", getGreeting).Methods("GET")
