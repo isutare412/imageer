@@ -8,7 +8,9 @@ import (
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"github.com/swaggo/http-swagger"
 
+	_ "github.com/isutare412/imageer/api/api"
 	"github.com/isutare412/imageer/api/internal/config"
 )
 
@@ -50,6 +52,8 @@ func New(cfg *config.HttpConfig) *server {
 	r := mux.NewRouter()
 
 	r.Use(logRequest, allowCORS)
+
+	r.PathPrefix("/docs").Handler(httpSwagger.WrapHandler).Methods("GET")
 
 	apiV1 := r.PathPrefix("/api/v1").Subrouter()
 	apiV1.HandleFunc("/greeting/{name}", getGreeting).Methods("GET")

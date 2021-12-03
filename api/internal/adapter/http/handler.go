@@ -11,7 +11,7 @@ import (
 // @Summary Say greeting
 // @Description Greeting by given name
 // @Tags Greeting
-// @Router /greeting/{name} [get]
+// @Router /api/v1/greeting/{name} [get]
 // @Param name path string true "name for greeting"
 // @Accept json
 // @Produce json

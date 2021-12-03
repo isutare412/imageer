@@ -23,7 +23,7 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/greeting/{name}": {
+        "/api/v1/greeting/{name}": {
             "get": {
                 "description": "Greeting by given name",
                 "consumes": [
@@ -92,8 +92,8 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "0.1",
-	Host:        "localhost:8080",
-	BasePath:    "/api/v1",
+	Host:        "",
+	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "Imageer Endpoint API",
 	Description: "Endpoint API for image processing service.",

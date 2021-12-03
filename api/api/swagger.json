@@ -6,10 +6,8 @@
         "contact": {},
         "version": "0.1"
     },
-    "host": "localhost:8080",
-    "basePath": "/api/v1",
     "paths": {
-        "/greeting/{name}": {
+        "/api/v1/greeting/{name}": {
             "get": {
                 "description": "Greeting by given name",
                 "consumes": [
