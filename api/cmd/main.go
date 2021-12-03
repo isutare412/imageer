@@ -13,6 +13,12 @@ import (
 	"github.com/isutare412/imageer/api/internal/config"
 )
 
+// @title Imageer Endpoint API
+// @version 0.1
+// @description Endpoint API for image processing service.
+
+// @host localhost:8080
+// @BasePath /api/v1
 func main() {
 	const ENV_CFG = "IMAGEER_CONFIG"
 

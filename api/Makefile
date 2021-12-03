@@ -2,13 +2,17 @@
 
 ROOTDIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-SWAG_IMAGE_NAME?=tmp/swag
-
 .PHONY: swag
-swag: ## Build swag docker image
-	docker build \
-		-t ${SWAG_IMAGE_NAME} \
-		- < ${ROOTDIR}/build/docker/swag.Dockerfile
+swag: ## Install swag binary
+	@cat ${ROOTDIR}/tools/tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -t go install
+	@echo Installed swag successfully
+
+.PHONY: api
+docs: swag ## Generate OpenAPI specification
+	swag init \
+		-d "${ROOTDIR}/cmd,${ROOTDIR}/internal/adapter/http" \
+		-o "${ROOTDIR}/api"
+	@echo Generated docs successfully
 
 .PHONY: help
 help: ## Print this help message

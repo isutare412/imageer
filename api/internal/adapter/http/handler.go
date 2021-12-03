@@ -8,12 +8,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// @Summary Say greeting
+// @Description Greeting by given name
+// @Tags Greeting
+// @Router /greeting/{name} [get]
+// @Param name path string true "name for greeting"
+// @Accept json
+// @Produce json
+// @Success 200 {object} getGreetingResp "ok"
+// @Failure 400 {string} string "error"
+// @Failure 500 {string} string "error"
 func getGreeting(w http.ResponseWriter, r *http.Request) {
-	const NAME = "name"
-
-	name, ok := mux.Vars(r)[NAME]
+	name, ok := mux.Vars(r)["name"]
 	if !ok {
-		http.Error(w, fmt.Sprintf("%q is mandatory field", NAME), http.StatusBadRequest)
+		http.Error(w, "'name' is mandatory field", http.StatusBadRequest)
 		return
 	}
 
