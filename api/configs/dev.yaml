@@ -1,5 +1,0 @@
-server:
-  mode: "development" # development/production
-  http:
-    host: "localhost"
-    port: "8080"
