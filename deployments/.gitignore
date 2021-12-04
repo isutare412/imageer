@@ -1,0 +1,3 @@
+# Ignore all envs except default
+.*.env
+!.default.env
