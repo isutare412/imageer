@@ -9,8 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/isutare412/imageer/api/internal/adapter/http"
-	"github.com/isutare412/imageer/api/internal/config"
+	"github.com/isutare412/imageer/api/pkg/adapter/http"
+	"github.com/isutare412/imageer/api/pkg/config"
 )
 
 // @title Imageer Endpoint API

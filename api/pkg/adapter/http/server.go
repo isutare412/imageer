@@ -8,10 +8,10 @@ import (
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-	"github.com/swaggo/http-swagger"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	_ "github.com/isutare412/imageer/api/api"
-	"github.com/isutare412/imageer/api/internal/config"
+	"github.com/isutare412/imageer/api/pkg/config"
 )
 
 type server struct {
