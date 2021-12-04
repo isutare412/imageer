@@ -10,7 +10,7 @@ swag: ## Install swag binary
 .PHONY: api
 docs: ## Generate OpenAPI specification
 	swag init \
-		-d "${ROOTDIR}/cmd,${ROOTDIR}/internal/adapter/http" \
+		-d "${ROOTDIR}/cmd,${ROOTDIR}/pkg/adapter/http" \
 		-o "${ROOTDIR}/api"
 	@echo Generated docs successfully
 
