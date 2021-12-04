@@ -4,11 +4,11 @@ ROOTDIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 .PHONY: swag
 swag: ## Install swag binary
-	@cat ${ROOTDIR}/tools/tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -t go install
+	@go list -f '{{ join .Imports "\n" }}' tools/tools.go | xargs -t -L1 go install
 	@echo Installed swag successfully
 
 .PHONY: api
-docs: swag ## Generate OpenAPI specification
+docs: ## Generate OpenAPI specification
 	swag init \
 		-d "${ROOTDIR}/cmd,${ROOTDIR}/internal/adapter/http" \
 		-o "${ROOTDIR}/api"
