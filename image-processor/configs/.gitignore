@@ -1,0 +1,3 @@
+# Ignore all yaml files except default
+*.yaml
+!default.yaml

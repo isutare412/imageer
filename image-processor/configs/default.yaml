@@ -1,0 +1,6 @@
+server:
+  mode: "development" # development/production
+redis:
+  addrs:
+    - "localhost:6379"
+  password: "imageer"
