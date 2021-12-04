@@ -17,13 +17,13 @@ import (
 // @version 0.1
 // @description Endpoint API for image processing service.
 func main() {
-	const ENV_CFG = "IMAGEER_CONFIG"
+	const cfgEnvStr = "IMAGEER_CONFIG"
 
-	cPath := os.Getenv(ENV_CFG)
-	if cPath == "" {
-		log.Fatalf("Need environment variable: %s", ENV_CFG)
+	cfgPath := os.Getenv(cfgEnvStr)
+	if cfgPath == "" {
+		log.Fatalf("Need environment variable: %s", cfgEnvStr)
 	}
-	cfg, err := readConfig(cPath)
+	cfg, err := readConfig(cfgPath)
 	if err != nil {
 		log.Fatalf("Failed to read config: %v", err)
 	}
