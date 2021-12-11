@@ -1,4 +1,4 @@
-# Image Processor Server
+# Imageer Processing Server
 
 ## Build
 
