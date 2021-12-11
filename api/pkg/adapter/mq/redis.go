@@ -12,6 +12,17 @@ type Redis struct {
 	client redis.UniversalClient
 }
 
+func (r *Redis) Produce(ctx context.Context, topic string, val []byte) error {
+	if _, err := r.client.XAdd(ctx, &redis.XAddArgs{
+		Stream: topic,
+		ID:     "*", // Use auto generated ID by redis
+		Values: []interface{}{"data", val},
+	}).Result(); err != nil {
+		return fmt.Errorf("on XAdd: %w", err)
+	}
+	return nil
+}
+
 func NewRedis(cfg *config.RedisConfig) (*Redis, error) {
 	c := redis.NewUniversalClient(&redis.UniversalOptions{
 		Addrs:    cfg.Addrs,
@@ -25,15 +36,4 @@ func NewRedis(cfg *config.RedisConfig) (*Redis, error) {
 	return &Redis{
 		client: c,
 	}, nil
-}
-
-func (r *Redis) Produce(ctx context.Context, topic string, val []byte) error {
-	if _, err := r.client.XAdd(ctx, &redis.XAddArgs{
-		Stream: topic,
-		ID:     "*", // Use auto generated ID by redis
-		Values: []interface{}{"data", val},
-	}).Result(); err != nil {
-		return fmt.Errorf("on XAdd: %w", err)
-	}
-	return nil
 }

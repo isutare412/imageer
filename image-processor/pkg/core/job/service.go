@@ -20,22 +20,6 @@ type Service struct {
 	done       chan struct{}
 }
 
-func NewService(cfg *config.ProcessorConfig, mq MsgQueue) (*Service, error) {
-	if err := mq.Init(context.Background(), topicKey); err != nil {
-		return nil, fmt.Errorf("on init MQ: %w", err)
-	}
-
-	if cfg.RetryDelay < 0 {
-		return nil, fmt.Errorf("retry delay should be larger than zero: %d", cfg.RetryDelay)
-	}
-
-	return &Service{
-		mq:         mq,
-		retryDelay: time.Duration(cfg.RetryDelay) * time.Millisecond,
-		done:       make(chan struct{}),
-	}, nil
-}
-
 func (s *Service) Start(ctx context.Context) {
 	go func() {
 		for {
@@ -79,4 +63,20 @@ func (s *Service) consume(ctx context.Context) error {
 
 func (s *Service) Done() <-chan struct{} {
 	return s.done
+}
+
+func NewService(cfg *config.ProcessorConfig, mq MsgQueue) (*Service, error) {
+	if err := mq.Init(context.Background(), topicKey); err != nil {
+		return nil, fmt.Errorf("on init MQ: %w", err)
+	}
+
+	if cfg.RetryDelay < 0 {
+		return nil, fmt.Errorf("retry delay should be larger than zero: %d", cfg.RetryDelay)
+	}
+
+	return &Service{
+		mq:         mq,
+		retryDelay: time.Duration(cfg.RetryDelay) * time.Millisecond,
+		done:       make(chan struct{}),
+	}, nil
 }
