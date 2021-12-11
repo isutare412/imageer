@@ -4,3 +4,5 @@ redis:
   addrs:
     - "localhost:6379"
   password: "imageer"
+  stream:
+    groupName: "prcsGrp"

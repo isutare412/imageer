@@ -10,6 +10,11 @@ type ServerConfig struct {
 }
 
 type RedisConfig struct {
-	Addrs    []string `yaml:"addrs" json:"addrs"`
-	Password string   `yaml:"password" json:"password"`
+	Addrs    []string          `yaml:"addrs" json:"addrs"`
+	Password string            `yaml:"password" json:"password"`
+	Stream   RedisStreamConfig `yaml:"stream" json:"stream"`
+}
+
+type RedisStreamConfig struct {
+	GroupName string `yaml:"groupName" json:"groupName"`
 }
