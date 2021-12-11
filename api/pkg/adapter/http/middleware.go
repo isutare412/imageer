@@ -6,22 +6,29 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type statusLogger struct {
+type responseLogger struct {
 	http.ResponseWriter
 	status int
+	length int
 }
 
-func (l *statusLogger) WriteHeader(status int) {
+func (l *responseLogger) WriteHeader(status int) {
 	l.status = status
 	l.ResponseWriter.WriteHeader(status)
 }
 
+func (l *responseLogger) Write(b []byte) (int, error) {
+	l.length += len(b)
+	return l.ResponseWriter.Write(b)
+}
+
 func logRequest(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger := statusLogger{ResponseWriter: w, status: http.StatusOK}
+		logger := responseLogger{ResponseWriter: w, status: http.StatusOK}
 		h.ServeHTTP(&logger, r)
 
-		log.Infof("%s - \"%s %s\" %d", r.RemoteAddr, r.Method, r.URL.String(), logger.status)
+		log.Infof("%s - \"%s %s\" %d %d",
+			r.RemoteAddr, r.Method, r.URL.String(), logger.status, logger.length)
 	})
 }
 
