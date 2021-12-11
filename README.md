@@ -4,12 +4,13 @@ Imageer is an image processing service.
 
 ## Components
 
-- [Imageer API Server](./api)
+- [Imageer API server](./api)
+- [Imageer processing server](./image-processor)
 
 ## Development
 
 ```bash
-./scripts/compose_dev.sh
+make dc-dev
 # 1) up
 # 2) down
 # 3) ps
