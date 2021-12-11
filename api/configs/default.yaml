@@ -3,3 +3,7 @@ server:
   http:
     host: "localhost"
     port: "8080"
+redis:
+  addrs:
+    - "localhost:6379"
+  password: "imageer"

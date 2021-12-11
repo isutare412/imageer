@@ -11,7 +11,9 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/isutare412/imageer/api/pkg/adapter/http"
+	"github.com/isutare412/imageer/api/pkg/adapter/mq"
 	"github.com/isutare412/imageer/api/pkg/config"
+	"github.com/isutare412/imageer/api/pkg/core/job"
 )
 
 // @title Imageer Endpoint API
@@ -32,7 +34,19 @@ func main() {
 
 	rootCtx, cancel := context.WithCancel(context.Background())
 
-	server := http.NewServer(&cfg.Server.Http)
+	redisMQ, err := mq.NewRedis(&cfg.Redis)
+	if err != nil {
+		log.Fatalf("Failed to create redis MQ: %v", err)
+	}
+	log.Infof("Created redis MQ on %v", cfg.Redis.Addrs)
+
+	jSvc := job.NewService(redisMQ)
+	log.Info("Created job service")
+
+	server := http.NewServer(&cfg.Server.Http, jSvc)
+	log.Info("Created HTTP server")
+
+	// Start services
 	sErr := server.Start(rootCtx)
 
 	// Wait for signal or error
