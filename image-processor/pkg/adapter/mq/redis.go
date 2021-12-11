@@ -47,7 +47,7 @@ func (r *Redis) Init(ctx context.Context, topic string) error {
 	return nil
 }
 
-func (r *Redis) Read(ctx context.Context, topic string, limit int64) (<-chan []byte, error) {
+func (r *Redis) Consume(ctx context.Context, topic string, limit int64) (<-chan []byte, error) {
 	result, err := r.client.XReadGroup(ctx, &redis.XReadGroupArgs{
 		Group:    r.groupName,
 		Consumer: r.consumerName,

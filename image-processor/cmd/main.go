@@ -12,7 +12,7 @@ import (
 
 	"github.com/isutare412/imageer/image-processor/pkg/adapter/mq"
 	"github.com/isutare412/imageer/image-processor/pkg/config"
-	"github.com/isutare412/imageer/image-processor/pkg/core/processor"
+	"github.com/isutare412/imageer/image-processor/pkg/core/job"
 )
 
 func main() {
@@ -36,7 +36,7 @@ func main() {
 	}
 	log.Infof("Created redis MQ on %v", cfg.Redis.Addrs)
 
-	pSvc, err := processor.NewService(&cfg.Processor, redisMQ)
+	pSvc, err := job.NewService(&cfg.Processor, redisMQ)
 	if err != nil {
 		log.Fatalf("Failed to create processor service: %v", err)
 	}

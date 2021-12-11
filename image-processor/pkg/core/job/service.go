@@ -1,4 +1,4 @@
-package processor
+package job
 
 import (
 	"context"
@@ -45,12 +45,12 @@ func (s *Service) Start(ctx context.Context) {
 				return
 
 			default:
-				err := s.readMQ(ctx)
+				err := s.consume(ctx)
 				if err != nil {
 					if errors.Is(err, context.Canceled) {
 						continue
 					}
-					log.Errorf("Failed to read MQ: %v", err)
+					log.Errorf("Failed to consume job: %v", err)
 					time.Sleep(s.retryDelay)
 					continue
 				}
@@ -64,10 +64,10 @@ func (s *Service) shutdown() {
 	log.Infof("Processor service shutdowned successfully")
 }
 
-func (s *Service) readMQ(ctx context.Context) error {
-	messages, err := s.mq.Read(ctx, topicKey, 1)
+func (s *Service) consume(ctx context.Context) error {
+	messages, err := s.mq.Consume(ctx, topicKey, 1)
 	if err != nil {
-		return fmt.Errorf("on read mq: %w", err)
+		return fmt.Errorf("on consume mq: %w", err)
 	}
 
 	log.Infof("Got messages")
