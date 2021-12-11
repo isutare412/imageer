@@ -1,8 +1,9 @@
 package config
 
 type Config struct {
-	Server ServerConfig `yaml:"server" json:"server"`
-	Redis  RedisConfig  `yaml:"redis" json:"redis"`
+	Server    ServerConfig    `yaml:"server" json:"server"`
+	Redis     RedisConfig     `yaml:"redis" json:"redis"`
+	Processor ProcessorConfig `yaml:"processor" json:"processor"`
 }
 
 type ServerConfig struct {
@@ -17,4 +18,8 @@ type RedisConfig struct {
 
 type RedisStreamConfig struct {
 	GroupName string `yaml:"groupName" json:"groupName"`
+}
+
+type ProcessorConfig struct {
+	RetryDelay int64 `yaml:"retryDelay" json:"retryDelay"`
 }

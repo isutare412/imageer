@@ -6,3 +6,5 @@ redis:
   password: "imageer"
   stream:
     groupName: "prcsGrp"
+processor:
+  retryDelay: 5000 # ms

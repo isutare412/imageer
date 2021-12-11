@@ -36,14 +36,14 @@ func main() {
 	}
 	log.Info("Created Redis MQ")
 
-	pSvc, err := processor.NewService(redisMQ)
+	pSvc, err := processor.NewService(&cfg.Processor, redisMQ)
 	if err != nil {
 		log.Fatalf("Failed to create processor service: %v", err)
 	}
 	log.Info("Created processor service")
 
 	// Start services
-	go pSvc.Start(rootCtx)
+	pSvc.Start(rootCtx)
 
 	// Wait for signals
 	sig := make(chan os.Signal, 3)
