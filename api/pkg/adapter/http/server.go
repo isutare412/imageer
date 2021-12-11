@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -16,39 +17,46 @@ import (
 
 type server struct {
 	server *http.Server
+	done   chan struct{}
 }
 
-func (s *server) Start() <-chan error {
-	errors := make(chan error)
+func (s *server) Start(ctx context.Context) <-chan error {
+	errNotify := make(chan error)
+	go func() {
+		defer close(errNotify)
+		if err := s.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			errNotify <- fmt.Errorf("on http listen: %w", err)
+		}
+	}()
+	log.Infof("HTTP server started on %s", s.server.Addr)
 
 	go func() {
-		defer close(errors)
-
-		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			errors <- fmt.Errorf("on server.Start: %w", err)
-			return
-		}
-		log.Info("HTTP server finished serving")
+		<-ctx.Done()
+		s.shutdown()
 	}()
 
-	log.Infof("HTTP server started on %s", s.server.Addr)
-	return errors
+	return errNotify
 }
 
-func (s *server) Shutdown() {
+func (s *server) shutdown() {
 	log.Info("HTTP server shutdown start")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
+	defer close(s.done)
 
 	if err := s.server.Shutdown(ctx); err != nil {
-		log.Fatalf("Failed to shutdown HTTP server: %v", err)
-		return
+		log.Errorf("Failed to shutdown HTTP server: %v", err)
 	}
+
 	log.Info("HTTP server shutdown finished successfully")
 }
 
-func New(cfg *config.HttpConfig) *server {
+func (s *server) Done() <-chan struct{} {
+	return s.done
+}
+
+func NewServer(cfg *config.HttpConfig) *server {
 	r := mux.NewRouter()
 
 	r.Use(logRequest, allowCORS)
@@ -63,5 +71,6 @@ func New(cfg *config.HttpConfig) *server {
 			Addr:    fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
 			Handler: r,
 		},
+		done: make(chan struct{}),
 	}
 }

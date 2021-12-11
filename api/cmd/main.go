@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -29,12 +30,14 @@ func main() {
 	}
 	setLogger(cfg.Server.Mode)
 
-	server := http.New(&cfg.Server.Http)
-	sErr := server.Start()
+	rootCtx, cancel := context.WithCancel(context.Background())
 
+	server := http.NewServer(&cfg.Server.Http)
+	sErr := server.Start(rootCtx)
+
+	// Wait for signal or error
 	sig := make(chan os.Signal, 3)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-
 	select {
 	case e := <-sErr:
 		log.Errorf("Got error from http server: %v", e)
@@ -42,7 +45,9 @@ func main() {
 		log.Infof("Caught signal: %s", s.String())
 	}
 
-	server.Shutdown()
+	// Wait for graceful shutdown
+	cancel()
+	<-server.Done()
 }
 
 func readConfig(path string) (*config.Config, error) {
