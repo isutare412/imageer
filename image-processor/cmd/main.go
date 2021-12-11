@@ -59,12 +59,12 @@ func main() {
 func readConfig(path string) (*config.Config, error) {
 	viper.SetConfigFile(path)
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("on reading config: %v", err)
+		return nil, fmt.Errorf("on reading config: %w", err)
 	}
 
 	var cfg config.Config
 	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("on unmarshaling config: %v", err)
+		return nil, fmt.Errorf("on unmarshaling config: %w", err)
 	}
 	return &cfg, nil
 }

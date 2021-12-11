@@ -25,7 +25,7 @@ func (s *server) Start() <-chan error {
 		defer close(errors)
 
 		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			errors <- fmt.Errorf("on server.Start: %v", err)
+			errors <- fmt.Errorf("on server.Start: %w", err)
 			return
 		}
 		log.Info("HTTP server finished serving")
