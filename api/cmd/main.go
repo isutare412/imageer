@@ -12,8 +12,10 @@ import (
 
 	"github.com/isutare412/imageer/api/pkg/adapter/http"
 	"github.com/isutare412/imageer/api/pkg/adapter/mq"
+	"github.com/isutare412/imageer/api/pkg/adapter/repository"
 	"github.com/isutare412/imageer/api/pkg/config"
 	"github.com/isutare412/imageer/api/pkg/core/job"
+	"github.com/isutare412/imageer/api/pkg/core/user"
 )
 
 // @title Imageer Endpoint API
@@ -36,14 +38,23 @@ func main() {
 
 	redisMQ, err := mq.NewRedis(&cfg.Redis)
 	if err != nil {
-		log.Fatalf("Failed to create redis MQ: %v", err)
+		log.Fatalf("Failed to create Redis MQ: %v", err)
 	}
-	log.Infof("Created redis MQ on %v", cfg.Redis.Addrs)
+	log.Infof("Created Redis MQ on %v", cfg.Redis.Addrs)
+
+	mysqlRepo, err := repository.NewMySQL(&cfg.MySQL)
+	if err != nil {
+		log.Fatalf("Failed to create MySQL repository: %v", err)
+	}
+	log.Infof("Created MySQL repository on %v", cfg.MySQL.Address)
+
+	uSvc := user.NewService(mysqlRepo)
+	log.Info("Created user service")
 
 	jSvc := job.NewService(redisMQ)
 	log.Info("Created job service")
 
-	server := http.NewServer(&cfg.Server.Http, jSvc)
+	server := http.NewServer(&cfg.Server.Http, jSvc, uSvc)
 	log.Info("Created HTTP server")
 
 	// Start services

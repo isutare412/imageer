@@ -1,11 +1,28 @@
-@protocol=http
+@scheme=http
 @url=localhost:8080
 @apiPrefix=api/v1
 
-GET {{protocol}}://{{url}}/docs/index.html HTTP/1.1
+GET {{scheme}}://{{url}}/docs/index.html HTTP/1.1
 content-type: application/json
 
 ###
 
-GET {{protocol}}://{{url}}/{{apiPrefix}}/greeting/Suhyuk HTTP/1.1
+GET {{scheme}}://{{url}}/{{apiPrefix}}/greeting/Suhyuk HTTP/1.1
+content-type: application/json
+
+###
+
+POST {{scheme}}://{{url}}/{{apiPrefix}}/users HTTP/1.1
+content-type: application/json
+
+{
+  "givenName": "Suhyuk",
+  "familyName": "Lee",
+  "email": "isutare412@gmail.com",
+  "password": "simplepass"
+}
+
+###
+
+GET {{scheme}}://{{url}}/{{apiPrefix}}/users/6 HTTP/1.1
 content-type: application/json
