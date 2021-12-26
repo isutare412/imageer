@@ -7,8 +7,8 @@ import (
 	mysqldriver "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"github.com/isutare412/imageer/api/pkg/config"
-	"github.com/isutare412/imageer/api/pkg/core/user"
+	"github.com/isutare412/imageer/api-server/pkg/config"
+	"github.com/isutare412/imageer/api-server/pkg/core/user"
 )
 
 type MySQL struct {

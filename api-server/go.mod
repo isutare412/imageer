@@ -1,4 +1,4 @@
-module github.com/isutare412/imageer/api
+module github.com/isutare412/imageer/api-server
 
 go 1.17
 

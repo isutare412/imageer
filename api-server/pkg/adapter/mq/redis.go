@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/isutare412/imageer/api/pkg/config"
+	"github.com/isutare412/imageer/api-server/pkg/config"
 )
 
 type Redis struct {

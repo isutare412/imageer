@@ -11,10 +11,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger"
 
-	_ "github.com/isutare412/imageer/api/api"
-	"github.com/isutare412/imageer/api/pkg/config"
-	"github.com/isutare412/imageer/api/pkg/core/job"
-	"github.com/isutare412/imageer/api/pkg/core/user"
+	_ "github.com/isutare412/imageer/api-server/api"
+	"github.com/isutare412/imageer/api-server/pkg/config"
+	"github.com/isutare412/imageer/api-server/pkg/core/job"
+	"github.com/isutare412/imageer/api-server/pkg/core/user"
 )
 
 type server struct {

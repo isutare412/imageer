@@ -10,8 +10,8 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/isutare412/imageer/api/pkg/core/job"
-	"github.com/isutare412/imageer/api/pkg/core/user"
+	"github.com/isutare412/imageer/api-server/pkg/core/job"
+	"github.com/isutare412/imageer/api-server/pkg/core/user"
 )
 
 // @Summary Say greeting

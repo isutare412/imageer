@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// TODO: Get from config
 const (
 	topicKey = "prcsQueue"
 )

@@ -10,12 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/isutare412/imageer/api/pkg/adapter/http"
-	"github.com/isutare412/imageer/api/pkg/adapter/mq"
-	"github.com/isutare412/imageer/api/pkg/adapter/repository"
-	"github.com/isutare412/imageer/api/pkg/config"
-	"github.com/isutare412/imageer/api/pkg/core/job"
-	"github.com/isutare412/imageer/api/pkg/core/user"
+	"github.com/isutare412/imageer/api-server/pkg/adapter/http"
+	"github.com/isutare412/imageer/api-server/pkg/adapter/mq"
+	"github.com/isutare412/imageer/api-server/pkg/adapter/repository"
+	"github.com/isutare412/imageer/api-server/pkg/config"
+	"github.com/isutare412/imageer/api-server/pkg/core/job"
+	"github.com/isutare412/imageer/api-server/pkg/core/user"
 )
 
 // @title Imageer Endpoint API

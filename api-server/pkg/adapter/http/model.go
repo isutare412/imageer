@@ -1,6 +1,6 @@
 package http
 
-import "github.com/isutare412/imageer/api/pkg/core/user"
+import "github.com/isutare412/imageer/api-server/pkg/core/user"
 
 type getGreetingRes struct {
 	Message string `yaml:"msg" json:"msg"`
