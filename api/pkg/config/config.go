@@ -3,6 +3,7 @@ package config
 type Config struct {
 	Server ServerConfig `yaml:"server" json:"server"`
 	Redis  RedisConfig  `yaml:"redis" json:"redis"`
+	MySQL  MySQLConfig  `yaml:"mysql" json:"mysql"`
 }
 
 type ServerConfig struct {
