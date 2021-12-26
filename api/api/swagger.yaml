@@ -1,8 +1,45 @@
 definitions:
-  http.getGreetingResp:
+  http.createUserReq:
+    properties:
+      email:
+        type: string
+      familyName:
+        type: string
+      givenName:
+        type: string
+      password:
+        type: string
+    type: object
+  http.createUserRes:
+    properties:
+      credit:
+        type: integer
+      email:
+        type: string
+      familyName:
+        type: string
+      givenName:
+        type: string
+      id:
+        type: integer
+    type: object
+  http.getGreetingRes:
     properties:
       msg:
         type: string
+    type: object
+  http.getUserRes:
+    properties:
+      credit:
+        type: integer
+      email:
+        type: string
+      familyName:
+        type: string
+      givenName:
+        type: string
+      id:
+        type: integer
     type: object
 info:
   contact: {}
@@ -27,7 +64,7 @@ paths:
         "200":
           description: ok
           schema:
-            $ref: '#/definitions/http.getGreetingResp'
+            $ref: '#/definitions/http.getGreetingRes'
         "400":
           description: error
           schema:
@@ -39,4 +76,63 @@ paths:
       summary: Say greeting
       tags:
       - Greeting
+  /api/v1/users:
+    post:
+      consumes:
+      - application/json
+      description: Create a user with basic information
+      parameters:
+      - description: request to create a new user
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.createUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/http.createUserRes'
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Create a user
+      tags:
+      - User
+  /api/v1/users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a user with given id
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/http.getUserRes'
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Get a user
+      tags:
+      - User
 swagger: "2.0"

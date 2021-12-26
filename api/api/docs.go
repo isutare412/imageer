@@ -49,7 +49,97 @@ var doc = `{
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/http.getGreetingResp"
+                            "$ref": "#/definitions/http.getGreetingRes"
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "post": {
+                "description": "Create a user with basic information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create a user",
+                "parameters": [
+                    {
+                        "description": "request to create a new user",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.createUserReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/http.createUserRes"
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}": {
+            "get": {
+                "description": "Get a user with given id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get a user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/http.getUserRes"
                         }
                     },
                     "400": {
@@ -69,11 +159,68 @@ var doc = `{
         }
     },
     "definitions": {
-        "http.getGreetingResp": {
+        "http.createUserReq": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "familyName": {
+                    "type": "string"
+                },
+                "givenName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.createUserRes": {
+            "type": "object",
+            "properties": {
+                "credit": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "familyName": {
+                    "type": "string"
+                },
+                "givenName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.getGreetingRes": {
             "type": "object",
             "properties": {
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "http.getUserRes": {
+            "type": "object",
+            "properties": {
+                "credit": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "familyName": {
+                    "type": "string"
+                },
+                "givenName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         }
