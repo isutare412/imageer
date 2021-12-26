@@ -4,7 +4,7 @@ Imageer is an image processing service.
 
 ## Components
 
-- [Imageer API server](./api)
+- [Imageer API server](./api-server)
 - [Imageer processing server](./image-processor)
 
 ## Development

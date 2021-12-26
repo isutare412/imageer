@@ -3,6 +3,7 @@
 ROOTDIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 IMAGEER_CONFIG ?= ${ROOTDIR}/configs/dev.yaml
+SERVER_BIN_NAME ?= imageer_api_server
 
 ##@ General
 
@@ -29,3 +30,9 @@ docs: ## Generate OpenAPI specification
 .PHONY: run-dev
 run-dev: ## Run api server in development environment
 	IMAGEER_CONFIG=${IMAGEER_CONFIG} go run ${ROOTDIR}/cmd/main.go
+
+##@ Build
+
+.PHONY: build
+build: ## Build api server
+	go build -o ${SERVER_BIN_NAME} cmd/main.go
