@@ -7,6 +7,8 @@ networks:
 volumes:
   redis_storage:
     driver: local
+  mysql_storage:
+    driver: local
 
 services:
   redis:
@@ -32,3 +34,27 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
       - redis
+
+  mysql:
+    image: 'bitnami/mysql:8.0'
+    networks:
+      - internal
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - 'mysql_storage:/bitnami/mysql/data'
+    environment:
+      - MYSQL_ROOT_USER=${MYSQL_ROOT_USER}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+
+  mysql-adminer:
+    image: 'adminer:4'
+    networks:
+      - internal
+    ports:
+      - "${MYSQL_ADMINER_PORT}:8080"
+    environment:
+      - MYSQL_ROOT_USER=${MYSQL_ROOT_USER}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}

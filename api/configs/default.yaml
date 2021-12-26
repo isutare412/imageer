@@ -7,3 +7,8 @@ redis:
   addrs:
     - "localhost:6379"
   password: "imageer"
+mysql:
+  username: "imageer"
+  password: "imageer"
+  address: "localhost:3306"
+  database: "imageer_api"

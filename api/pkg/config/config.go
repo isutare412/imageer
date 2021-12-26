@@ -19,3 +19,10 @@ type RedisConfig struct {
 	Addrs    []string `yaml:"addrs" json:"addrs"`
 	Password string   `yaml:"password" json:"password"`
 }
+
+type MySQLConfig struct {
+	Username string `yaml:"username" json:"username"`
+	Password string `yaml:"password" json:"password"`
+	Address  string `yaml:"address" json:"address"`
+	Database string `yaml:"database" json:"database"`
+}
