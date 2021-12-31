@@ -58,7 +58,7 @@ func (s *server) Done() <-chan struct{} {
 	return s.done
 }
 
-func NewServer(cfg *config.HttpConfig, jSvc *job.Service, uSvc user.Service) *server {
+func NewServer(cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service) *server {
 	r := mux.NewRouter()
 
 	r.Use(logRequest, allowCORS)

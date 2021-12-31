@@ -24,7 +24,7 @@ import (
 // @Success 200 {object} getGreetingRes "ok"
 // @Failure 400 {string} string "error"
 // @Failure 500 {string} string "error"
-func getGreeting(jSvc *job.Service) http.HandlerFunc {
+func getGreeting(jSvc job.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name, ok := mux.Vars(r)["name"]
 		if !ok {
