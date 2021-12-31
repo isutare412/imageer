@@ -41,13 +41,25 @@ definitions:
       id:
         type: integer
     type: object
+  http.signInReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  http.signInRes:
+    properties:
+      token:
+        type: string
+    type: object
 info:
   contact: {}
   description: Endpoint API for image processing service.
   title: Imageer Endpoint API
   version: "0.1"
 paths:
-  /api/v1/greeting/{name}:
+  /api/v1/greetings/{name}:
     get:
       consumes:
       - application/json
@@ -135,4 +147,62 @@ paths:
       summary: Get a user
       tags:
       - User
+  /signCheck:
+    get:
+      consumes:
+      - application/json
+      description: Debug sign in taking query or cookie
+      parameters:
+      - description: jwt token
+        in: query
+        name: token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Sign check
+      tags:
+      - Authentication
+  /signIn:
+    post:
+      consumes:
+      - application/json
+      description: Sign in using email and password
+      parameters:
+      - description: request to sign in
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.signInReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/http.signInRes'
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Sign in
+      tags:
+      - Authentication
 swagger: "2.0"
