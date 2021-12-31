@@ -125,7 +125,7 @@ func signCheck(authSvc auth.Service) http.HandlerFunc {
 		}
 		log.Infof("Verified token: id(%v)", id)
 
-		w.Header().Set("Content-Type", "plain/text")
+		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("Token verified"))
 	}
 }
