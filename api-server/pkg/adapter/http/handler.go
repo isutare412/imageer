@@ -85,18 +85,23 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		user := req.into()
+		userEntity := req.into()
 
-		userID, err := uSvc.Create(ctx, user, req.Password)
-		if err != nil {
+		userID, err := uSvc.Create(ctx, userEntity, req.Password)
+		if errors.Is(err, user.ErrDuplicate) {
+			msg := fmt.Sprintf("Duplicate email: %v", userEntity.Email)
+			log.Info(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		} else if err != nil {
 			log.Errorf("Failed to create user: %v", err)
 			http.Error(w, "Failed to create user", http.StatusInternalServerError)
 			return
 		}
-		user.ID = userID
+		userEntity.ID = userID
 
 		var res createUserRes
-		res.from(user)
+		res.from(userEntity)
 		resBytes, err := json.Marshal(&res)
 		if err != nil {
 			log.Errorf("Failed marshal response: %v", err)
@@ -138,15 +143,20 @@ func getUserByID(uSvc user.Service) http.HandlerFunc {
 			return
 		}
 
-		user, err := uSvc.GetByID(ctx, id)
-		if err != nil {
+		userEntity, err := uSvc.GetByID(ctx, id)
+		if errors.Is(err, user.ErrUserNotFound) {
+			msg := fmt.Sprintf("Invalid user id: %v", id)
+			log.Info(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		} else if err != nil {
 			log.Errorf("Failed to get user: %v", err)
 			http.Error(w, "Failed to get user", http.StatusInternalServerError)
 			return
 		}
 
 		var res getUserRes
-		res.from(user)
+		res.from(userEntity)
 		resBytes, err := json.Marshal(&res)
 		if err != nil {
 			log.Errorf("Failed marshal response: %v", err)

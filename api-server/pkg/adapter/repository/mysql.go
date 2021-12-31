@@ -2,11 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	mysqldriver "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/isutare412/imageer/api-server/pkg/config"
 	"github.com/isutare412/imageer/api-server/pkg/core/user"
 )
@@ -17,6 +19,15 @@ type MySQL struct {
 
 func (r *MySQL) Session(ctx context.Context) *gorm.DB {
 	return r.db.WithContext(ctx)
+}
+
+func (r *MySQL) IsErrDuplicate(err error) bool {
+	var mysqlErr *mysql.MySQLError
+	return errors.As(err, &mysqlErr) && mysqlErr.Number == 1062
+}
+
+func (r *MySQL) IsErrNotFound(err error) bool {
+	return errors.Is(err, gorm.ErrRecordNotFound)
 }
 
 func NewMySQL(cfg *config.MySQLConfig) (*MySQL, error) {

@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/isutare412/imageer/api-server/pkg/core/encrypt"
@@ -36,9 +35,12 @@ func (s *service) Create(ctx context.Context, user *User, password string) (int6
 
 		newID = user.ID
 		return nil
-	}); err != nil {
+	}); s.repo.IsErrDuplicate(err) {
+		return 0, ErrDuplicate
+	} else if err != nil {
 		return 0, fmt.Errorf("on transaction: %w", err)
 	}
+
 	return newID, nil
 }
 
@@ -49,7 +51,7 @@ func (s *service) GetByEmailPw(ctx context.Context, email, password string) (*Us
 			return fmt.Errorf("on find user with email: %w", err)
 		}
 		return nil
-	}); errors.Is(err, gorm.ErrRecordNotFound) {
+	}); s.repo.IsErrNotFound(err) {
 		return nil, ErrUserNotFound
 	} else if err != nil {
 		return nil, fmt.Errorf("on transaction: %w", err)
@@ -69,9 +71,12 @@ func (s *service) GetByID(ctx context.Context, id int64) (*User, error) {
 			return fmt.Errorf("on first user: %w", err)
 		}
 		return nil
-	}); err != nil { // TODO: Wrap with custom error
+	}); s.repo.IsErrNotFound(err) {
+		return nil, ErrUserNotFound
+	} else if err != nil {
 		return nil, fmt.Errorf("on transaction: %w", err)
 	}
+
 	return &user, nil
 }
 

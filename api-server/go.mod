@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/go-redis/redis/v8 v8.11.4
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.9.0
@@ -27,7 +28,6 @@ require (
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
