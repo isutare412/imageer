@@ -14,6 +14,7 @@ import (
 	"github.com/isutare412/imageer/api-server/pkg/adapter/mq"
 	"github.com/isutare412/imageer/api-server/pkg/adapter/repository"
 	"github.com/isutare412/imageer/api-server/pkg/config"
+	"github.com/isutare412/imageer/api-server/pkg/core/encrypt"
 	"github.com/isutare412/imageer/api-server/pkg/core/job"
 	"github.com/isutare412/imageer/api-server/pkg/core/user"
 )
@@ -48,7 +49,10 @@ func main() {
 	}
 	log.Infof("Created MySQL repository on %v", cfg.MySQL.Address)
 
-	uSvc := user.NewService(mysqlRepo)
+	ecrSvc := encrypt.NewService()
+	log.Info("Created encrypt service")
+
+	uSvc := user.NewService(mysqlRepo, ecrSvc)
 	log.Info("Created user service")
 
 	jSvc := job.NewService(redisMQ)

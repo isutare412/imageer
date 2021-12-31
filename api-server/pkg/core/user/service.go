@@ -2,22 +2,32 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/isutare412/imageer/api-server/pkg/core/encrypt"
 	"gorm.io/gorm"
 )
 
 type Service interface {
-	Create(ctx context.Context, user *User) (int64, error)
+	Create(ctx context.Context, user *User, password string) (int64, error)
+	GetByEmailPw(ctx context.Context, email, password string) (*User, error)
 	GetByID(ctx context.Context, id int64) (*User, error)
 	UpdateCredit(ctx context.Context, id int64, delta int64) (*User, error)
 }
 
 type service struct {
-	repo Repo
+	repo   Repo
+	ecrSvc encrypt.Service
 }
 
-func (s *service) Create(ctx context.Context, user *User) (int64, error) {
+func (s *service) Create(ctx context.Context, user *User, password string) (int64, error) {
+	hashed, err := s.ecrSvc.Hash(password)
+	if err != nil {
+		return 0, fmt.Errorf("on hash password: %w", err)
+	}
+	user.Password = hashed
+
 	var newID int64
 	if err := s.repo.Session(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(user).Error; err != nil {
@@ -32,6 +42,26 @@ func (s *service) Create(ctx context.Context, user *User) (int64, error) {
 	return newID, nil
 }
 
+func (s *service) GetByEmailPw(ctx context.Context, email, password string) (*User, error) {
+	var user User
+	if err := s.repo.Session(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("email = ?", email).Find(&user).Error; err != nil {
+			return fmt.Errorf("on find user with email: %w", err)
+		}
+		return nil
+	}); errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, ErrUserNotFound
+	} else if err != nil {
+		return nil, fmt.Errorf("on transaction: %w", err)
+	}
+
+	if ok := s.ecrSvc.Compare(password, user.Password); !ok {
+		return nil, ErrPasswordNotCorrect
+	}
+
+	return &user, nil
+}
+
 func (s *service) GetByID(ctx context.Context, id int64) (*User, error) {
 	var user User
 	if err := s.repo.Session(ctx).Transaction(func(tx *gorm.DB) error {
@@ -39,7 +69,7 @@ func (s *service) GetByID(ctx context.Context, id int64) (*User, error) {
 			return fmt.Errorf("on first user: %w", err)
 		}
 		return nil
-	}); err != nil {
+	}); err != nil { // TODO: Wrap with custom error
 		return nil, fmt.Errorf("on transaction: %w", err)
 	}
 	return &user, nil
@@ -67,8 +97,9 @@ func (s *service) UpdateCredit(ctx context.Context, id int64, delta int64) (*Use
 	return &user, nil
 }
 
-func NewService(repo Repo) Service {
+func NewService(repo Repo, ecrSvc encrypt.Service) Service {
 	return &service{
-		repo: repo,
+		repo:   repo,
+		ecrSvc: ecrSvc,
 	}
 }

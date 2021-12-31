@@ -87,7 +87,7 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 		}
 		user := req.into()
 
-		userID, err := uSvc.Create(ctx, user)
+		userID, err := uSvc.Create(ctx, user, req.Password)
 		if err != nil {
 			log.Errorf("Failed to create user: %v", err)
 			http.Error(w, "Failed to create user", http.StatusInternalServerError)
@@ -123,7 +123,7 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 // @Success 200 {object} getUserRes "ok"
 // @Failure 400 {string} string "error"
 // @Failure 500 {string} string "error"
-func getUser(uSvc user.Service) http.HandlerFunc {
+func getUserByID(uSvc user.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 

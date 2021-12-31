@@ -18,7 +18,6 @@ func (req *createUserReq) into() *user.User {
 		GivenName:  req.GivenName,
 		FamilyName: req.FamilyName,
 		Email:      req.Email,
-		Password:   req.Password + "-fake-hash", // TODO: Hash password
 	}
 }
 

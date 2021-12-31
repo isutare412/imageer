@@ -70,7 +70,7 @@ func NewServer(cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service) *ser
 	apiV1.HandleFunc("/greetings/{name}", getGreeting(jSvc)).Methods("GET")
 
 	apiV1.HandleFunc("/users", createUser(uSvc)).Methods("POST")
-	apiV1.HandleFunc("/users/{id}", getUser(uSvc)).Methods("GET")
+	apiV1.HandleFunc("/users/{id}", getUserByID(uSvc)).Methods("GET")
 
 	return &server{
 		server: &http.Server{

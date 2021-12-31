@@ -9,6 +9,7 @@ require (
 	github.com/spf13/viper v1.9.0
 	github.com/swaggo/http-swagger v1.1.2
 	github.com/swaggo/swag v1.7.6
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	gorm.io/driver/mysql v1.2.1
 	gorm.io/gorm v1.22.4
 )
