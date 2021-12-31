@@ -4,6 +4,7 @@ type Config struct {
 	Server ServerConfig `yaml:"server" json:"server"`
 	Redis  RedisConfig  `yaml:"redis" json:"redis"`
 	MySQL  MySQLConfig  `yaml:"mysql" json:"mysql"`
+	Auth   AuthConfig   `yaml:"auth" json:"auth"`
 }
 
 type ServerConfig struct {
@@ -26,4 +27,10 @@ type MySQLConfig struct {
 	Password string `yaml:"password" json:"password"`
 	Address  string `yaml:"address" json:"address"`
 	Database string `yaml:"database" json:"database"`
+}
+
+type AuthConfig struct {
+	ExpireHour int64  `yaml:"expireHour" json:"expireHour"`
+	PrivateKey string `yaml:"privateKey" json:"privateKey"`
+	PublicKey  string `yaml:"publicKey" json:"publicKey"`
 }

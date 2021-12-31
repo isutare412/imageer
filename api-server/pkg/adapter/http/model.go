@@ -2,6 +2,15 @@ package http
 
 import "github.com/isutare412/imageer/api-server/pkg/core/user"
 
+type signInReq struct {
+	Email    string `yaml:"email" json:"email"`
+	Password string `yaml:"password" json:"password"`
+}
+
+type signInRes struct {
+	Token string `yaml:"token" json:"token"`
+}
+
 type getGreetingRes struct {
 	Message string `yaml:"msg" json:"msg"`
 }

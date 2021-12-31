@@ -1,8 +1,25 @@
 @scheme=http
 @url=localhost:8080
 @apiPrefix=api/v1
+@token={{signIn.response.body.token}}
 
 GET {{scheme}}://{{url}}/docs/index.html HTTP/1.1
+content-type: application/json
+
+###
+
+# @name signIn
+POST {{scheme}}://{{url}}/signIn HTTP/1.1
+content-type: application/json
+
+{
+  "email": "isutare412@gmail.com",
+  "password": "simplepass"
+}
+
+###
+
+GET {{scheme}}://{{url}}/signCheck HTTP/1.1
 content-type: application/json
 
 ###

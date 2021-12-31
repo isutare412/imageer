@@ -4,24 +4,25 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/isutare412/imageer/api-server/pkg/core/encrypt"
 	"gorm.io/gorm"
+
+	"github.com/isutare412/imageer/api-server/pkg/core/auth"
 )
 
 type Service interface {
 	Create(ctx context.Context, user *User, password string) (int64, error)
-	GetByEmailPw(ctx context.Context, email, password string) (*User, error)
+	GetByEmailPassword(ctx context.Context, email, password string) (*User, error)
 	GetByID(ctx context.Context, id int64) (*User, error)
 	UpdateCredit(ctx context.Context, id int64, delta int64) (*User, error)
 }
 
 type service struct {
-	repo   Repo
-	ecrSvc encrypt.Service
+	repo    Repo
+	authSvc auth.Service
 }
 
 func (s *service) Create(ctx context.Context, user *User, password string) (int64, error) {
-	hashed, err := s.ecrSvc.Hash(password)
+	hashed, err := s.authSvc.Hash(password)
 	if err != nil {
 		return 0, fmt.Errorf("on hash password: %w", err)
 	}
@@ -44,11 +45,11 @@ func (s *service) Create(ctx context.Context, user *User, password string) (int6
 	return newID, nil
 }
 
-func (s *service) GetByEmailPw(ctx context.Context, email, password string) (*User, error) {
+func (s *service) GetByEmailPassword(ctx context.Context, email, password string) (*User, error) {
 	var user User
 	if err := s.repo.Session(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("email = ?", email).Find(&user).Error; err != nil {
-			return fmt.Errorf("on find user with email: %w", err)
+		if err := tx.Where("email = ?", email).First(&user).Error; err != nil {
+			return fmt.Errorf("on first user with email: %w", err)
 		}
 		return nil
 	}); s.repo.IsErrNotFound(err) {
@@ -57,7 +58,7 @@ func (s *service) GetByEmailPw(ctx context.Context, email, password string) (*Us
 		return nil, fmt.Errorf("on transaction: %w", err)
 	}
 
-	if ok := s.ecrSvc.Compare(password, user.Password); !ok {
+	if ok := s.authSvc.Compare(password, user.Password); !ok {
 		return nil, ErrPasswordNotCorrect
 	}
 
@@ -102,9 +103,9 @@ func (s *service) UpdateCredit(ctx context.Context, id int64, delta int64) (*Use
 	return &user, nil
 }
 
-func NewService(repo Repo, ecrSvc encrypt.Service) Service {
+func NewService(repo Repo, authSvc auth.Service) Service {
 	return &service{
-		repo:   repo,
-		ecrSvc: ecrSvc,
+		repo:    repo,
+		authSvc: authSvc,
 	}
 }

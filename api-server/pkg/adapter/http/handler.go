@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -10,9 +11,124 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/isutare412/imageer/api-server/pkg/core/auth"
 	"github.com/isutare412/imageer/api-server/pkg/core/job"
 	"github.com/isutare412/imageer/api-server/pkg/core/user"
 )
+
+// @Summary Sign in
+// @Description Sign in using email and password
+// @Tags Authentication
+// @Router /signIn [post]
+// @Param request body signInReq true "request to sign in"
+// @Accept json
+// @Produce json
+// @Success 200 {object} signInRes "ok"
+// @Failure 400 {string} string "error"
+// @Failure 500 {string} string "error"
+func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		reqBytes, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Need body param", http.StatusBadRequest)
+			return
+		}
+
+		var req signInReq
+		if err := json.Unmarshal(reqBytes, &req); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		userEntity, err := uSvc.GetByEmailPassword(ctx, req.Email, req.Password)
+		if errors.Is(err, user.ErrUserNotFound) {
+			log.Infof("Email not found: %v", req.Email)
+			http.Error(w, "Invalid email or password", http.StatusBadRequest)
+			return
+		} else if errors.Is(err, user.ErrPasswordNotCorrect) {
+			log.Infof("Password incorrect: %v", req.Password)
+			http.Error(w, "Invalid email or password", http.StatusBadRequest)
+			return
+		} else if err != nil {
+			log.Errorf("Failed to get user: %v", err)
+			http.Error(w, "Failed to get user", http.StatusInternalServerError)
+			return
+		}
+
+		id := auth.ID(strconv.Itoa(int(userEntity.ID)))
+		token, err := authSvc.SignToken(id)
+		if err != nil {
+			log.Errorf("Failed to sign token: %v", err)
+			http.Error(w, "Failed to sign token", http.StatusInternalServerError)
+			return
+		}
+
+		var res signInRes
+		res.Token = string(token)
+		resBytes, err := json.Marshal(&res)
+		if err != nil {
+			log.Errorf("Failed marshal response: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:  "token",
+			Value: string(token),
+		})
+
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(resBytes)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+// @Summary Sign check
+// @Description Debug sign in taking query or cookie
+// @Tags Authentication
+// @Router /signCheck [get]
+// @Param token query string false "jwt token"
+// @Accept json
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 400 {string} string "error"
+// @Failure 500 {string} string "error"
+func signCheck(authSvc auth.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token := r.URL.Query().Get("token")
+		if token == "" {
+			cookie, err := r.Cookie("token")
+			if err != nil {
+				msg := "Need token as query param or cookie"
+				log.Info(msg)
+				http.Error(w, msg, http.StatusBadRequest)
+				return
+			}
+			token = cookie.Value
+		}
+
+		id, err := authSvc.VerifyToken(auth.Token(token))
+		if errors.Is(err, auth.ErrTokenExpired) {
+			msg := "Token expired"
+			log.Info(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		} else if err != nil {
+			log.Errorf("Failed to verify token: %v", err)
+			http.Error(w, "Failed to verify token", http.StatusInternalServerError)
+			return
+		}
+		log.Infof("Verified token: id(%v)", id)
+
+		w.Header().Set("Content-Type", "plain/text")
+		w.Write([]byte("Token verified"))
+	}
+}
 
 // @Summary Say greeting
 // @Description Greeting by given name

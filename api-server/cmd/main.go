@@ -14,7 +14,7 @@ import (
 	"github.com/isutare412/imageer/api-server/pkg/adapter/mq"
 	"github.com/isutare412/imageer/api-server/pkg/adapter/repository"
 	"github.com/isutare412/imageer/api-server/pkg/config"
-	"github.com/isutare412/imageer/api-server/pkg/core/encrypt"
+	"github.com/isutare412/imageer/api-server/pkg/core/auth"
 	"github.com/isutare412/imageer/api-server/pkg/core/job"
 	"github.com/isutare412/imageer/api-server/pkg/core/user"
 )
@@ -49,16 +49,19 @@ func main() {
 	}
 	log.Infof("Created MySQL repository on %v", cfg.MySQL.Address)
 
-	ecrSvc := encrypt.NewService()
-	log.Info("Created encrypt service")
+	authSvc, err := auth.NewService(&cfg.Auth)
+	if err != nil {
+		log.Fatalf("Failed to create auth service: %v", err)
+	}
+	log.Info("Created auth service")
 
-	uSvc := user.NewService(mysqlRepo, ecrSvc)
+	uSvc := user.NewService(mysqlRepo, authSvc)
 	log.Info("Created user service")
 
 	jSvc := job.NewService(redisMQ)
 	log.Info("Created job service")
 
-	server := http.NewServer(&cfg.Server.Http, jSvc, uSvc)
+	server := http.NewServer(&cfg.Server.Http, jSvc, uSvc, authSvc)
 	log.Info("Created HTTP server")
 
 	// Start services

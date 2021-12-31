@@ -13,6 +13,7 @@ import (
 
 	_ "github.com/isutare412/imageer/api-server/api"
 	"github.com/isutare412/imageer/api-server/pkg/config"
+	"github.com/isutare412/imageer/api-server/pkg/core/auth"
 	"github.com/isutare412/imageer/api-server/pkg/core/job"
 	"github.com/isutare412/imageer/api-server/pkg/core/user"
 )
@@ -58,12 +59,16 @@ func (s *server) Done() <-chan struct{} {
 	return s.done
 }
 
-func NewServer(cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service) *server {
+func NewServer(
+	cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service, authSvc auth.Service,
+) *server {
 	r := mux.NewRouter()
 
 	r.Use(logRequest, allowCORS)
 
 	r.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler).Methods("GET")
+	r.HandleFunc("/signIn", signIn(uSvc, authSvc)).Methods("POST")
+	r.HandleFunc("/signCheck", signCheck(authSvc)).Methods("GET")
 
 	apiV1 := r.PathPrefix("/api/v1").Subrouter()
 
