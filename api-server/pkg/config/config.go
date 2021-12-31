@@ -10,6 +10,16 @@ type Config struct {
 type ServerConfig struct {
 	Mode string     `yaml:"mode" json:"mode"`
 	Http HttpConfig `yaml:"http" json:"http"`
+	Job  JobConfig  `yaml:"job" json:"job"`
+}
+
+type JobConfig struct {
+	Queue JobQueueConfig `yaml:"queue" json:"queue"`
+}
+
+type JobQueueConfig struct {
+	Request  string `yaml:"request" json:"request"`
+	Response string `yaml:"response" json:"response"`
 }
 
 type HttpConfig struct {

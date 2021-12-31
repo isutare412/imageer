@@ -10,14 +10,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	topicKey = "prcsQueue"
-)
-
 type Service struct {
-	mq         MsgQueue
-	retryDelay time.Duration
-	done       chan struct{}
+	reqQueueName string
+	resQueueName string
+	retryDelay   time.Duration
+
+	mq   MsgQueue
+	done chan struct{}
 }
 
 func (s *Service) Start(ctx context.Context) {
@@ -50,7 +49,7 @@ func (s *Service) shutdown() {
 }
 
 func (s *Service) consume(ctx context.Context) error {
-	messages, err := s.mq.Consume(ctx, topicKey, 1)
+	messages, err := s.mq.Consume(ctx, s.reqQueueName, 1)
 	if err != nil {
 		return fmt.Errorf("on consume mq: %w", err)
 	}
@@ -66,8 +65,8 @@ func (s *Service) Done() <-chan struct{} {
 	return s.done
 }
 
-func NewService(cfg *config.ProcessorConfig, mq MsgQueue) (*Service, error) {
-	if err := mq.Init(context.Background(), topicKey); err != nil {
+func NewService(cfg *config.JobConfig, mq MsgQueue) (*Service, error) {
+	if err := mq.Init(context.Background(), cfg.Queue.Request); err != nil {
 		return nil, fmt.Errorf("on init MQ: %w", err)
 	}
 
@@ -76,8 +75,10 @@ func NewService(cfg *config.ProcessorConfig, mq MsgQueue) (*Service, error) {
 	}
 
 	return &Service{
-		mq:         mq,
-		retryDelay: time.Duration(cfg.RetryDelay) * time.Millisecond,
-		done:       make(chan struct{}),
+		reqQueueName: cfg.Queue.Request,
+		resQueueName: cfg.Queue.Response,
+		retryDelay:   time.Duration(cfg.RetryDelay) * time.Millisecond,
+		mq:           mq,
+		done:         make(chan struct{}),
 	}, nil
 }

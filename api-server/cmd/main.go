@@ -58,7 +58,7 @@ func main() {
 	uSvc := user.NewService(mysqlRepo, authSvc)
 	log.Info("Created user service")
 
-	jSvc := job.NewService(redisMQ)
+	jSvc := job.NewService(&cfg.Server.Job, redisMQ)
 	log.Info("Created job service")
 
 	server := http.NewServer(&cfg.Server.Http, jSvc, uSvc, authSvc)

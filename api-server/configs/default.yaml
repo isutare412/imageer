@@ -1,19 +1,23 @@
 server:
-  mode: "development" # development/production
+  mode: development # development/production
   http:
     host: "localhost"
     port: "8080"
+  job:
+    queue:
+      request: processor-job-request
+      response: processor-job-response
 
 redis:
   addrs:
-    - "localhost:6379"
-  password: "imageer"
+    - localhost:6379
+  password: imageer
 
 mysql:
-  username: "imageer"
-  password: "imageer"
-  address: "localhost:3306"
-  database: "imageer_api"
+  username: imageer
+  password: imageer
+  address: localhost:3306
+  database: imageer_api
 
 auth:
   expireHour: 72

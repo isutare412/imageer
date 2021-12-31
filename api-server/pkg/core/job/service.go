@@ -3,11 +3,8 @@ package job
 import (
 	"context"
 	"fmt"
-)
 
-// TODO: Get from config
-const (
-	topicKey = "prcsQueue"
+	"github.com/isutare412/imageer/api-server/pkg/config"
 )
 
 type Service interface {
@@ -15,18 +12,23 @@ type Service interface {
 }
 
 type service struct {
+	reqQueueName string
+	resQueueName string
+
 	mq MsgQueue
 }
 
 func (s *service) Produce(ctx context.Context, val string) error {
-	if err := s.mq.Produce(ctx, topicKey, []byte(val)); err != nil {
+	if err := s.mq.Produce(ctx, s.reqQueueName, []byte(val)); err != nil {
 		return fmt.Errorf("on mq produce: %w", err)
 	}
 	return nil
 }
 
-func NewService(mq MsgQueue) Service {
+func NewService(cfg *config.JobConfig, mq MsgQueue) Service {
 	return &service{
-		mq: mq,
+		reqQueueName: cfg.Queue.Request,
+		resQueueName: cfg.Queue.Response,
+		mq:           mq,
 	}
 }

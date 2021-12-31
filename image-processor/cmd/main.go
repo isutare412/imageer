@@ -36,7 +36,7 @@ func main() {
 	}
 	log.Infof("Created redis MQ on %v", cfg.Redis.Addrs)
 
-	pSvc, err := job.NewService(&cfg.Processor, redisMQ)
+	pSvc, err := job.NewService(&cfg.Server.Job, redisMQ)
 	if err != nil {
 		log.Fatalf("Failed to create processor service: %v", err)
 	}

@@ -1,10 +1,14 @@
 server:
-  mode: "development" # development/production
+  mode: development # development/production
+  job:
+    retryDelay: 5000 # ms
+    queue:
+      request: processor-job-request
+      response: processor-job-response
+
 redis:
   addrs:
-    - "localhost:6379"
-  password: "imageer"
+    - localhost:6379
+  password: imageer
   stream:
-    groupName: "prcsGrp"
-processor:
-  retryDelay: 5000 # ms
+    groupName: processor-group
