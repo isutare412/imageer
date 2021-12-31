@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -88,11 +89,11 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 	}
 }
 
-// @Summary Sign check
-// @Description Debug sign in taking query or cookie
+// @Summary Sign in test
+// @Description Sign in test using authorization header or cookie
 // @Tags Authentication
-// @Router /signCheck [get]
-// @Param token query string false "jwt token"
+// @Router /signTest [get]
+// @Param Authorization header string false "bearer authorization" extensions(x-example=Bearer your_jwt_token)
 // @Accept json
 // @Produce json
 // @Success 200 {string} string "ok"
@@ -100,11 +101,20 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 // @Failure 500 {string} string "error"
 func signCheck(authSvc auth.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token := r.URL.Query().Get("token")
-		if token == "" {
+		var token string
+		if rawAuth := r.Header.Get("Authorization"); rawAuth != "" {
+			authSplit := strings.SplitN(rawAuth, "Bearer ", 2)
+			if len(authSplit) < 2 {
+				msg := "Invalid authorization header"
+				log.Info(msg)
+				http.Error(w, msg, http.StatusBadRequest)
+				return
+			}
+			token = authSplit[1]
+		} else {
 			cookie, err := r.Cookie("token")
 			if err != nil {
-				msg := "Need token as query param or cookie"
+				msg := "Need token from cookie or authorization header"
 				log.Info(msg)
 				http.Error(w, msg, http.StatusBadRequest)
 				return

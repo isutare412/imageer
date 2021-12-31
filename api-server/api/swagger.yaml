@@ -147,34 +147,6 @@ paths:
       summary: Get a user
       tags:
       - User
-  /signCheck:
-    get:
-      consumes:
-      - application/json
-      description: Debug sign in taking query or cookie
-      parameters:
-      - description: jwt token
-        in: query
-        name: token
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "400":
-          description: error
-          schema:
-            type: string
-        "500":
-          description: error
-          schema:
-            type: string
-      summary: Sign check
-      tags:
-      - Authentication
   /signIn:
     post:
       consumes:
@@ -203,6 +175,35 @@ paths:
           schema:
             type: string
       summary: Sign in
+      tags:
+      - Authentication
+  /signTest:
+    get:
+      consumes:
+      - application/json
+      description: Sign in test using authorization header or cookie
+      parameters:
+      - description: bearer authorization
+        in: header
+        name: Authorization
+        type: string
+        x-example: Bearer your_jwt_token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Sign in test
       tags:
       - Authentication
 swagger: "2.0"
