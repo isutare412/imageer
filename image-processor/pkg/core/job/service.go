@@ -22,24 +22,25 @@ type Service struct {
 
 func (s *Service) Start(ctx context.Context) {
 	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				s.shutdown()
-				return
+		ticker := time.NewTicker(s.retryDelay)
+		defer ticker.Stop()
 
-			default:
-				err := s.consume(ctx)
-				if err != nil {
-					if errors.Is(err, context.Canceled) {
-						continue
-					}
-					log.Errorf("Failed to consume job: %v", err)
-					time.Sleep(s.retryDelay)
-					continue
-				}
+	loop:
+		for {
+			err := s.consume(ctx)
+			if err != nil && !errors.Is(err, context.Canceled) {
+				log.Errorf("Failed to consume job: %v", err)
+			}
+
+			select {
+			case <-ticker.C:
+				continue
+			case <-ctx.Done():
+				break loop
 			}
 		}
+
+		s.shutdown()
 	}()
 }
 
