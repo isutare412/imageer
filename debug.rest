@@ -7,7 +7,7 @@ content-type: application/json
 
 ###
 
-GET {{scheme}}://{{url}}/{{apiPrefix}}/greeting/Suhyuk HTTP/1.1
+GET {{scheme}}://{{url}}/{{apiPrefix}}/greetings/Suhyuk HTTP/1.1
 content-type: application/json
 
 ###

@@ -66,7 +66,8 @@ func NewServer(cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service) *ser
 	r.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler).Methods("GET")
 
 	apiV1 := r.PathPrefix("/api/v1").Subrouter()
-	apiV1.HandleFunc("/greeting/{name}", getGreeting(jSvc)).Methods("GET")
+
+	apiV1.HandleFunc("/greetings/{name}", getGreeting(jSvc)).Methods("GET")
 
 	apiV1.HandleFunc("/users", createUser(uSvc)).Methods("POST")
 	apiV1.HandleFunc("/users/{id}", getUser(uSvc)).Methods("GET")
