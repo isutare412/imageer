@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"crypto/rsa"
 	"errors"
 	"fmt"
@@ -77,6 +78,22 @@ func (s *service) VerifyToken(t Token) (ID, error) {
 		return "", fmt.Errorf("on cast id into string: %w", err)
 	}
 	return ID(id), nil
+}
+
+func ContextWithID(ctx context.Context, id ID) context.Context {
+	return context.WithValue(ctx, ctxKeyID, id)
+}
+
+func IDFromContext(ctx context.Context) (ID, error) {
+	val := ctx.Value(ctxKeyID)
+	if val == nil {
+		return "", ErrCtxIDNotFound
+	}
+	id, ok := val.(ID)
+	if !ok {
+		return "", ErrCtxInvalidID
+	}
+	return id, nil
 }
 
 func NewService(cfg *config.AuthConfig) (Service, error) {

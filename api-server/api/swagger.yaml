@@ -89,6 +89,28 @@ paths:
       tags:
       - Greeting
   /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get an user by header or cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/http.getUserRes'
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Get an authenticated user
+      tags:
+      - User
     post:
       consumes:
       - application/json

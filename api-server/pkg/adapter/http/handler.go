@@ -186,6 +186,60 @@ func getGreeting(jSvc job.Service) http.HandlerFunc {
 	}
 }
 
+// @Summary Get an authenticated user
+// @Description Get an user by header or cookie
+// @Tags User
+// @Router /api/v1/users [get]
+// @Accept json
+// @Produce json
+// @Success 200 {object} getUserRes "ok"
+// @Failure 400 {string} string "error"
+// @Failure 500 {string} string "error"
+func getUser(uSvc user.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		idStr, err := auth.IDFromContext(ctx)
+		if err != nil {
+			http.Error(w, "Invalid ID in request", http.StatusInternalServerError)
+			return
+		}
+		id, err := strconv.ParseInt(string(idStr), 10, 64)
+		if err != nil {
+			http.Error(w, "Cannot parse id", http.StatusInternalServerError)
+			return
+		}
+
+		userEntity, err := uSvc.GetByID(ctx, id)
+		if errors.Is(err, user.ErrUserNotFound) {
+			msg := fmt.Sprintf("Invalid user id: %v", id)
+			log.Info(msg)
+			http.Error(w, msg, http.StatusBadRequest)
+			return
+		} else if err != nil {
+			log.Errorf("Failed to get user: %v", err)
+			http.Error(w, "Failed to get user", http.StatusInternalServerError)
+			return
+		}
+
+		var res getUserRes
+		res.from(userEntity)
+		resBytes, err := json.Marshal(&res)
+		if err != nil {
+			log.Errorf("Failed marshal response: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(resBytes)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
 // @Summary Create a user
 // @Description Create a user with basic information
 // @Tags User

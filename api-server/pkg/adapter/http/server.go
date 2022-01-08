@@ -63,7 +63,6 @@ func NewServer(
 	cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service, authSvc auth.Service,
 ) *server {
 	r := mux.NewRouter()
-
 	r.Use(logRequest, allowCORS)
 
 	r.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler).Methods("GET")
@@ -71,9 +70,11 @@ func NewServer(
 	r.HandleFunc("/signTest", signCheck(authSvc)).Methods("GET")
 
 	apiV1 := r.PathPrefix("/api/v1").Subrouter()
+	apiV1.Use(authenticate(authSvc))
 
 	apiV1.HandleFunc("/greetings/{name}", getGreeting(jSvc)).Methods("GET")
 
+	apiV1.HandleFunc("/users", getUser(uSvc)).Methods("GET")
 	apiV1.HandleFunc("/users", createUser(uSvc)).Methods("POST")
 	apiV1.HandleFunc("/users/{id}", getUserByID(uSvc)).Methods("GET")
 
