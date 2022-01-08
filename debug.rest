@@ -3,11 +3,15 @@
 @apiPrefix=api/v1
 @token={{signIn.response.body.token}}
 
+################################################################################
+# Get swagger UI
+################################################################################
 GET {{scheme}}://{{url}}/docs/index.html HTTP/1.1
 Content-Type: application/json
 
-###
-
+################################################################################
+# Sign in
+################################################################################
 # @name signIn
 POST {{scheme}}://{{url}}/signIn HTTP/1.1
 Content-Type: application/json
@@ -17,28 +21,37 @@ Content-Type: application/json
   "password": "simplepass"
 }
 
-###
-
+################################################################################
+# Sign in test
+################################################################################
 GET {{scheme}}://{{url}}/signTest HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-###
-
+################################################################################
+# Greetings
+################################################################################
 GET {{scheme}}://{{url}}/{{apiPrefix}}/greetings/Suhyuk HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-###
-
+################################################################################
+# Get user by session
+################################################################################
 GET {{scheme}}://{{url}}/{{apiPrefix}}/users HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-###
+################################################################################
+# Get user by id
+################################################################################
+GET {{scheme}}://{{url}}/{{apiPrefix}}/users/6 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
-###
-
+################################################################################
+# Create user
+################################################################################
 POST {{scheme}}://{{url}}/{{apiPrefix}}/users HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -49,9 +62,3 @@ Authorization: Bearer {{token}}
   "email": "isutare412@gmail.com",
   "password": "simplepass"
 }
-
-###
-
-GET {{scheme}}://{{url}}/{{apiPrefix}}/users/6 HTTP/1.1
-Content-Type: application/json
-Authorization: Bearer {{token}}
