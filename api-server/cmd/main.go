@@ -98,9 +98,9 @@ func readConfig(path string) (*config.Config, error) {
 func setLogger(mode string) {
 	if mode != "production" {
 		log.SetFormatter(&log.TextFormatter{})
-		log.SetLevel(log.InfoLevel)
+		log.SetLevel(log.TraceLevel)
 	} else {
 		log.SetFormatter(&log.JSONFormatter{})
-		log.SetLevel(log.TraceLevel)
+		log.SetLevel(log.InfoLevel)
 	}
 }
