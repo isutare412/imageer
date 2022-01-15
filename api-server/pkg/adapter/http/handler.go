@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -74,6 +75,23 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 			Token: string(token),
 		}
 		responseJson(w, &res)
+	}
+}
+
+// @Summary Sign out
+// @Description Sign out by deleting cookie
+// @Tags Authentication
+// @Router /signOut [get]
+// @Success 200 {string} string "ok"
+// @Failure 400 {object} errorRes "error"
+// @Failure 500 {object} errorRes "error"
+func signOut(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.SetCookie(w, &http.Cookie{
+			Name:    "token",
+			Value:   "",
+			Expires: time.Unix(0, 0),
+		})
 	}
 }
 

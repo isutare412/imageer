@@ -220,6 +220,35 @@
                 }
             }
         },
+        "/signOut": {
+            "get": {
+                "description": "Sign out by deleting cookie",
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Sign out",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorRes"
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/signTest": {
             "get": {
                 "description": "Sign in test using authorization header or cookie",
