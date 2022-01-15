@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/isutare412/imageer/api-server/pkg/config"
@@ -39,7 +40,9 @@ func (s *service) Produce(ctx context.Context, val string) error {
 }
 
 func (s *service) sourceFileName(ext string) string {
-	return fmt.Sprintf("%s/%s.%s", s.sourceDir, uuid.NewString(), ext)
+	now := time.Now()
+	return fmt.Sprintf("%s/%04d/%02d/%02d/%s.%s",
+		s.sourceDir, now.Year(), now.Month(), now.Day(), uuid.NewString(), ext)
 }
 
 func NewService(cfg *config.JobConfig, mq MsgQueue, objRepo ObjectRepo) Service {
