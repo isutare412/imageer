@@ -38,13 +38,13 @@ func NewMySQL(cfg *config.MySQLConfig) (*MySQL, error) {
 		PrepareStmt:            true,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("on open gorm DB: %w", err)
+		return nil, err
 	}
 
 	if err := db.AutoMigrate(
 		&user.User{},
 	); err != nil {
-		return nil, fmt.Errorf("on migrate entities: %w", err)
+		return nil, err
 	}
 
 	return &MySQL{

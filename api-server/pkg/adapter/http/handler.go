@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -31,38 +31,38 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		reqBytes, err := ioutil.ReadAll(r.Body)
+		reqBytes, err := io.ReadAll(r.Body)
 		if err != nil {
-			http.Error(w, "Need body param", http.StatusBadRequest)
+			msg := "failed to read body"
+			log.Errorf(msg)
+			responseError(w, http.StatusInternalServerError, msg)
 			return
 		}
 
 		var req signInReq
 		if err := json.Unmarshal(reqBytes, &req); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "invalid body param")
 			return
 		}
 
 		userEntity, err := uSvc.GetByEmailPassword(ctx, req.Email, req.Password)
 		if errors.Is(err, user.ErrUserNotFound) {
-			log.Infof("Email not found: %v", req.Email)
-			http.Error(w, "Invalid email or password", http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "invalid email or password")
 			return
 		} else if errors.Is(err, user.ErrPasswordNotCorrect) {
-			log.Infof("Password incorrect: %v", req.Password)
-			http.Error(w, "Invalid email or password", http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "invalid email or password")
 			return
 		} else if err != nil {
-			log.Errorf("Failed to get user: %v", err)
-			http.Error(w, "Failed to get user", http.StatusInternalServerError)
+			log.Errorf("failed to get user: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to get user")
 			return
 		}
 
 		id := auth.ID(strconv.Itoa(int(userEntity.ID)))
 		token, err := authSvc.SignToken(id)
 		if err != nil {
-			log.Errorf("Failed to sign token: %v", err)
-			http.Error(w, "Failed to sign token", http.StatusInternalServerError)
+			log.Errorf("failed to sign token: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to sign token")
 			return
 		}
 
@@ -70,8 +70,8 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 		res.Token = string(token)
 		resBytes, err := json.Marshal(&res)
 		if err != nil {
-			log.Errorf("Failed marshal response: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Errorf("failed marshal response: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to marshal response")
 			return
 		}
 
@@ -81,11 +81,7 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 		})
 
 		w.Header().Set("Content-Type", "application/json")
-		_, err = w.Write(resBytes)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		w.Write(resBytes)
 	}
 }
 
@@ -105,18 +101,14 @@ func signCheck(authSvc auth.Service) http.HandlerFunc {
 		if rawAuth := r.Header.Get("Authorization"); rawAuth != "" {
 			authSplit := strings.SplitN(rawAuth, "Bearer ", 2)
 			if len(authSplit) < 2 {
-				msg := "Invalid authorization header"
-				log.Info(msg)
-				http.Error(w, msg, http.StatusBadRequest)
+				responseError(w, http.StatusBadRequest, "invalid authorization header")
 				return
 			}
 			token = authSplit[1]
 		} else {
 			cookie, err := r.Cookie("token")
 			if err != nil {
-				msg := "Need token from cookie or authorization header"
-				log.Info(msg)
-				http.Error(w, msg, http.StatusBadRequest)
+				responseError(w, http.StatusBadRequest, "need token from cookie or authorization header")
 				return
 			}
 			token = cookie.Value
@@ -124,19 +116,17 @@ func signCheck(authSvc auth.Service) http.HandlerFunc {
 
 		id, err := authSvc.VerifyToken(auth.Token(token))
 		if errors.Is(err, auth.ErrTokenExpired) {
-			msg := "Token expired"
-			log.Info(msg)
-			http.Error(w, msg, http.StatusInternalServerError)
+			responseError(w, http.StatusInternalServerError, "token expired")
 			return
 		} else if err != nil {
-			log.Errorf("Failed to verify token: %v", err)
-			http.Error(w, "Failed to verify token", http.StatusInternalServerError)
+			log.Errorf("failed to verify token: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to verify token")
 			return
 		}
-		log.Infof("Verified token: id(%v)", id)
+		log.Infof("verified token: id(%v)", id)
 
 		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte("Token verified"))
+		w.Write([]byte("token verified"))
 	}
 }
 
@@ -154,35 +144,30 @@ func getGreeting(jSvc job.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name, ok := mux.Vars(r)["name"]
 		if !ok {
-			http.Error(w, "'name' is mandatory field", http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "'name' is mandatory field")
 			return
 		}
 
 		msg := fmt.Sprintf("Hello, %s!", name)
 
 		if err := jSvc.Produce(r.Context(), msg); err != nil {
-			errMsg := fmt.Sprintf("Failed to produce job: %v", err)
-			log.Error(errMsg)
-			http.Error(w, errMsg, http.StatusInternalServerError)
+			log.Errorf("failed to produce job: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to produce job")
 			return
 		}
 
 		res := getGreetingRes{
 			Message: msg,
 		}
-
 		resBytes, err := json.Marshal(&res)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Errorf("failed to marshal response: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to marshal response")
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		_, err = w.Write(resBytes)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		w.Write(resBytes)
 	}
 }
 
@@ -201,24 +186,24 @@ func getUser(uSvc user.Service) http.HandlerFunc {
 
 		idStr, err := auth.IDFromContext(ctx)
 		if err != nil {
-			http.Error(w, "Invalid ID in request", http.StatusInternalServerError)
+			log.Errorf("failed to get id from context: %v", err)
+			responseError(w, http.StatusInternalServerError, "invalid ID in request")
 			return
 		}
 		id, err := strconv.ParseInt(string(idStr), 10, 64)
 		if err != nil {
-			http.Error(w, "Cannot parse id", http.StatusInternalServerError)
+			log.Errorf("failed to parse id[%s]", idStr)
+			responseError(w, http.StatusInternalServerError, "failed to parse id")
 			return
 		}
 
 		userEntity, err := uSvc.GetByID(ctx, id)
 		if errors.Is(err, user.ErrUserNotFound) {
-			msg := fmt.Sprintf("Invalid user id: %v", id)
-			log.Info(msg)
-			http.Error(w, msg, http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "id[%d] is invalid", id)
 			return
 		} else if err != nil {
-			log.Errorf("Failed to get user: %v", err)
-			http.Error(w, "Failed to get user", http.StatusInternalServerError)
+			log.Errorf("failed to get user: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to get user")
 			return
 		}
 
@@ -226,17 +211,13 @@ func getUser(uSvc user.Service) http.HandlerFunc {
 		res.from(userEntity)
 		resBytes, err := json.Marshal(&res)
 		if err != nil {
-			log.Errorf("Failed marshal response: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Errorf("failed to marshal response: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to marshal response")
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		_, err = w.Write(resBytes)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		w.Write(resBytes)
 	}
 }
 
@@ -254,28 +235,28 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		reqBytes, err := ioutil.ReadAll(r.Body)
+		reqBytes, err := io.ReadAll(r.Body)
 		if err != nil {
-			http.Error(w, "Need body param", http.StatusBadRequest)
+			msg := "failed to read body"
+			log.Errorf(msg)
+			responseError(w, http.StatusInternalServerError, msg)
 			return
 		}
 
 		var req createUserReq
 		if err := json.Unmarshal(reqBytes, &req); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "invalid body param")
 			return
 		}
 		userEntity := req.into()
 
 		userID, err := uSvc.Create(ctx, userEntity, req.Password)
 		if errors.Is(err, user.ErrDuplicate) {
-			msg := fmt.Sprintf("Duplicate email: %v", userEntity.Email)
-			log.Info(msg)
-			http.Error(w, msg, http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "email[%s] duplicated", userEntity.Email)
 			return
 		} else if err != nil {
-			log.Errorf("Failed to create user: %v", err)
-			http.Error(w, "Failed to create user", http.StatusInternalServerError)
+			log.Errorf("failed to marshal response: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to marshal response")
 			return
 		}
 		userEntity.ID = userID
@@ -284,17 +265,13 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 		res.from(userEntity)
 		resBytes, err := json.Marshal(&res)
 		if err != nil {
-			log.Errorf("Failed marshal response: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Errorf("failed to marshal response: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to marshal response")
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		_, err = w.Write(resBytes)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		w.Write(resBytes)
 	}
 }
 
@@ -314,24 +291,22 @@ func getUserByID(uSvc user.Service) http.HandlerFunc {
 
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
-			http.Error(w, "'id' is mandatory field", http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "'id' is mandatory field")
 			return
 		}
 		id, err := strconv.ParseInt(idStr, 10, 64)
 		if err != nil {
-			http.Error(w, "'id' is not valid", http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "id[%s] is invalid", idStr)
 			return
 		}
 
 		userEntity, err := uSvc.GetByID(ctx, id)
 		if errors.Is(err, user.ErrUserNotFound) {
-			msg := fmt.Sprintf("Invalid user id: %v", id)
-			log.Info(msg)
-			http.Error(w, msg, http.StatusBadRequest)
+			responseError(w, http.StatusBadRequest, "user not exists")
 			return
 		} else if err != nil {
-			log.Errorf("Failed to get user: %v", err)
-			http.Error(w, "Failed to get user", http.StatusInternalServerError)
+			log.Errorf("failed to get user: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to get user")
 			return
 		}
 
@@ -339,16 +314,12 @@ func getUserByID(uSvc user.Service) http.HandlerFunc {
 		res.from(userEntity)
 		resBytes, err := json.Marshal(&res)
 		if err != nil {
-			log.Errorf("Failed marshal response: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Errorf("failed to marshal response: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to marshal response")
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		_, err = w.Write(resBytes)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		w.Write(resBytes)
 	}
 }

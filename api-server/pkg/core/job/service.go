@@ -2,7 +2,6 @@ package job
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/isutare412/imageer/api-server/pkg/config"
 )
@@ -20,7 +19,7 @@ type service struct {
 
 func (s *service) Produce(ctx context.Context, val string) error {
 	if err := s.mq.Produce(ctx, s.reqQueueName, []byte(val)); err != nil {
-		return fmt.Errorf("on mq produce: %w", err)
+		return err
 	}
 	return nil
 }

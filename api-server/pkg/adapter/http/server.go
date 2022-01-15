@@ -28,7 +28,7 @@ func (s *server) Start(ctx context.Context) <-chan error {
 	go func() {
 		defer close(errNotify)
 		if err := s.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			errNotify <- fmt.Errorf("on http listen: %w", err)
+			errNotify <- err
 		}
 	}()
 	log.Infof("HTTP server started on %s", s.server.Addr)
@@ -49,7 +49,7 @@ func (s *server) shutdown() {
 	defer close(s.done)
 
 	if err := s.server.Shutdown(ctx); err != nil {
-		log.Errorf("Failed to shutdown HTTP server: %v", err)
+		log.Errorf("failed to shutdown HTTP server: %v", err)
 	}
 
 	log.Info("HTTP server shutdown finished successfully")

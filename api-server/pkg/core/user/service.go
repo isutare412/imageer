@@ -24,7 +24,7 @@ type service struct {
 func (s *service) Create(ctx context.Context, user *User, password string) (int64, error) {
 	hashed, err := s.authSvc.Hash(password)
 	if err != nil {
-		return 0, fmt.Errorf("on hash password: %w", err)
+		return 0, fmt.Errorf("on create user: %w", err)
 	}
 	user.Password = hashed
 
@@ -39,7 +39,7 @@ func (s *service) Create(ctx context.Context, user *User, password string) (int6
 	}); s.repo.IsErrDuplicate(err) {
 		return 0, ErrDuplicate
 	} else if err != nil {
-		return 0, fmt.Errorf("on transaction: %w", err)
+		return 0, fmt.Errorf("on create user: %w", err)
 	}
 
 	return newID, nil
@@ -49,13 +49,13 @@ func (s *service) GetByEmailPassword(ctx context.Context, email, password string
 	var user User
 	if err := s.repo.Session(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("email = ?", email).First(&user).Error; err != nil {
-			return fmt.Errorf("on first user with email: %w", err)
+			return fmt.Errorf("on get user by email: %w", err)
 		}
 		return nil
 	}); s.repo.IsErrNotFound(err) {
 		return nil, ErrUserNotFound
 	} else if err != nil {
-		return nil, fmt.Errorf("on transaction: %w", err)
+		return nil, fmt.Errorf("on get user by email: %w", err)
 	}
 
 	if ok := s.authSvc.Compare(password, user.Password); !ok {
@@ -69,13 +69,13 @@ func (s *service) GetByID(ctx context.Context, id int64) (*User, error) {
 	var user User
 	if err := s.repo.Session(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.First(&user, id).Error; err != nil {
-			return fmt.Errorf("on first user: %w", err)
+			return fmt.Errorf("on get by id: %w", err)
 		}
 		return nil
 	}); s.repo.IsErrNotFound(err) {
 		return nil, ErrUserNotFound
 	} else if err != nil {
-		return nil, fmt.Errorf("on transaction: %w", err)
+		return nil, fmt.Errorf("on get by id: %w", err)
 	}
 
 	return &user, nil
@@ -85,7 +85,7 @@ func (s *service) UpdateCredit(ctx context.Context, id int64, delta int64) (*Use
 	var user User
 	if err := s.repo.Session(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.First(&user, id).Error; err != nil {
-			return fmt.Errorf("on first user: %w", err)
+			return fmt.Errorf("on update credit: %w", err)
 		}
 
 		newCredit := user.Credit + delta
@@ -98,7 +98,7 @@ func (s *service) UpdateCredit(ctx context.Context, id int64, delta int64) (*Use
 		user.Credit = newCredit
 		return nil
 	}); err != nil {
-		return nil, fmt.Errorf("on transaction: %w", err)
+		return nil, fmt.Errorf("on update credit: %w", err)
 	}
 	return &user, nil
 }

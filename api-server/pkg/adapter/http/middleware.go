@@ -52,18 +52,14 @@ func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 			if rawAuth := r.Header.Get("Authorization"); rawAuth != "" {
 				authSplit := strings.SplitN(rawAuth, "Bearer ", 2)
 				if len(authSplit) < 2 {
-					msg := "Invalid authorization header"
-					log.Info(msg)
-					http.Error(w, msg, http.StatusBadRequest)
+					responseError(w, http.StatusBadRequest, "invalid authorization header")
 					return
 				}
 				token = authSplit[1]
 			} else {
 				cookie, err := r.Cookie("token")
 				if err != nil {
-					msg := "Need token from cookie or authorization header"
-					log.Info(msg)
-					http.Error(w, msg, http.StatusBadRequest)
+					responseError(w, http.StatusBadRequest, "need token from cookie or authorization header")
 					return
 				}
 				token = cookie.Value
@@ -71,13 +67,11 @@ func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 
 			id, err := authSvc.VerifyToken(auth.Token(token))
 			if errors.Is(err, auth.ErrTokenExpired) {
-				msg := "Token expired"
-				log.Info(msg)
-				http.Error(w, msg, http.StatusBadRequest)
+				responseError(w, http.StatusInternalServerError, "token expired")
 				return
 			} else if err != nil {
-				log.Errorf("Failed to verify token: %v", err)
-				http.Error(w, "Failed to verify token", http.StatusBadRequest)
+				log.Errorf("failed to verify token: %v", err)
+				responseError(w, http.StatusInternalServerError, "failed to verify token")
 				return
 			}
 

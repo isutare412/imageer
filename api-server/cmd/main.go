@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -27,11 +26,11 @@ func main() {
 
 	cfgPath := os.Getenv(cfgEnvStr)
 	if cfgPath == "" {
-		log.Fatalf("Need environment variable: %s", cfgEnvStr)
+		log.Fatalf("need environment variable: %s", cfgEnvStr)
 	}
 	cfg, err := readConfig(cfgPath)
 	if err != nil {
-		log.Fatalf("Failed to read config: %v", err)
+		log.Fatalf("failed to read config: %v", err)
 	}
 	setLogger(cfg.Server.Mode)
 
@@ -39,30 +38,30 @@ func main() {
 
 	redisMQ, err := mq.NewRedis(&cfg.Redis)
 	if err != nil {
-		log.Fatalf("Failed to create Redis MQ: %v", err)
+		log.Fatalf("failed to create Redis MQ: %v", err)
 	}
-	log.Infof("Created Redis MQ on %v", cfg.Redis.Addrs)
+	log.Infof("created Redis MQ on %v", cfg.Redis.Addrs)
 
 	mysqlRepo, err := repository.NewMySQL(&cfg.MySQL)
 	if err != nil {
-		log.Fatalf("Failed to create MySQL repository: %v", err)
+		log.Fatalf("failed to create MySQL repository: %v", err)
 	}
-	log.Infof("Created MySQL repository on %v", cfg.MySQL.Address)
+	log.Infof("created MySQL repository on %v", cfg.MySQL.Address)
 
 	authSvc, err := auth.NewService(&cfg.Auth)
 	if err != nil {
-		log.Fatalf("Failed to create auth service: %v", err)
+		log.Fatalf("failed to create auth service: %v", err)
 	}
-	log.Info("Created auth service")
+	log.Info("created auth service")
 
 	uSvc := user.NewService(mysqlRepo, authSvc)
-	log.Info("Created user service")
+	log.Info("created user service")
 
 	jSvc := job.NewService(&cfg.Server.Job, redisMQ)
-	log.Info("Created job service")
+	log.Info("created job service")
 
 	server := http.NewServer(&cfg.Server.Http, jSvc, uSvc, authSvc)
-	log.Info("Created HTTP server")
+	log.Info("created HTTP server")
 
 	// Start services
 	sErr := server.Start(rootCtx)
@@ -72,9 +71,9 @@ func main() {
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	select {
 	case e := <-sErr:
-		log.Errorf("Got error from http server: %v", e)
+		log.Errorf("got error from http server: %v", e)
 	case s := <-sig:
-		log.Infof("Caught signal: %s", s.String())
+		log.Infof("caught signal[%s]", s.String())
 	}
 
 	// Wait for graceful shutdown
@@ -85,12 +84,12 @@ func main() {
 func readConfig(path string) (*config.Config, error) {
 	viper.SetConfigFile(path)
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("on readConfig: %w", err)
+		return nil, err
 	}
 
 	var cfg config.Config
 	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("on readConfig: %w", err)
+		return nil, err
 	}
 	return &cfg, nil
 }

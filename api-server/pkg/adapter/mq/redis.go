@@ -2,7 +2,6 @@ package mq
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/isutare412/imageer/api-server/pkg/config"
@@ -18,7 +17,7 @@ func (r *Redis) Produce(ctx context.Context, topic string, val []byte) error {
 		ID:     "*", // Use auto generated ID by redis
 		Values: []interface{}{"data", val},
 	}).Result(); err != nil {
-		return fmt.Errorf("on XAdd: %w", err)
+		return err
 	}
 	return nil
 }
@@ -30,7 +29,7 @@ func NewRedis(cfg *config.RedisConfig) (*Redis, error) {
 	})
 
 	if err := c.Ping(context.Background()).Err(); err != nil {
-		return nil, fmt.Errorf("on ping redis: %w", err)
+		return nil, err
 	}
 
 	return &Redis{

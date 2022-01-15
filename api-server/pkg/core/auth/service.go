@@ -47,7 +47,7 @@ func (s *service) SignToken(id ID) (Token, error) {
 	})
 	tokenStr, err := token.SignedString(s.signKey)
 	if err != nil {
-		return "", fmt.Errorf("on signing token: %w", err)
+		return "", err
 	}
 	return Token(tokenStr), nil
 }
@@ -57,25 +57,25 @@ func (s *service) VerifyToken(t Token) (ID, error) {
 		return s.verifyKey, nil
 	})
 	if err != nil {
-		return "", fmt.Errorf("on parsing token: %w", err)
+		return "", err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", fmt.Errorf("on cast to MapClaims: %w", err)
+		return "", errors.New("token is not jwt.MapClaims")
 	}
 
 	if !claims.VerifyExpiresAt(time.Now().Unix(), true) {
 		return "", ErrTokenExpired
 	}
 
-	idItfc, ok := claims["id"]
+	idInterface, ok := claims["id"]
 	if !ok {
-		return "", fmt.Errorf("on get id from claims: %w", err)
+		return "", errors.New("id not found in claims")
 	}
-	id, ok := idItfc.(string)
+	id, ok := idInterface.(string)
 	if !ok {
-		return "", fmt.Errorf("on cast id into string: %w", err)
+		return "", errors.New("id claim is not string")
 	}
 	return ID(id), nil
 }
@@ -99,15 +99,15 @@ func IDFromContext(ctx context.Context) (ID, error) {
 func NewService(cfg *config.AuthConfig) (Service, error) {
 	signKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(cfg.PrivateKey))
 	if err != nil {
-		return nil, fmt.Errorf("on parse private key: %w", err)
+		return nil, err
 	}
 	verifyKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(cfg.PublicKey))
 	if err != nil {
-		return nil, fmt.Errorf("on parse public key: %w", err)
+		return nil, err
 	}
 
 	if cfg.ExpireHour <= 0 {
-		return nil, errors.New("ExpireHour should be greater than 0")
+		return nil, fmt.Errorf("ExpireHour[%d] should be greater than 0", cfg.ExpireHour)
 	}
 
 	return &service{

@@ -2,6 +2,11 @@ package http
 
 import "github.com/isutare412/imageer/api-server/pkg/core/user"
 
+type errorRes struct {
+	Code    int    `yaml:"code" json:"code,omitempty" example:"400"`
+	Message string `yaml:"msg" json:"msg,omitempty" example:"simple error message"`
+}
+
 type signInReq struct {
 	Email    string `yaml:"email" json:"email"`
 	Password string `yaml:"password" json:"password"`
