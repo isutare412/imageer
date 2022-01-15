@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger"
 
@@ -63,7 +64,7 @@ func NewServer(
 	cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service, authSvc auth.Service,
 ) *server {
 	r := mux.NewRouter()
-	r.Use(logRequest, allowCORS)
+	r.Use(logRequest)
 
 	r.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler).Methods("GET")
 	r.HandleFunc("/signIn", signIn(uSvc, authSvc)).Methods("POST")
@@ -81,8 +82,12 @@ func NewServer(
 
 	return &server{
 		server: &http.Server{
-			Addr:    fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
-			Handler: r,
+			Addr: fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
+			Handler: cors.New(cors.Options{
+				AllowedOrigins:   []string{"*"},
+				AllowedMethods:   []string{"HEAD", "GET", "POST", "PUT", "PATCH", "DELETE"},
+				AllowCredentials: true,
+			}).Handler(r),
 		},
 		done: make(chan struct{}),
 	}

@@ -4,6 +4,14 @@
 @token={{signIn.response.body.token}}
 
 ################################################################################
+# Check CORS
+################################################################################
+OPTIONS {{scheme}}://{{url}}/docs/index.html HTTP/1.1
+Access-Control-Request-Method: GET
+Access-Control-Request-Headers: origin, x-requested-with
+Origin: http://localhost
+
+################################################################################
 # Get swagger UI
 ################################################################################
 GET {{scheme}}://{{url}}/docs/index.html HTTP/1.1

@@ -36,15 +36,6 @@ func logRequest(h http.Handler) http.Handler {
 	})
 }
 
-func allowCORS(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		header := w.Header()
-		header.Add("Access-Control-Allow-Origin", "*")
-		header.Add("Access-Control-Allow-Methods", "*")
-		h.ServeHTTP(w, r)
-	})
-}
-
 func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
