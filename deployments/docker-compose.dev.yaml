@@ -9,6 +9,8 @@ volumes:
     driver: local
   mysql_storage:
     driver: local
+  minio_storage:
+    driver: local
 
 services:
   redis:
@@ -59,3 +61,17 @@ services:
     environment:
       - MYSQL_ROOT_USER=${MYSQL_ROOT_USER}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+
+  minio:
+    image: 'bitnami/minio:2022-debian-10'
+    networks:
+      - internal
+    ports:
+      - "${MINIO_API_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9001"
+    environment:
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_DEFAULT_BUCKETS=imageer
+    volumes:
+      - 'minio_storage:/data'
