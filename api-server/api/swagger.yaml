@@ -23,6 +23,15 @@ definitions:
       id:
         type: integer
     type: object
+  http.errorRes:
+    properties:
+      code:
+        example: 400
+        type: integer
+      msg:
+        example: simple error message
+        type: string
+    type: object
   http.getGreetingRes:
     properties:
       msg:
@@ -80,11 +89,11 @@ paths:
         "400":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
         "500":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
       summary: Say greeting
       tags:
       - Greeting
@@ -103,11 +112,11 @@ paths:
         "400":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
         "500":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
       summary: Get an authenticated user
       tags:
       - User
@@ -132,11 +141,11 @@ paths:
         "400":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
         "500":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
       summary: Create a user
       tags:
       - User
@@ -161,11 +170,11 @@ paths:
         "400":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
         "500":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
       summary: Get a user
       tags:
       - User
@@ -191,11 +200,11 @@ paths:
         "400":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
         "500":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
       summary: Sign in
       tags:
       - Authentication
@@ -220,11 +229,11 @@ paths:
         "400":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
         "500":
           description: error
           schema:
-            type: string
+            $ref: '#/definitions/http.errorRes'
       summary: Sign in test
       tags:
       - Authentication

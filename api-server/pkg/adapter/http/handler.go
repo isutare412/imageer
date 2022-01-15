@@ -25,8 +25,8 @@ import (
 // @Accept json
 // @Produce json
 // @Success 200 {object} signInRes "ok"
-// @Failure 400 {string} string "error"
-// @Failure 500 {string} string "error"
+// @Failure 400 {object} errorRes "error"
+// @Failure 500 {object} errorRes "error"
 func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -93,8 +93,8 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {string} string "ok"
-// @Failure 400 {string} string "error"
-// @Failure 500 {string} string "error"
+// @Failure 400 {object} errorRes "error"
+// @Failure 500 {object} errorRes "error"
 func signCheck(authSvc auth.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var token string
@@ -138,8 +138,8 @@ func signCheck(authSvc auth.Service) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} getGreetingRes "ok"
-// @Failure 400 {string} string "error"
-// @Failure 500 {string} string "error"
+// @Failure 400 {object} errorRes "error"
+// @Failure 500 {object} errorRes "error"
 func getGreeting(jSvc job.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name, ok := mux.Vars(r)["name"]
@@ -178,8 +178,8 @@ func getGreeting(jSvc job.Service) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} getUserRes "ok"
-// @Failure 400 {string} string "error"
-// @Failure 500 {string} string "error"
+// @Failure 400 {object} errorRes "error"
+// @Failure 500 {object} errorRes "error"
 func getUser(uSvc user.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -229,8 +229,8 @@ func getUser(uSvc user.Service) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} createUserRes "ok"
-// @Failure 400 {string} string "error"
-// @Failure 500 {string} string "error"
+// @Failure 400 {object} errorRes "error"
+// @Failure 500 {object} errorRes "error"
 func createUser(uSvc user.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -283,8 +283,8 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} getUserRes "ok"
-// @Failure 400 {string} string "error"
-// @Failure 500 {string} string "error"
+// @Failure 400 {object} errorRes "error"
+// @Failure 500 {object} errorRes "error"
 func getUserByID(uSvc user.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()

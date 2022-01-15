@@ -55,13 +55,13 @@ var doc = `{
                     "400": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     },
                     "500": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     }
                 }
@@ -90,13 +90,13 @@ var doc = `{
                     "400": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     },
                     "500": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     }
                 }
@@ -134,13 +134,13 @@ var doc = `{
                     "400": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     },
                     "500": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     }
                 }
@@ -178,13 +178,13 @@ var doc = `{
                     "400": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     },
                     "500": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     }
                 }
@@ -224,13 +224,13 @@ var doc = `{
                     "400": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     },
                     "500": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     }
                 }
@@ -268,13 +268,13 @@ var doc = `{
                     "400": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     },
                     "500": {
                         "description": "error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/http.errorRes"
                         }
                     }
                 }
@@ -316,6 +316,19 @@ var doc = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "http.errorRes": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "msg": {
+                    "type": "string",
+                    "example": "simple error message"
                 }
             }
         },
