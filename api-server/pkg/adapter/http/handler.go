@@ -143,6 +143,7 @@ func signCheck(authSvc auth.Service) http.HandlerFunc {
 // @Description Greeting by given name
 // @Tags Greeting
 // @Router /api/v1/greetings/{name} [get]
+// @Param Authorization header string false "bearer authorization" extensions(x-example=Bearer your_jwt_token)
 // @Param name path string true "name for greeting"
 // @Accept json
 // @Produce json
@@ -176,6 +177,7 @@ func getGreeting(jSvc job.Service) http.HandlerFunc {
 // @Description Get an user by header or cookie
 // @Tags User
 // @Router /api/v1/users [get]
+// @Param Authorization header string false "bearer authorization" extensions(x-example=Bearer your_jwt_token)
 // @Accept json
 // @Produce json
 // @Success 200 {object} getUserRes "ok"
@@ -218,6 +220,7 @@ func getUser(uSvc user.Service) http.HandlerFunc {
 // @Description Create a user with basic information
 // @Tags User
 // @Router /api/v1/users [post]
+// @Param Authorization header string false "bearer authorization" extensions(x-example=Bearer your_jwt_token)
 // @Param request body createUserReq true "request to create a new user"
 // @Accept json
 // @Produce json
@@ -264,6 +267,7 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 // @Description Get a user with given id
 // @Tags User
 // @Router /api/v1/users/{id} [get]
+// @Param Authorization header string false "bearer authorization" extensions(x-example=Bearer your_jwt_token)
 // @Param id path string true "user id"
 // @Accept json
 // @Produce json
@@ -305,6 +309,7 @@ func getUserByID(uSvc user.Service) http.HandlerFunc {
 // @Description Archive an image to object storage
 // @Tags Image
 // @Router /api/v1/images/archives [post]
+// @Param Authorization header string false "bearer authorization" extensions(x-example=Bearer your_jwt_token)
 // @Param image formData file true "image files to be archived"
 // @Accept multipart/form-data
 // @Success 200 {string} string "ok"

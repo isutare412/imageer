@@ -39,6 +39,13 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "x-example": "Bearer your_jwt_token",
+                        "description": "bearer authorization",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
                         "description": "name for greeting",
                         "name": "name",
                         "in": "path",
@@ -78,6 +85,13 @@ var doc = `{
                 ],
                 "summary": "Archive an image",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "x-example": "Bearer your_jwt_token",
+                        "description": "bearer authorization",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
                     {
                         "type": "file",
                         "description": "image files to be archived",
@@ -121,6 +135,15 @@ var doc = `{
                     "User"
                 ],
                 "summary": "Get an authenticated user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-example": "Bearer your_jwt_token",
+                        "description": "bearer authorization",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -155,6 +178,13 @@ var doc = `{
                 ],
                 "summary": "Create a user",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "x-example": "Bearer your_jwt_token",
+                        "description": "bearer authorization",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
                     {
                         "description": "request to create a new user",
                         "name": "request",
@@ -201,6 +231,13 @@ var doc = `{
                 ],
                 "summary": "Get a user",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "x-example": "Bearer your_jwt_token",
+                        "description": "bearer authorization",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
                     {
                         "type": "string",
                         "description": "user id",

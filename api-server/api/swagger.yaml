@@ -74,6 +74,11 @@ paths:
       - application/json
       description: Greeting by given name
       parameters:
+      - description: bearer authorization
+        in: header
+        name: Authorization
+        type: string
+        x-example: Bearer your_jwt_token
       - description: name for greeting
         in: path
         name: name
@@ -103,6 +108,11 @@ paths:
       - multipart/form-data
       description: Archive an image to object storage
       parameters:
+      - description: bearer authorization
+        in: header
+        name: Authorization
+        type: string
+        x-example: Bearer your_jwt_token
       - description: image files to be archived
         in: formData
         name: image
@@ -129,6 +139,12 @@ paths:
       consumes:
       - application/json
       description: Get an user by header or cookie
+      parameters:
+      - description: bearer authorization
+        in: header
+        name: Authorization
+        type: string
+        x-example: Bearer your_jwt_token
       produces:
       - application/json
       responses:
@@ -152,6 +168,11 @@ paths:
       - application/json
       description: Create a user with basic information
       parameters:
+      - description: bearer authorization
+        in: header
+        name: Authorization
+        type: string
+        x-example: Bearer your_jwt_token
       - description: request to create a new user
         in: body
         name: request
@@ -182,6 +203,11 @@ paths:
       - application/json
       description: Get a user with given id
       parameters:
+      - description: bearer authorization
+        in: header
+        name: Authorization
+        type: string
+        x-example: Bearer your_jwt_token
       - description: user id
         in: path
         name: id
