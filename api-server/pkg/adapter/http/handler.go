@@ -66,22 +66,14 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 			return
 		}
 
-		var res signInRes
-		res.Token = string(token)
-		resBytes, err := json.Marshal(&res)
-		if err != nil {
-			log.Errorf("failed marshal response: %v", err)
-			responseError(w, http.StatusInternalServerError, "failed to marshal response")
-			return
-		}
-
 		http.SetCookie(w, &http.Cookie{
 			Name:  "token",
 			Value: string(token),
 		})
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(resBytes)
+		res := signInRes{
+			Token: string(token),
+		}
+		responseJson(w, &res)
 	}
 }
 
@@ -125,8 +117,7 @@ func signCheck(authSvc auth.Service) http.HandlerFunc {
 		}
 		log.Infof("verified token: id(%v)", id)
 
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte("token verified"))
+		responseText(w, "token verified")
 	}
 }
 
@@ -159,15 +150,7 @@ func getGreeting(jSvc job.Service) http.HandlerFunc {
 		res := getGreetingRes{
 			Message: msg,
 		}
-		resBytes, err := json.Marshal(&res)
-		if err != nil {
-			log.Errorf("failed to marshal response: %v", err)
-			responseError(w, http.StatusInternalServerError, "failed to marshal response")
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(resBytes)
+		responseJson(w, &res)
 	}
 }
 
@@ -209,15 +192,7 @@ func getUser(uSvc user.Service) http.HandlerFunc {
 
 		var res getUserRes
 		res.from(userEntity)
-		resBytes, err := json.Marshal(&res)
-		if err != nil {
-			log.Errorf("failed to marshal response: %v", err)
-			responseError(w, http.StatusInternalServerError, "failed to marshal response")
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(resBytes)
+		responseJson(w, &res)
 	}
 }
 
@@ -263,15 +238,7 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 
 		var res createUserRes
 		res.from(userEntity)
-		resBytes, err := json.Marshal(&res)
-		if err != nil {
-			log.Errorf("failed to marshal response: %v", err)
-			responseError(w, http.StatusInternalServerError, "failed to marshal response")
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(resBytes)
+		responseJson(w, &res)
 	}
 }
 
@@ -312,14 +279,6 @@ func getUserByID(uSvc user.Service) http.HandlerFunc {
 
 		var res getUserRes
 		res.from(userEntity)
-		resBytes, err := json.Marshal(&res)
-		if err != nil {
-			log.Errorf("failed to marshal response: %v", err)
-			responseError(w, http.StatusInternalServerError, "failed to marshal response")
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(resBytes)
+		responseJson(w, &res)
 	}
 }

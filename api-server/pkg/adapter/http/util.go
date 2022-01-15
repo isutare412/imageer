@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func responseError(w http.ResponseWriter, code int, format string, values ...interface{}) {
@@ -18,5 +20,19 @@ func responseError(w http.ResponseWriter, code int, format string, values ...int
 	w.Write(resBytes)
 }
 
-// TODO: response by Text, JSON
-// TODO: change OAS response error type
+func responseJson(w http.ResponseWriter, res interface{}) {
+	resBytes, err := json.Marshal(&res)
+	if err != nil {
+		log.Errorf("failed to marshal response: %v", err)
+		responseError(w, http.StatusInternalServerError, "failed to marshal response")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Write(resBytes)
+}
+
+func responseText(w http.ResponseWriter, txt string) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Write([]byte(txt))
+}
