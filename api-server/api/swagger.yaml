@@ -97,6 +97,33 @@ paths:
       summary: Say greeting
       tags:
       - Greeting
+  /api/v1/images/archives:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Archive an image to object storage
+      parameters:
+      - description: image files to be archived
+        in: formData
+        name: image
+        required: true
+        type: file
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/http.errorRes'
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/http.errorRes'
+      summary: Archive an image
+      tags:
+      - Image
   /api/v1/users:
     get:
       consumes:

@@ -48,6 +48,12 @@ func main() {
 	}
 	log.Infof("created MySQL repository on %v", cfg.MySQL.Address)
 
+	s3Repo, err := repository.NewS3(&cfg.S3)
+	if err != nil {
+		log.Fatalf("failed to create S3 repository: %v", err)
+	}
+	log.Infof("created S3 repository on %v", cfg.S3.Address)
+
 	authSvc, err := auth.NewService(&cfg.Auth)
 	if err != nil {
 		log.Fatalf("failed to create auth service: %v", err)
@@ -57,7 +63,7 @@ func main() {
 	uSvc := user.NewService(mysqlRepo, authSvc)
 	log.Info("created user service")
 
-	jSvc := job.NewService(&cfg.Server.Job, redisMQ)
+	jSvc := job.NewService(&cfg.Server.Job, redisMQ, s3Repo)
 	log.Info("created job service")
 
 	server := http.NewServer(&cfg.Server.Http, jSvc, uSvc, authSvc)

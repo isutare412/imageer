@@ -75,3 +75,16 @@ Authorization: Bearer {{token}}
   "email": "isutare412@gmail.com",
   "password": "simplepass"
 }
+
+################################################################################
+# Archive file
+################################################################################
+POST {{scheme}}://{{url}}/{{apiPrefix}}/images/archives HTTP/1.1
+Content-Type: multipart/form-data; boundary=ComplexBoundaryQ3qAfv5fD
+
+--ComplexBoundaryQ3qAfv5fD
+Content-Disposition: form-data; name="image"; filename="bus.png"
+Content-Type: application/octet-stream
+
+< ./test-data/bus.png
+--ComplexBoundaryQ3qAfv5fD--

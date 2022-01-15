@@ -4,6 +4,7 @@ type Config struct {
 	Server ServerConfig `yaml:"server" json:"server"`
 	Redis  RedisConfig  `yaml:"redis" json:"redis"`
 	MySQL  MySQLConfig  `yaml:"mysql" json:"mysql"`
+	S3     S3Config     `yaml:"s3" json:"s3"`
 	Auth   AuthConfig   `yaml:"auth" json:"auth"`
 }
 
@@ -15,11 +16,22 @@ type ServerConfig struct {
 
 type JobConfig struct {
 	Queue JobQueueConfig `yaml:"queue" json:"queue"`
+	Repo  JobRepoConfig  `yaml:"repo" json:"repo"`
 }
 
 type JobQueueConfig struct {
 	Request  string `yaml:"request" json:"request"`
 	Response string `yaml:"response" json:"response"`
+}
+
+type JobRepoConfig struct {
+	S3 JobRepoS3Config `yaml:"s3" json:"s3"`
+}
+
+type JobRepoS3Config struct {
+	Bucket    string `yaml:"bucket" json:"bucket"`
+	SourceDir string `yaml:"sourceDir" json:"sourceDir"`
+	ResultDir string `yaml:"resultDir" json:"resultDir"`
 }
 
 type HttpConfig struct {
@@ -37,6 +49,12 @@ type MySQLConfig struct {
 	Password string `yaml:"password" json:"password"`
 	Address  string `yaml:"address" json:"address"`
 	Database string `yaml:"database" json:"database"`
+}
+
+type S3Config struct {
+	Address   string `yaml:"address" json:"address"`
+	AccessKey string `yaml:"accessKey" json:"accessKey"`
+	SecretKey string `yaml:"secretKey" json:"secretKey"`
 }
 
 type AuthConfig struct {

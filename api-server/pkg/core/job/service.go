@@ -2,19 +2,33 @@ package job
 
 import (
 	"context"
+	"fmt"
+	"io"
 
+	"github.com/google/uuid"
 	"github.com/isutare412/imageer/api-server/pkg/config"
 )
 
 type Service interface {
+	Archive(ctx context.Context, ext string, body io.Reader) error
 	Produce(ctx context.Context, val string) error
 }
 
 type service struct {
+	mq           MsgQueue
 	reqQueueName string
 	resQueueName string
 
-	mq MsgQueue
+	objRepo   ObjectRepo
+	bucket    string
+	sourceDir string
+}
+
+func (s *service) Archive(ctx context.Context, ext string, body io.Reader) error {
+	if err := s.objRepo.Put(ctx, s.bucket, s.sourceFileName(ext), body); err != nil {
+		return fmt.Errorf("on produce bytes: %w", err)
+	}
+	return nil
 }
 
 func (s *service) Produce(ctx context.Context, val string) error {
@@ -24,10 +38,17 @@ func (s *service) Produce(ctx context.Context, val string) error {
 	return nil
 }
 
-func NewService(cfg *config.JobConfig, mq MsgQueue) Service {
+func (s *service) sourceFileName(ext string) string {
+	return fmt.Sprintf("%s/%s.%s", s.sourceDir, uuid.NewString(), ext)
+}
+
+func NewService(cfg *config.JobConfig, mq MsgQueue, objRepo ObjectRepo) Service {
 	return &service{
+		mq:           mq,
 		reqQueueName: cfg.Queue.Request,
 		resQueueName: cfg.Queue.Response,
-		mq:           mq,
+		objRepo:      objRepo,
+		bucket:       cfg.Repo.S3.Bucket,
+		sourceDir:    cfg.Repo.S3.SourceDir,
 	}
 }

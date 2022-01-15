@@ -300,3 +300,50 @@ func getUserByID(uSvc user.Service) http.HandlerFunc {
 		responseJson(w, &res)
 	}
 }
+
+// @Summary Archive an image
+// @Description Archive an image to object storage
+// @Tags Image
+// @Router /api/v1/images/archives [post]
+// @Param image formData file true "image files to be archived"
+// @Accept multipart/form-data
+// @Success 200 {string} string "ok"
+// @Failure 400 {object} errorRes "error"
+// @Failure 500 {object} errorRes "error"
+func archiveImage(jSvc job.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		if err := r.ParseMultipartForm(32 << 20); err != nil {
+			log.Errorf("failed parse multipart form: %v", err)
+			responseError(w, http.StatusBadRequest, "failed parse multipart form")
+			return
+		}
+
+		images := r.MultipartForm.File["image"]
+		if len(images) == 0 {
+			responseError(w, http.StatusBadRequest, "need at least one image")
+			return
+		}
+
+		var files []io.ReadSeekCloser
+		for _, img := range images {
+			f, err := img.Open()
+			if err != nil {
+				log.Errorf("cannot open file[%s]: %v", img.Filename, err)
+				responseError(w, http.StatusBadRequest, "cannot open file[%s]", img.Filename)
+				return
+			}
+			defer f.Close()
+			files = append(files, f)
+		}
+
+		for _, f := range files {
+			if err := jSvc.Archive(ctx, "png", f); err != nil {
+				log.Errorf("failed to produce by file: %v", err)
+				responseError(w, http.StatusInternalServerError, "failed to produce by file")
+				return
+			}
+		}
+	}
+}

@@ -80,6 +80,8 @@ func NewServer(
 	apiV1.HandleFunc("/users", createUser(uSvc)).Methods("POST")
 	apiV1.HandleFunc("/users/{id}", getUserByID(uSvc)).Methods("GET")
 
+	apiV1.HandleFunc("/images/archives", archiveImage(jSvc)).Methods("POST")
+
 	return &server{
 		server: &http.Server{
 			Addr: fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),

@@ -67,6 +67,47 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/images/archives": {
+            "post": {
+                "description": "Archive an image to object storage",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Archive an image",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "image files to be archived",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorRes"
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/users": {
             "get": {
                 "description": "Get an user by header or cookie",

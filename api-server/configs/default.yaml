@@ -7,6 +7,11 @@ server:
     queue:
       request: processor-job-request
       response: processor-job-response
+    repo:
+      s3:
+        bucket: imageer
+        sourceDir: source
+        resultDir: result
 
 redis:
   addrs:
@@ -18,6 +23,11 @@ mysql:
   password: imageer
   address: localhost:3306
   database: imageer_api
+
+s3:
+  address: localhost:9000
+  accessKey: imageer_minio
+  secretKey: imageer_minio
 
 auth:
   expireHour: 72
