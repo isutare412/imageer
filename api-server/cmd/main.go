@@ -11,7 +11,7 @@ import (
 
 	"github.com/isutare412/imageer/api-server/pkg/adapter/http"
 	"github.com/isutare412/imageer/api-server/pkg/adapter/mq"
-	"github.com/isutare412/imageer/api-server/pkg/adapter/repository"
+	"github.com/isutare412/imageer/api-server/pkg/adapter/repo"
 	"github.com/isutare412/imageer/api-server/pkg/config"
 	"github.com/isutare412/imageer/api-server/pkg/core/auth"
 	"github.com/isutare412/imageer/api-server/pkg/core/job"
@@ -42,13 +42,13 @@ func main() {
 	}
 	log.Infof("created Redis MQ on %v", cfg.Redis.Addrs)
 
-	mysqlRepo, err := repository.NewMySQL(&cfg.MySQL)
+	mysqlRepo, err := repo.NewMySQL(&cfg.MySQL)
 	if err != nil {
 		log.Fatalf("failed to create MySQL repository: %v", err)
 	}
 	log.Infof("created MySQL repository on %v", cfg.MySQL.Address)
 
-	s3Repo, err := repository.NewS3(&cfg.S3)
+	s3Repo, err := repo.NewS3(&cfg.S3)
 	if err != nil {
 		log.Fatalf("failed to create S3 repository: %v", err)
 	}
