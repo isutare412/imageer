@@ -53,6 +53,7 @@ func (resp *createUserRes) from(user *user.User) {
 
 type getUserRes struct {
 	ID         int64  `yaml:"id" json:"id"`
+	Privilege  string `yaml:"privilege" json:"privilege"`
 	GivenName  string `yaml:"givenName" json:"givenName"`
 	FamilyName string `yaml:"familyName" json:"familyName"`
 	Email      string `yaml:"email" json:"email"`
@@ -61,6 +62,7 @@ type getUserRes struct {
 
 func (resp *getUserRes) from(user *user.User) {
 	resp.ID = user.ID
+	resp.Privilege = string(user.Privilege)
 	resp.GivenName = user.GivenName
 	resp.FamilyName = user.FamilyName
 	resp.Email = user.Email

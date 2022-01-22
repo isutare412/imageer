@@ -17,8 +17,8 @@ type Service interface {
 	Hash(password string) (string, error)
 	Compare(password, hash string) bool
 
-	SignToken(id ID) (Token, error)
-	VerifyToken(t Token) (ID, error)
+	SignToken(sess *Session) (Token, error)
+	VerifyToken(t Token) (*Session, error)
 }
 
 type service struct {
@@ -40,11 +40,19 @@ func (s *service) Compare(password, hash string) bool {
 	return err == nil
 }
 
-func (s *service) SignToken(id ID) (Token, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"id":  string(id),
-		"exp": time.Now().Add(time.Duration(s.expireHour) * time.Hour).Unix(),
-	})
+func (s *service) SignToken(sess *Session) (Token, error) {
+	now := time.Now()
+	expire := now.Add(time.Duration(s.expireHour) * time.Hour)
+	clm := claims{
+		StandardClaims: jwt.StandardClaims{
+			Id:        sess.Id,
+			IssuedAt:  now.Unix(),
+			ExpiresAt: expire.Unix(),
+		},
+		Privilege: sess.Privilege,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, &clm)
 	tokenStr, err := token.SignedString(s.signKey)
 	if err != nil {
 		return "", err
@@ -52,48 +60,43 @@ func (s *service) SignToken(id ID) (Token, error) {
 	return Token(tokenStr), nil
 }
 
-func (s *service) VerifyToken(t Token) (ID, error) {
-	token, err := jwt.Parse(string(t), func(t *jwt.Token) (interface{}, error) {
+func (s *service) VerifyToken(t Token) (*Session, error) {
+	token, err := jwt.ParseWithClaims(string(t), &claims{}, func(t *jwt.Token) (interface{}, error) {
 		return s.verifyKey, nil
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
+	clm, ok := token.Claims.(*claims)
 	if !ok {
-		return "", errors.New("token is not jwt.MapClaims")
+		return nil, errors.New("token is not claims")
+	}
+	if !clm.VerifyExpiresAt(time.Now().Unix(), true) {
+		return nil, ErrTokenExpired
 	}
 
-	if !claims.VerifyExpiresAt(time.Now().Unix(), true) {
-		return "", ErrTokenExpired
+	sess := Session{
+		Id:        clm.Id,
+		Privilege: clm.Privilege,
 	}
-
-	idInterface, ok := claims["id"]
-	if !ok {
-		return "", errors.New("id not found in claims")
-	}
-	id, ok := idInterface.(string)
-	if !ok {
-		return "", errors.New("id claim is not string")
-	}
-	return ID(id), nil
+	return &sess, nil
 }
 
-func ContextWithID(ctx context.Context, id ID) context.Context {
-	return context.WithValue(ctx, ctxKeyID, id)
+func ContextWithSession(ctx context.Context, sess *Session) context.Context {
+	return context.WithValue(ctx, ctxKeyID, sess)
 }
 
-func IDFromContext(ctx context.Context) (ID, error) {
+func SessionFromContext(ctx context.Context) (*Session, error) {
 	val := ctx.Value(ctxKeyID)
 	if val == nil {
-		return "", ErrCtxIDNotFound
+		return nil, ErrCtxSessionNotFound
 	}
-	id, ok := val.(ID)
+	sess, ok := val.(*Session)
 	if !ok {
-		return "", ErrCtxInvalidID
+		return nil, ErrCtxInvalidSession
 	}
-	return id, nil
+	return sess, nil
 }
 
 func NewService(cfg *config.AuthConfig) (Service, error) {

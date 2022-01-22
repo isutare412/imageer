@@ -49,6 +49,8 @@ definitions:
         type: string
       id:
         type: integer
+      privilege:
+        type: string
     type: object
   http.signInReq:
     properties:

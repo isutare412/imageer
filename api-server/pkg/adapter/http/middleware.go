@@ -56,7 +56,7 @@ func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 				token = cookie.Value
 			}
 
-			id, err := authSvc.VerifyToken(auth.Token(token))
+			sess, err := authSvc.VerifyToken(auth.Token(token))
 			if errors.Is(err, auth.ErrTokenExpired) {
 				responseError(w, http.StatusInternalServerError, "token expired")
 				return
@@ -66,7 +66,7 @@ func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 				return
 			}
 
-			ctx := auth.ContextWithID(r.Context(), id)
+			ctx := auth.ContextWithSession(r.Context(), sess)
 			r = r.WithContext(ctx)
 			h.ServeHTTP(w, r)
 		})

@@ -464,6 +464,9 @@ var doc = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "privilege": {
+                    "type": "string"
                 }
             }
         },

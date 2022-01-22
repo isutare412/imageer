@@ -59,8 +59,8 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 			return
 		}
 
-		id := auth.ID(strconv.Itoa(int(userEntity.ID)))
-		token, err := authSvc.SignToken(id)
+		sess := userEntity.BuildSession()
+		token, err := authSvc.SignToken(sess)
 		if err != nil {
 			log.Errorf("failed to sign token: %v", err)
 			responseError(w, http.StatusInternalServerError, "failed to sign token")
@@ -187,16 +187,16 @@ func getUser(uSvc user.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		idStr, err := auth.IDFromContext(ctx)
+		sess, err := auth.SessionFromContext(ctx)
 		if err != nil {
-			log.Errorf("failed to get id from context: %v", err)
-			responseError(w, http.StatusInternalServerError, "invalid ID in request")
+			log.Errorf("failed to get session from context: %v", err)
+			responseError(w, http.StatusInternalServerError, "invalid session in request")
 			return
 		}
-		id, err := strconv.ParseInt(string(idStr), 10, 64)
+		id, err := strconv.ParseInt(string(sess.Id), 10, 64)
 		if err != nil {
-			log.Errorf("failed to parse id[%s]", idStr)
-			responseError(w, http.StatusInternalServerError, "failed to parse id")
+			log.Errorf("failed to parse session id[%s]", sess.Id)
+			responseError(w, http.StatusInternalServerError, "failed to parse session id")
 			return
 		}
 
@@ -251,8 +251,8 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 			responseError(w, http.StatusBadRequest, "email[%s] duplicated", userEntity.Email)
 			return
 		} else if err != nil {
-			log.Errorf("failed to marshal response: %v", err)
-			responseError(w, http.StatusInternalServerError, "failed to marshal response")
+			log.Errorf("failed to create user: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to create user")
 			return
 		}
 		userEntity.ID = userID

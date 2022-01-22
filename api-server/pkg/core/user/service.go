@@ -22,6 +22,8 @@ type service struct {
 }
 
 func (s *service) Create(ctx context.Context, user *User, password string) (int64, error) {
+	user.Privilege = PrivilegeUser
+
 	hashed, err := s.authSvc.Hash(password)
 	if err != nil {
 		return 0, fmt.Errorf("on create user: %w", err)

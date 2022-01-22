@@ -3,7 +3,7 @@ package auth
 import "errors"
 
 var (
-	ErrTokenExpired  = errors.New("token expired")
-	ErrCtxIDNotFound = errors.New("ID not found in context")
-	ErrCtxInvalidID  = errors.New("invalid type of ID in context")
+	ErrTokenExpired       = errors.New("token expired")
+	ErrCtxSessionNotFound = errors.New("session not found in context")
+	ErrCtxInvalidSession  = errors.New("invalid type of session in context")
 )
