@@ -1,5 +1,5 @@
 server:
-  mode: development # development/production
+  mode: &mode development # development/production
   http:
     host: "localhost"
     port: "8080"
@@ -23,6 +23,7 @@ mysql:
   password: imageer
   address: localhost:3306
   database: imageer_api
+  mode: *mode
 
 s3:
   address: localhost:9000

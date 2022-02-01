@@ -49,6 +49,7 @@ type MySQLConfig struct {
 	Password string `yaml:"password" json:"password"`
 	Address  string `yaml:"address" json:"address"`
 	Database string `yaml:"database" json:"database"`
+	Mode     string `yaml:"mode" json:"mode"`
 }
 
 type S3Config struct {
