@@ -9,6 +9,5 @@ import (
 type Repo interface {
 	Session(ctx context.Context) *gorm.DB
 
-	IsErrDuplicate(err error) bool
 	IsErrNotFound(err error) bool
 }

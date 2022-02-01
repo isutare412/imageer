@@ -37,10 +37,15 @@ func (s *service) Create(ctx context.Context, user *User, password string) (id i
 		}
 	}()
 
-	err = tx.Create(user).Error
-	if s.repo.IsErrDuplicate(err) {
+	res := tx.Where("email = ?", user.Email).Find(&User{})
+	if err := res.Error; err != nil {
+		return 0, fmt.Errorf("on create user: %w", err)
+	} else if res.RowsAffected > 0 {
 		return 0, fmt.Errorf("email[%s] duplicated: %w", user.Email, ErrDuplicate)
-	} else if err != nil {
+	}
+
+	err = tx.Create(user).Error
+	if err != nil {
 		return 0, fmt.Errorf("on create user: %w", err)
 	}
 	return user.ID, nil
@@ -87,8 +92,10 @@ func (s *service) UpdateCredit(ctx context.Context, id int64, delta int64) (user
 	}()
 
 	err = tx.First(user, id).Error
-	if err != nil {
+	if s.repo.IsErrNotFound(err) {
 		return nil, ErrUserNotFound
+	} else if err != nil {
+		return nil, fmt.Errorf("on update credit: %w", err)
 	}
 
 	newCredit := user.Credit + delta
