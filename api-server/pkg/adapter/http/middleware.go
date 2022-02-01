@@ -40,20 +40,18 @@ func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var token string
-			if rawAuth := r.Header.Get("Authorization"); rawAuth != "" {
-				authSplit := strings.SplitN(rawAuth, "Bearer ", 2)
+			if cookie, err := r.Cookie("token"); err == nil {
+				token = cookie.Value
+			} else if authStr := r.Header.Get("Authorization"); authStr != "" {
+				authSplit := strings.SplitN(authStr, "Bearer ", 2)
 				if len(authSplit) < 2 {
 					responseError(w, http.StatusBadRequest, "invalid authorization header")
 					return
 				}
 				token = authSplit[1]
 			} else {
-				cookie, err := r.Cookie("token")
-				if err != nil {
 					responseError(w, http.StatusBadRequest, "need token from cookie or authorization header")
 					return
-				}
-				token = cookie.Value
 			}
 
 			sess, err := authSvc.VerifyToken(auth.Token(token))

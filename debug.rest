@@ -46,28 +46,24 @@ Authorization: Bearer {{token}}
 ################################################################################
 GET {{scheme}}://{{url}}/{{apiPrefix}}/greetings/Suhyuk HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 ################################################################################
 # Get user by session
 ################################################################################
 GET {{scheme}}://{{url}}/{{apiPrefix}}/users HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 ################################################################################
 # Get user by id
 ################################################################################
 GET {{scheme}}://{{url}}/{{apiPrefix}}/users/6 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 ################################################################################
 # Create user
 ################################################################################
 POST {{scheme}}://{{url}}/{{apiPrefix}}/users HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
   "givenName": "Suhyuk",
