@@ -1,10 +1,7 @@
 package user
 
 import (
-	"strconv"
 	"time"
-
-	"github.com/isutare412/imageer/api-server/pkg/core/auth"
 )
 
 type Privilege string
@@ -24,11 +21,4 @@ type User struct {
 	Credit     int64     `gorm:"default:0"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
-}
-
-func (u *User) BuildSession() *auth.Session {
-	return &auth.Session{
-		Id:        strconv.Itoa(int(u.ID)),
-		Privilege: string(u.Privilege),
-	}
 }

@@ -59,8 +59,11 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 			return
 		}
 
-		sess := userEntity.BuildSession()
-		token, err := authSvc.SignToken(sess)
+		sess := auth.Session{
+			Id:        strconv.Itoa(int(userEntity.ID)),
+			Privilege: string(userEntity.Privilege),
+		}
+		token, err := authSvc.SignToken(&sess)
 		if err != nil {
 			log.Errorf("failed to sign token: %v", err)
 			responseError(w, http.StatusInternalServerError, "failed to sign token")
@@ -200,7 +203,7 @@ func getUser(uSvc user.Service) http.HandlerFunc {
 			return
 		}
 
-		userEntity, err := uSvc.GetByID(ctx, id)
+		usr, err := uSvc.GetByID(ctx, id)
 		if errors.Is(err, user.ErrUserNotFound) {
 			responseError(w, http.StatusBadRequest, "id[%d] is invalid", id)
 			return
@@ -210,8 +213,14 @@ func getUser(uSvc user.Service) http.HandlerFunc {
 			return
 		}
 
-		var res getUserRes
-		res.from(userEntity)
+		res := getUserRes{
+			ID:         usr.ID,
+			Privilege:  string(usr.Privilege),
+			GivenName:  usr.GivenName,
+			FamilyName: usr.FamilyName,
+			Email:      usr.Email,
+			Credit:     usr.Credit,
+		}
 		responseJson(w, &res)
 	}
 }
@@ -244,21 +253,30 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 			responseError(w, http.StatusBadRequest, "invalid body param")
 			return
 		}
-		userEntity := req.into()
 
-		userID, err := uSvc.Create(ctx, userEntity, req.Password)
+		usr := user.User{
+			GivenName:  req.GivenName,
+			FamilyName: req.FamilyName,
+			Email:      req.Email,
+		}
+		userID, err := uSvc.Create(ctx, &usr, req.Password)
 		if errors.Is(err, user.ErrDuplicate) {
-			responseError(w, http.StatusBadRequest, "email[%s] duplicated", userEntity.Email)
+			responseError(w, http.StatusBadRequest, "email[%s] duplicated", usr.Email)
 			return
 		} else if err != nil {
 			log.Errorf("failed to create user: %v", err)
 			responseError(w, http.StatusInternalServerError, "failed to create user")
 			return
 		}
-		userEntity.ID = userID
+		usr.ID = userID
 
-		var res createUserRes
-		res.from(userEntity)
+		res := createUserRes{
+			ID:         usr.ID,
+			GivenName:  usr.GivenName,
+			FamilyName: usr.FamilyName,
+			Email:      usr.Email,
+			Credit:     usr.Credit,
+		}
 		responseJson(w, &res)
 	}
 }
@@ -289,7 +307,7 @@ func getUserByID(uSvc user.Service) http.HandlerFunc {
 			return
 		}
 
-		userEntity, err := uSvc.GetByID(ctx, id)
+		usr, err := uSvc.GetByID(ctx, id)
 		if errors.Is(err, user.ErrUserNotFound) {
 			responseError(w, http.StatusBadRequest, "user not exists")
 			return
@@ -299,8 +317,14 @@ func getUserByID(uSvc user.Service) http.HandlerFunc {
 			return
 		}
 
-		var res getUserRes
-		res.from(userEntity)
+		res := getUserRes{
+			ID:         usr.ID,
+			Privilege:  string(usr.Privilege),
+			GivenName:  usr.GivenName,
+			FamilyName: usr.FamilyName,
+			Email:      usr.Email,
+			Credit:     usr.Credit,
+		}
 		responseJson(w, &res)
 	}
 }
