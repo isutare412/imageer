@@ -37,6 +37,7 @@ type JobRepoS3Config struct {
 type HttpConfig struct {
 	Host string `yaml:"host" json:"host"`
 	Port string `yaml:"port" json:"port"`
+	Mode string `yaml:"mode" json:"mode"`
 }
 
 type RedisConfig struct {

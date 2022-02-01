@@ -3,6 +3,7 @@ server:
   http:
     host: "localhost"
     port: "8080"
+    mode: *mode
   job:
     queue:
       request: processor-job-request

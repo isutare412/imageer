@@ -27,7 +27,7 @@ func (l *responseLogger) Write(b []byte) (int, error) {
 	return l.ResponseWriter.Write(b)
 }
 
-func logRequest(h http.Handler) http.Handler {
+func structAccessLog(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := responseLogger{ResponseWriter: w, status: http.StatusOK}
 		h.ServeHTTP(&logger, r)
@@ -39,6 +39,16 @@ func logRequest(h http.Handler) http.Handler {
 			"status": logger.status,
 			"length": logger.length,
 		}).Info("access")
+	})
+}
+
+func plainAccessLog(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger := responseLogger{ResponseWriter: w, status: http.StatusOK}
+		h.ServeHTTP(&logger, r)
+
+		log.Infof("%s - \"%s %s\" %d %d",
+			r.RemoteAddr, r.Method, r.URL.String(), logger.status, logger.length)
 	})
 }
 

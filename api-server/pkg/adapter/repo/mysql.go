@@ -37,7 +37,7 @@ func NewMySQL(cfg *config.MySQLConfig) (*MySQL, error) {
 		cfg.Username, cfg.Password, cfg.Address, cfg.Database)
 
 	useColor := false
-	if cfg.Mode != "production" {
+	if cfg.Mode == "development" {
 		useColor = true
 	}
 	logger := glog.New(

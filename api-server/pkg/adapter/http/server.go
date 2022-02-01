@@ -63,10 +63,15 @@ func (s *server) Done() <-chan struct{} {
 func NewServer(
 	cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service, authSvc auth.Service,
 ) *server {
+	accessLog := structAccessLog
+	if cfg.Mode == "development" {
+		accessLog = plainAccessLog
+	}
+
 	checkSession := checkSession(authSvc)
 
 	r := mux.NewRouter()
-	r.Use(logRequest)
+	r.Use(accessLog)
 
 	r.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler).Methods("GET")
 	r.HandleFunc("/signIn", signIn(uSvc, authSvc)).Methods("POST")

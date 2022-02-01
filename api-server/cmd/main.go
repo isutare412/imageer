@@ -101,7 +101,7 @@ func readConfig(path string) (*config.Config, error) {
 }
 
 func setLogger(mode string) {
-	if mode != "production" {
+	if mode == "development" {
 		log.SetFormatter(&log.TextFormatter{})
 		log.SetLevel(log.TraceLevel)
 	} else {
