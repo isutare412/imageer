@@ -31,8 +31,13 @@ func logRequest(h http.Handler) http.Handler {
 		logger := responseLogger{ResponseWriter: w, status: http.StatusOK}
 		h.ServeHTTP(&logger, r)
 
-		log.Infof("%s - \"%s %s\" %d %d",
-			r.RemoteAddr, r.Method, r.URL.String(), logger.status, logger.length)
+		log.WithFields(log.Fields{
+			"addr":   r.RemoteAddr,
+			"method": r.Method,
+			"url":    r.URL.String(),
+			"status": logger.status,
+			"length": logger.length,
+		}).Info("access")
 	})
 }
 
@@ -50,8 +55,8 @@ func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 				}
 				token = authSplit[1]
 			} else {
-					responseError(w, http.StatusBadRequest, "need token from cookie or authorization header")
-					return
+				responseError(w, http.StatusBadRequest, "need token from cookie or authorization header")
+				return
 			}
 
 			sess, err := authSvc.VerifyToken(auth.Token(token))
