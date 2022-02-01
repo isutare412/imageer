@@ -28,7 +28,7 @@ func (s *Service) Start(ctx context.Context) {
 		for {
 			err := s.consume(ctx)
 			if err != nil && !errors.Is(err, context.Canceled) {
-				log.Errorf("Failed to consume job: %v", err)
+				log.Errorf("failed to consume job: %v", err)
 			}
 
 			select {
@@ -45,7 +45,7 @@ func (s *Service) Start(ctx context.Context) {
 
 func (s *Service) shutdown() {
 	defer close(s.done)
-	log.Infof("Processor service shutdowned successfully")
+	log.Infof("job service shutdowned successfully")
 }
 
 func (s *Service) consume(ctx context.Context) error {
@@ -54,9 +54,9 @@ func (s *Service) consume(ctx context.Context) error {
 		return fmt.Errorf("on consume mq: %w", err)
 	}
 
-	log.Infof("Got messages")
+	log.Infof("got messages")
 	for msg := range messages {
-		log.Infof("Message: %s", string(msg))
+		log.Infof("message: %s", string(msg))
 	}
 	return nil
 }
@@ -67,11 +67,11 @@ func (s *Service) Done() <-chan struct{} {
 
 func NewService(cfg *config.JobConfig, mq MsgQueue) (*Service, error) {
 	if err := mq.Init(context.Background(), cfg.Queue.Request); err != nil {
-		return nil, fmt.Errorf("on init MQ: %w", err)
+		return nil, fmt.Errorf("on new job service: %w", err)
 	}
 
 	if cfg.RetryDelay < 0 {
-		return nil, fmt.Errorf("retry delay should be larger than zero: %d", cfg.RetryDelay)
+		return nil, fmt.Errorf("retry delay[%d] should be larger than zero", cfg.RetryDelay)
 	}
 
 	return &Service{

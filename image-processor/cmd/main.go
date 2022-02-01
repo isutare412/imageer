@@ -20,11 +20,11 @@ func main() {
 
 	cfgPath := os.Getenv(cfgEnvStr)
 	if cfgPath == "" {
-		log.Fatalf("Need environment variable: %s", cfgEnvStr)
+		log.Fatalf("need environment variable: %s", cfgEnvStr)
 	}
 	cfg, err := readConfig(cfgPath)
 	if err != nil {
-		log.Fatalf("Failed to read config: %v", err)
+		log.Fatalf("failed to read config: %v", err)
 	}
 
 	config.SetMode(config.Mode(cfg.Mode))
@@ -40,15 +40,15 @@ func main() {
 
 	redisMQ, err := mq.NewRedis(&cfg.Redis)
 	if err != nil {
-		log.Fatalf("Failed to create RedisMq: %v", err)
+		log.Fatalf("failed to create RedisMq: %v", err)
 	}
-	log.Infof("Created redis MQ on %v", cfg.Redis.Addrs)
+	log.Infof("created redis MQ on %v", cfg.Redis.Addrs)
 
 	pSvc, err := job.NewService(&cfg.Job, redisMQ)
 	if err != nil {
-		log.Fatalf("Failed to create processor service: %v", err)
+		log.Fatalf("failed to create processor service: %v", err)
 	}
-	log.Info("Created processor service")
+	log.Info("created processor service")
 
 	// Start services
 	pSvc.Start(rootCtx)
@@ -57,7 +57,7 @@ func main() {
 	sig := make(chan os.Signal, 3)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	s := <-sig
-	log.Infof("Caught signal: %s", s.String())
+	log.Infof("caught signal: %s", s.String())
 
 	// Wait for graceful shutdown
 	cancel()

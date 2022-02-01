@@ -2,7 +2,6 @@ package mq
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strings"
 
@@ -20,7 +19,7 @@ func (r *Redis) Init(ctx context.Context, topic string) error {
 	if _, err := r.client.XGroupCreateMkStream(
 		ctx, topic, r.groupName, "0",
 	).Result(); err != nil && !strings.HasPrefix(err.Error(), "BUSYGROUP") {
-		return fmt.Errorf("on XGroupCreateMkStream: %w", err)
+		return err
 	}
 	return nil
 }
@@ -35,7 +34,7 @@ func (r *Redis) Consume(ctx context.Context, topic string, limit int64) (<-chan 
 		Count:    limit,
 	}).Result()
 	if err != nil {
-		return nil, fmt.Errorf("on XReadGroup: %w", err)
+		return nil, err
 	}
 
 	messages := make(chan []byte, limit)
@@ -56,12 +55,12 @@ func NewRedis(cfg *config.RedisConfig) (*Redis, error) {
 	})
 
 	if err := c.Ping(context.Background()).Err(); err != nil {
-		return nil, fmt.Errorf("on ping redis: %w", err)
+		return nil, err
 	}
 
 	hostname, err := os.Hostname()
 	if err != nil {
-		return nil, fmt.Errorf("on Hostname: %w", err)
+		return nil, err
 	}
 
 	return &Redis{
