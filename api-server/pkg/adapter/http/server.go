@@ -69,7 +69,6 @@ func NewServer(
 	r.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler).Methods("GET")
 	r.HandleFunc("/signIn", signIn(uSvc, authSvc)).Methods("POST")
 	r.HandleFunc("/signOut", signOut(uSvc, authSvc)).Methods("GET")
-	r.HandleFunc("/signTest", signCheck(authSvc)).Methods("GET")
 
 	apiV1 := r.PathPrefix("/api/v1").Subrouter()
 	apiV1.Use(authenticate(authSvc))

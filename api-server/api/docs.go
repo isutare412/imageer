@@ -342,50 +342,6 @@ var doc = `{
                     }
                 }
             }
-        },
-        "/signTest": {
-            "get": {
-                "description": "Sign in test using authorization header or cookie",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Sign in test",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "x-example": "Bearer your_jwt_token",
-                        "description": "bearer authorization",
-                        "name": "Authorization",
-                        "in": "header"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "error",
-                        "schema": {
-                            "$ref": "#/definitions/http.errorRes"
-                        }
-                    },
-                    "500": {
-                        "description": "error",
-                        "schema": {
-                            "$ref": "#/definitions/http.errorRes"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {

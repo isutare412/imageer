@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -95,50 +94,6 @@ func signOut(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 			Value:   "",
 			Expires: time.Unix(0, 0),
 		})
-	}
-}
-
-// @Summary Sign in test
-// @Description Sign in test using authorization header or cookie
-// @Tags Authentication
-// @Router /signTest [get]
-// @Param Authorization header string false "bearer authorization" extensions(x-example=Bearer your_jwt_token)
-// @Accept json
-// @Produce json
-// @Success 200 {string} string "ok"
-// @Failure 400 {object} errorRes "error"
-// @Failure 500 {object} errorRes "error"
-func signCheck(authSvc auth.Service) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var token string
-		if rawAuth := r.Header.Get("Authorization"); rawAuth != "" {
-			authSplit := strings.SplitN(rawAuth, "Bearer ", 2)
-			if len(authSplit) < 2 {
-				responseError(w, http.StatusBadRequest, "invalid authorization header")
-				return
-			}
-			token = authSplit[1]
-		} else {
-			cookie, err := r.Cookie("token")
-			if err != nil {
-				responseError(w, http.StatusBadRequest, "need token from cookie or authorization header")
-				return
-			}
-			token = cookie.Value
-		}
-
-		id, err := authSvc.VerifyToken(auth.Token(token))
-		if errors.Is(err, auth.ErrTokenExpired) {
-			responseError(w, http.StatusInternalServerError, "token expired")
-			return
-		} else if err != nil {
-			log.Errorf("failed to verify token: %v", err)
-			responseError(w, http.StatusInternalServerError, "failed to verify token")
-			return
-		}
-		log.Infof("verified token: id(%v)", id)
-
-		responseText(w, "token verified")
 	}
 }
 

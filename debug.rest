@@ -35,13 +35,6 @@ Content-Type: application/json
 GET {{scheme}}://{{url}}/signOut HTTP/1.1
 
 ################################################################################
-# Sign in test
-################################################################################
-GET {{scheme}}://{{url}}/signTest HTTP/1.1
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-################################################################################
 # Greetings
 ################################################################################
 GET {{scheme}}://{{url}}/{{apiPrefix}}/greetings/Suhyuk HTTP/1.1
