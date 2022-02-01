@@ -42,7 +42,7 @@ func logRequest(h http.Handler) http.Handler {
 	})
 }
 
-func injectSession(authSvc auth.Service) mux.MiddlewareFunc {
+func checkSession(authSvc auth.Service) mux.MiddlewareFunc {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var token string
@@ -73,30 +73,28 @@ func injectSession(authSvc auth.Service) mux.MiddlewareFunc {
 				return
 			}
 
-			ctx := authSvc.ContextWithSession(r.Context(), sess)
+			ctx := injectSession(r.Context(), sess)
 			r = r.WithContext(ctx)
 			h.ServeHTTP(w, r)
 		})
 	}
 }
 
-func checkAdmin(authSvc auth.Service) mux.MiddlewareFunc {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			sess, err := authSvc.SessionFromContext(r.Context())
-			if err != nil {
-				log.Errorf("failed to extract session from context: %v", err)
-				responseError(w, http.StatusInternalServerError, "failed to get session")
-				return
-			}
+func checkAdmin(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sess, err := extractSession(r.Context())
+		if err != nil {
+			log.Errorf("failed to extract session from context: %v", err)
+			responseError(w, http.StatusInternalServerError, "failed to get session")
+			return
+		}
 
-			if sess.Privilege != string(user.PrivilegeAdmin) {
-				log.Warnf("request without admin privilege")
-				responseError(w, http.StatusUnauthorized, "need admin privilege")
-				return
-			}
+		if sess.Privilege != string(user.PrivilegeAdmin) {
+			log.Warnf("request without admin privilege")
+			responseError(w, http.StatusUnauthorized, "need admin privilege")
+			return
+		}
 
-			h.ServeHTTP(w, r)
-		})
-	}
+		h.ServeHTTP(w, r)
+	})
 }

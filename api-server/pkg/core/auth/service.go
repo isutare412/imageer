@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"crypto/rsa"
 	"errors"
 	"fmt"
@@ -19,9 +18,6 @@ type Service interface {
 
 	SignToken(sess *Session) (Token, error)
 	VerifyToken(t Token) (*Session, error)
-
-	ContextWithSession(ctx context.Context, sess *Session) context.Context
-	SessionFromContext(ctx context.Context) (*Session, error)
 }
 
 type service struct {
@@ -84,22 +80,6 @@ func (s *service) VerifyToken(t Token) (*Session, error) {
 		Privilege: clm.Privilege,
 	}
 	return &sess, nil
-}
-
-func (s *service) ContextWithSession(ctx context.Context, sess *Session) context.Context {
-	return context.WithValue(ctx, ctxKeyID, sess)
-}
-
-func (s *service) SessionFromContext(ctx context.Context) (*Session, error) {
-	val := ctx.Value(ctxKeyID)
-	if val == nil {
-		return nil, ErrCtxSessionNotFound
-	}
-	sess, ok := val.(*Session)
-	if !ok {
-		return nil, ErrCtxInvalidSession
-	}
-	return sess, nil
 }
 
 func NewService(cfg *config.AuthConfig) (Service, error) {

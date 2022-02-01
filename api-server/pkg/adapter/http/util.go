@@ -1,10 +1,13 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
+	"github.com/isutare412/imageer/api-server/pkg/core/auth"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,4 +38,20 @@ func responseJson(w http.ResponseWriter, res interface{}) {
 func responseText(w http.ResponseWriter, txt string) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Write([]byte(txt))
+}
+
+func injectSession(ctx context.Context, sess *auth.Session) context.Context {
+	return context.WithValue(ctx, ctxKeyID, sess)
+}
+
+func extractSession(ctx context.Context) (*auth.Session, error) {
+	val := ctx.Value(ctxKeyID)
+	if val == nil {
+		return nil, errors.New("session not found")
+	}
+	sess, ok := val.(*auth.Session)
+	if !ok {
+		return nil, errors.New("invalid session in context")
+	}
+	return sess, nil
 }

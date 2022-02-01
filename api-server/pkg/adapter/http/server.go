@@ -63,8 +63,7 @@ func (s *server) Done() <-chan struct{} {
 func NewServer(
 	cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service, authSvc auth.Service,
 ) *server {
-	injectSession := injectSession(authSvc)
-	checkAdmin := checkAdmin(authSvc)
+	checkSession := checkSession(authSvc)
 
 	r := mux.NewRouter()
 	r.Use(logRequest)
@@ -76,14 +75,14 @@ func NewServer(
 	apiBase := r.PathPrefix("/api/v1").Subrouter()
 
 	apiAuth := apiBase.NewRoute().Subrouter()
-	apiAuth.Use(injectSession)
+	apiAuth.Use(checkSession)
 
 	apiAdmin := apiBase.NewRoute().Subrouter()
-	apiAdmin.Use(injectSession, checkAdmin)
+	apiAdmin.Use(checkSession, checkAdmin)
 
 	apiAuth.HandleFunc("/greetings/{name}", getGreeting(jSvc)).Methods("GET")
 
-	apiAuth.HandleFunc("/users", getUser(uSvc, authSvc)).Methods("GET")
+	apiAuth.HandleFunc("/users", getUser(uSvc)).Methods("GET")
 	apiBase.HandleFunc("/users", createUser(uSvc)).Methods("POST")
 	apiAdmin.HandleFunc("/users/{id}", getUserByID(uSvc)).Methods("GET")
 

@@ -145,11 +145,11 @@ func getGreeting(jSvc job.Service) http.HandlerFunc {
 // @Success 200 {object} getUserRes "ok"
 // @Failure 400 {object} errorRes "error"
 // @Failure 500 {object} errorRes "error"
-func getUser(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
+func getUser(uSvc user.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		sess, err := authSvc.SessionFromContext(ctx)
+		sess, err := extractSession(ctx)
 		if err != nil {
 			log.Errorf("failed to get session from context: %v", err)
 			responseError(w, http.StatusInternalServerError, "invalid session in request")
