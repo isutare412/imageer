@@ -179,13 +179,6 @@ var doc = `{
                 "summary": "Create a user",
                 "parameters": [
                     {
-                        "type": "string",
-                        "x-example": "Bearer your_jwt_token",
-                        "description": "bearer authorization",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
-                    {
                         "description": "request to create a new user",
                         "name": "request",
                         "in": "body",

@@ -170,11 +170,6 @@ paths:
       - application/json
       description: Create a user with basic information
       parameters:
-      - description: bearer authorization
-        in: header
-        name: Authorization
-        type: string
-        x-example: Bearer your_jwt_token
       - description: request to create a new user
         in: body
         name: request

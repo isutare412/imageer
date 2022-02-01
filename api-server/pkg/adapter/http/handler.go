@@ -189,7 +189,6 @@ func getUser(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 // @Description Create a user with basic information
 // @Tags User
 // @Router /api/v1/users [post]
-// @Param Authorization header string false "bearer authorization" extensions(x-example=Bearer your_jwt_token)
 // @Param request body createUserReq true "request to create a new user"
 // @Accept json
 // @Produce json

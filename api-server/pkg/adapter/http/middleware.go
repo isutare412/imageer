@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/isutare412/imageer/api-server/pkg/core/auth"
+	"github.com/isutare412/imageer/api-server/pkg/core/user"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -41,7 +42,7 @@ func logRequest(h http.Handler) http.Handler {
 	})
 }
 
-func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
+func injectSession(authSvc auth.Service) mux.MiddlewareFunc {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var token string
@@ -51,29 +52,50 @@ func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 				authSplit := strings.SplitN(authStr, "Bearer ", 2)
 				if len(authSplit) < 2 {
 					log.Warnf("failed to split authorization header")
-					responseError(w, http.StatusBadRequest, "invalid authorization header")
+					responseError(w, http.StatusUnauthorized, "invalid authorization header")
 					return
 				}
 				token = authSplit[1]
 			} else {
 				log.Warnf("received request without auth")
-				responseError(w, http.StatusBadRequest, "need token from cookie or authorization header")
+				responseError(w, http.StatusUnauthorized, "need token from cookie or authorization header")
 				return
 			}
 
 			sess, err := authSvc.VerifyToken(auth.Token(token))
 			if errors.Is(err, auth.ErrTokenExpired) {
 				log.Warnf("received expired token")
-				responseError(w, http.StatusInternalServerError, "token expired")
+				responseError(w, http.StatusUnauthorized, "token expired")
 				return
 			} else if err != nil {
 				log.Errorf("failed to verify token: %v", err)
-				responseError(w, http.StatusInternalServerError, "failed to verify token")
+				responseError(w, http.StatusUnauthorized, "failed to verify token")
 				return
 			}
 
 			ctx := authSvc.ContextWithSession(r.Context(), sess)
 			r = r.WithContext(ctx)
+			h.ServeHTTP(w, r)
+		})
+	}
+}
+
+func checkAdmin(authSvc auth.Service) mux.MiddlewareFunc {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			sess, err := authSvc.SessionFromContext(r.Context())
+			if err != nil {
+				log.Errorf("failed to extract session from context: %v", err)
+				responseError(w, http.StatusInternalServerError, "failed to get session")
+				return
+			}
+
+			if sess.Privilege != string(user.PrivilegeAdmin) {
+				log.Warnf("request without admin privilege")
+				responseError(w, http.StatusUnauthorized, "need admin privilege")
+				return
+			}
+
 			h.ServeHTTP(w, r)
 		})
 	}

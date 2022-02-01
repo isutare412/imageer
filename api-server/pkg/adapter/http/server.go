@@ -63,6 +63,9 @@ func (s *server) Done() <-chan struct{} {
 func NewServer(
 	cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service, authSvc auth.Service,
 ) *server {
+	injectSession := injectSession(authSvc)
+	checkAdmin := checkAdmin(authSvc)
+
 	r := mux.NewRouter()
 	r.Use(logRequest)
 
@@ -70,16 +73,21 @@ func NewServer(
 	r.HandleFunc("/signIn", signIn(uSvc, authSvc)).Methods("POST")
 	r.HandleFunc("/signOut", signOut(uSvc, authSvc)).Methods("GET")
 
-	apiV1 := r.PathPrefix("/api/v1").Subrouter()
-	apiV1.Use(authenticate(authSvc))
+	apiBase := r.PathPrefix("/api/v1").Subrouter()
 
-	apiV1.HandleFunc("/greetings/{name}", getGreeting(jSvc)).Methods("GET")
+	apiAuth := apiBase.NewRoute().Subrouter()
+	apiAuth.Use(injectSession)
 
-	apiV1.HandleFunc("/users", getUser(uSvc, authSvc)).Methods("GET")
-	apiV1.HandleFunc("/users", createUser(uSvc)).Methods("POST")
-	apiV1.HandleFunc("/users/{id}", getUserByID(uSvc)).Methods("GET")
+	apiAdmin := apiBase.NewRoute().Subrouter()
+	apiAdmin.Use(injectSession, checkAdmin)
 
-	apiV1.HandleFunc("/images/archives", archiveImage(jSvc)).Methods("POST")
+	apiAuth.HandleFunc("/greetings/{name}", getGreeting(jSvc)).Methods("GET")
+
+	apiAuth.HandleFunc("/users", getUser(uSvc, authSvc)).Methods("GET")
+	apiBase.HandleFunc("/users", createUser(uSvc)).Methods("POST")
+	apiAdmin.HandleFunc("/users/{id}", getUserByID(uSvc)).Methods("GET")
+
+	apiAuth.HandleFunc("/images/archives", archiveImage(jSvc)).Methods("POST")
 
 	return &server{
 		server: &http.Server{
