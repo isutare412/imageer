@@ -33,23 +33,25 @@ func signIn(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 
 		reqBytes, err := io.ReadAll(r.Body)
 		if err != nil {
-			msg := "failed to read body"
-			log.Errorf(msg)
-			responseError(w, http.StatusInternalServerError, msg)
+			log.Warnf("failed to read body")
+			responseError(w, http.StatusInternalServerError, "failed to read body")
 			return
 		}
 
 		var req signInReq
 		if err := json.Unmarshal(reqBytes, &req); err != nil {
+			log.Warnf("invalid body param")
 			responseError(w, http.StatusBadRequest, "invalid body param")
 			return
 		}
 
 		userEntity, err := uSvc.GetByEmailPassword(ctx, req.Email, req.Password)
 		if errors.Is(err, user.ErrUserNotFound) {
+			log.Warnf("user not found by email[%s]", req.Email)
 			responseError(w, http.StatusBadRequest, "invalid email or password")
 			return
 		} else if errors.Is(err, user.ErrPasswordNotCorrect) {
+			log.Warnf("password[%s] mismatch", req.Password)
 			responseError(w, http.StatusBadRequest, "invalid email or password")
 			return
 		} else if err != nil {
@@ -94,6 +96,7 @@ func signOut(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 			Value:   "",
 			Expires: time.Unix(0, 0),
 		})
+		responseText(w, "success")
 	}
 }
 
@@ -112,6 +115,7 @@ func getGreeting(jSvc job.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name, ok := mux.Vars(r)["name"]
 		if !ok {
+			log.Warnf("name field not given")
 			responseError(w, http.StatusBadRequest, "'name' is mandatory field")
 			return
 		}
@@ -160,6 +164,7 @@ func getUser(uSvc user.Service, authSvc auth.Service) http.HandlerFunc {
 
 		usr, err := uSvc.GetByID(ctx, id)
 		if errors.Is(err, user.ErrUserNotFound) {
+			log.Warnf("user not found by id[%d]", id)
 			responseError(w, http.StatusBadRequest, "id[%d] is invalid", id)
 			return
 		} else if err != nil {
@@ -197,14 +202,14 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 
 		reqBytes, err := io.ReadAll(r.Body)
 		if err != nil {
-			msg := "failed to read body"
-			log.Errorf(msg)
-			responseError(w, http.StatusInternalServerError, msg)
+			log.Warnf("failed to read body")
+			responseError(w, http.StatusInternalServerError, "failed to read body")
 			return
 		}
 
 		var req createUserReq
 		if err := json.Unmarshal(reqBytes, &req); err != nil {
+			log.Warnf("invalid body param")
 			responseError(w, http.StatusBadRequest, "invalid body param")
 			return
 		}
@@ -216,7 +221,8 @@ func createUser(uSvc user.Service) http.HandlerFunc {
 		}
 		userID, err := uSvc.Create(ctx, &usr, req.Password)
 		if errors.Is(err, user.ErrDuplicate) {
-			responseError(w, http.StatusBadRequest, "email[%s] duplicated", usr.Email)
+			log.Warnf("failed to create user: %v", err)
+			responseError(w, http.StatusBadRequest, err.Error())
 			return
 		} else if err != nil {
 			log.Errorf("failed to create user: %v", err)
@@ -253,17 +259,20 @@ func getUserByID(uSvc user.Service) http.HandlerFunc {
 
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
+			log.Warnf("id field not given")
 			responseError(w, http.StatusBadRequest, "'id' is mandatory field")
 			return
 		}
 		id, err := strconv.ParseInt(idStr, 10, 64)
 		if err != nil {
+			log.Warnf("failed to parse int[%s]", idStr)
 			responseError(w, http.StatusBadRequest, "id[%s] is invalid", idStr)
 			return
 		}
 
 		usr, err := uSvc.GetByID(ctx, id)
 		if errors.Is(err, user.ErrUserNotFound) {
+			log.Warnf("user not found by id[%d]", id)
 			responseError(w, http.StatusBadRequest, "user not exists")
 			return
 		} else if err != nil {

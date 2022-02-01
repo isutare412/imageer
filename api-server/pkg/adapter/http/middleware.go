@@ -50,17 +50,20 @@ func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 			} else if authStr := r.Header.Get("Authorization"); authStr != "" {
 				authSplit := strings.SplitN(authStr, "Bearer ", 2)
 				if len(authSplit) < 2 {
+					log.Warnf("failed to split authorization header")
 					responseError(w, http.StatusBadRequest, "invalid authorization header")
 					return
 				}
 				token = authSplit[1]
 			} else {
+				log.Warnf("received request without auth")
 				responseError(w, http.StatusBadRequest, "need token from cookie or authorization header")
 				return
 			}
 
 			sess, err := authSvc.VerifyToken(auth.Token(token))
 			if errors.Is(err, auth.ErrTokenExpired) {
+				log.Warnf("received expired token")
 				responseError(w, http.StatusInternalServerError, "token expired")
 				return
 			} else if err != nil {
