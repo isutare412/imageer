@@ -64,7 +64,7 @@ func NewServer(
 	cfg *config.HttpConfig, jSvc job.Service, uSvc user.Service, authSvc auth.Service,
 ) *server {
 	accessLog := structAccessLog
-	if cfg.Mode == "development" {
+	if config.IsDevelopmentMode() {
 		accessLog = plainAccessLog
 	}
 

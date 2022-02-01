@@ -1,17 +1,18 @@
 package config
 
 type Config struct {
-	Server ServerConfig `yaml:"server" json:"server"`
-	Redis  RedisConfig  `yaml:"redis" json:"redis"`
-	MySQL  MySQLConfig  `yaml:"mysql" json:"mysql"`
-	S3     S3Config     `yaml:"s3" json:"s3"`
-	Auth   AuthConfig   `yaml:"auth" json:"auth"`
+	Mode  string      `yaml:"mode" json:"mode"`
+	Http  HttpConfig  `yaml:"http" json:"http"`
+	Job   JobConfig   `yaml:"job" json:"job"`
+	Redis RedisConfig `yaml:"redis" json:"redis"`
+	MySQL MySQLConfig `yaml:"mysql" json:"mysql"`
+	S3    S3Config    `yaml:"s3" json:"s3"`
+	Auth  AuthConfig  `yaml:"auth" json:"auth"`
 }
 
-type ServerConfig struct {
-	Mode string     `yaml:"mode" json:"mode"`
-	Http HttpConfig `yaml:"http" json:"http"`
-	Job  JobConfig  `yaml:"job" json:"job"`
+type HttpConfig struct {
+	Host string `yaml:"host" json:"host"`
+	Port string `yaml:"port" json:"port"`
 }
 
 type JobConfig struct {
@@ -34,12 +35,6 @@ type JobRepoS3Config struct {
 	ResultDir string `yaml:"resultDir" json:"resultDir"`
 }
 
-type HttpConfig struct {
-	Host string `yaml:"host" json:"host"`
-	Port string `yaml:"port" json:"port"`
-	Mode string `yaml:"mode" json:"mode"`
-}
-
 type RedisConfig struct {
 	Addrs    []string `yaml:"addrs" json:"addrs"`
 	Password string   `yaml:"password" json:"password"`
@@ -50,7 +45,6 @@ type MySQLConfig struct {
 	Password string `yaml:"password" json:"password"`
 	Address  string `yaml:"address" json:"address"`
 	Database string `yaml:"database" json:"database"`
-	Mode     string `yaml:"mode" json:"mode"`
 }
 
 type S3Config struct {

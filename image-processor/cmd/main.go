@@ -26,7 +26,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to read config: %v", err)
 	}
-	setLogger(cfg.Server.Mode)
+
+	config.SetMode(config.Mode(cfg.Mode))
+	if config.IsDevelopmentMode() {
+		log.SetFormatter(&log.TextFormatter{})
+		log.SetLevel(log.InfoLevel)
+	} else {
+		log.SetFormatter(&log.JSONFormatter{})
+		log.SetLevel(log.TraceLevel)
+	}
 
 	rootCtx, cancel := context.WithCancel(context.Background())
 
@@ -36,7 +44,7 @@ func main() {
 	}
 	log.Infof("Created redis MQ on %v", cfg.Redis.Addrs)
 
-	pSvc, err := job.NewService(&cfg.Server.Job, redisMQ)
+	pSvc, err := job.NewService(&cfg.Job, redisMQ)
 	if err != nil {
 		log.Fatalf("Failed to create processor service: %v", err)
 	}
@@ -67,14 +75,4 @@ func readConfig(path string) (*config.Config, error) {
 		return nil, fmt.Errorf("on unmarshaling config: %w", err)
 	}
 	return &cfg, nil
-}
-
-func setLogger(mode string) {
-	if mode != "production" {
-		log.SetFormatter(&log.TextFormatter{})
-		log.SetLevel(log.InfoLevel)
-	} else {
-		log.SetFormatter(&log.JSONFormatter{})
-		log.SetLevel(log.TraceLevel)
-	}
 }

@@ -1,13 +1,9 @@
 package config
 
 type Config struct {
-	Server ServerConfig `yaml:"server" json:"server"`
-	Redis  RedisConfig  `yaml:"redis" json:"redis"`
-}
-
-type ServerConfig struct {
-	Mode string    `yaml:"mode" json:"mode"`
-	Job  JobConfig `yaml:"job" json:"job"`
+	Mode  string      `yaml:"mode" json:"mode"`
+	Job   JobConfig   `yaml:"job" json:"job"`
+	Redis RedisConfig `yaml:"redis" json:"redis"`
 }
 
 type JobConfig struct {

@@ -1,10 +1,10 @@
-server:
-  mode: development # development/production
-  job:
-    retryDelay: 5000 # ms
-    queue:
-      request: processor-job-request
-      response: processor-job-response
+mode: development # development/production
+
+job:
+  retryDelay: 5000 # ms
+  queue:
+    request: processor-job-request
+    response: processor-job-response
 
 redis:
   addrs:

@@ -32,7 +32,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to read config: %v", err)
 	}
-	setLogger(cfg.Server.Mode)
+
+	config.SetMode(config.Mode(cfg.Mode))
+	if config.IsDevelopmentMode() {
+		log.SetFormatter(&log.TextFormatter{})
+		log.SetLevel(log.TraceLevel)
+	} else {
+		log.SetFormatter(&log.JSONFormatter{})
+		log.SetLevel(log.InfoLevel)
+	}
 
 	rootCtx, cancel := context.WithCancel(context.Background())
 
@@ -63,10 +71,10 @@ func main() {
 	uSvc := user.NewService(mysqlRepo, authSvc)
 	log.Info("created user service")
 
-	jSvc := job.NewService(&cfg.Server.Job, redisMQ, s3Repo)
+	jSvc := job.NewService(&cfg.Job, redisMQ, s3Repo)
 	log.Info("created job service")
 
-	server := http.NewServer(&cfg.Server.Http, jSvc, uSvc, authSvc)
+	server := http.NewServer(&cfg.Http, jSvc, uSvc, authSvc)
 	log.Info("created HTTP server")
 
 	// Start services
@@ -98,14 +106,4 @@ func readConfig(path string) (*config.Config, error) {
 		return nil, err
 	}
 	return &cfg, nil
-}
-
-func setLogger(mode string) {
-	if mode == "development" {
-		log.SetFormatter(&log.TextFormatter{})
-		log.SetLevel(log.TraceLevel)
-	} else {
-		log.SetFormatter(&log.JSONFormatter{})
-		log.SetLevel(log.InfoLevel)
-	}
 }
