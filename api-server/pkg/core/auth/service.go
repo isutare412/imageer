@@ -19,6 +19,9 @@ type Service interface {
 
 	SignToken(sess *Session) (Token, error)
 	VerifyToken(t Token) (*Session, error)
+
+	ContextWithSession(ctx context.Context, sess *Session) context.Context
+	SessionFromContext(ctx context.Context) (*Session, error)
 }
 
 type service struct {
@@ -83,11 +86,11 @@ func (s *service) VerifyToken(t Token) (*Session, error) {
 	return &sess, nil
 }
 
-func ContextWithSession(ctx context.Context, sess *Session) context.Context {
+func (s *service) ContextWithSession(ctx context.Context, sess *Session) context.Context {
 	return context.WithValue(ctx, ctxKeyID, sess)
 }
 
-func SessionFromContext(ctx context.Context) (*Session, error) {
+func (s *service) SessionFromContext(ctx context.Context) (*Session, error) {
 	val := ctx.Value(ctxKeyID)
 	if val == nil {
 		return nil, ErrCtxSessionNotFound

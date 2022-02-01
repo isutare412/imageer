@@ -69,7 +69,7 @@ func authenticate(authSvc auth.Service) mux.MiddlewareFunc {
 				return
 			}
 
-			ctx := auth.ContextWithSession(r.Context(), sess)
+			ctx := authSvc.ContextWithSession(r.Context(), sess)
 			r = r.WithContext(ctx)
 			h.ServeHTTP(w, r)
 		})

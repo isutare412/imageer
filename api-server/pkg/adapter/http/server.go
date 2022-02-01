@@ -76,7 +76,7 @@ func NewServer(
 
 	apiV1.HandleFunc("/greetings/{name}", getGreeting(jSvc)).Methods("GET")
 
-	apiV1.HandleFunc("/users", getUser(uSvc)).Methods("GET")
+	apiV1.HandleFunc("/users", getUser(uSvc, authSvc)).Methods("GET")
 	apiV1.HandleFunc("/users", createUser(uSvc)).Methods("POST")
 	apiV1.HandleFunc("/users/{id}", getUserByID(uSvc)).Methods("GET")
 
