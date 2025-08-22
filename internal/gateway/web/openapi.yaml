@@ -1,0 +1,981 @@
+openapi: '3.0.4'
+info:
+  title: Imageer Gateway
+  version: '0.1'
+  description: |-
+    Imageer Gateway API for managing image resources.
+
+servers:
+  - url: /
+    description: Current server
+
+tags:
+  - name: Project
+  - name: Image
+  - name: User
+  - name: Admin
+
+paths:
+  /api/v1/admin/projects:
+    get:
+      operationId: listProjectsAdmin
+      summary: List all projects
+      tags:
+        - Admin
+      parameters:
+        # Pagination parameters
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+      responses:
+        '200':
+          description: Successfully retrieved projects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    post:
+      operationId: createProjectAdmin
+      summary: Create a new project
+      tags:
+        - Admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectAdminRequest'
+      responses:
+        '200':
+          description: Successfully created project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/admin/projects/{projectId}:
+    get:
+      operationId: getProjectAdmin
+      summary: Get project details
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+      responses:
+        '200':
+          description: Successfully retrieved project details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    put:
+      operationId: updateProjectAdmin
+      summary: Update project details
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectAdminRequest'
+      responses:
+        '200':
+          description: Successfully updated project details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/admin/projects/{projectId}/images/reprocess:
+    post:
+      operationId: reprocessImagesAdmin
+      summary: Reprocess multiple images in a project
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReprocessImagesAdminRequest'
+      responses:
+        '200':
+          description: Successfully triggered batch image reprocessing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Images'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/admin/projects/{projectId}/service-accounts:
+    get:
+      operationId: listServiceAccountsAdmin
+      summary: List service accounts of a project
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+      responses:
+        '200':
+          description: Successfully retrieved service accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAccounts'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    post:
+      operationId: createServiceAccountAdmin
+      summary: Create a new service account for a project
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServiceAccountAdminRequest'
+      responses:
+        '200':
+          description: Successfully created service account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAccount'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+
+  /api/v1/admin/projects/{projectId}/service-accounts/{serviceAccountId}:
+    get:
+      operationId: getServiceAccountAdmin
+      summary: Get service account details
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+        - $ref: '#/components/parameters/ServiceAccountIdPath'
+      responses:
+        '200':
+          description: Successfully retrieved service account details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAccount'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    put:
+      operationId: updateServiceAccountAdmin
+      summary: Update a service account
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+        - $ref: '#/components/parameters/ServiceAccountIdPath'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateServiceAccountAdminRequest'
+      responses:
+        '200':
+          description: Successfully updated service account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAccount'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    delete:
+      operationId: deleteServiceAccountAdmin
+      summary: Delete a service account
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+        - $ref: '#/components/parameters/ServiceAccountIdPath'
+      responses:
+        '200':
+          description: Successfully deleted service account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAccount'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/users/me:
+    get:
+      operationId: getCurrentUser
+      summary: Get current user details
+      tags:
+        - User
+      responses:
+        '200':
+          description: Successfully retrieved current user details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/auth/google/sign-in:
+    get:
+      operationId: startGoogleSignIn
+      summary: Start Google Sign-In
+      tags:
+        - User
+      responses:
+        '302':
+          description: Redirecting to Google Sign-In
+          headers:
+            Location:
+              description: The URL to redirect the user to for Google Sign-In
+              schema:
+                type: string
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/auth/google/sign-in/callback:
+    get:
+      operationId: finishGoogleSignIn
+      summary: Finish Google Sign-In
+      tags:
+        - User
+      parameters:
+        - name: code
+          in: query
+          required: true
+          description: The authorization code returned by Google after sign-in.
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Successfully signed in with Google
+          headers:
+            Location:
+              description: The URL to redirect the user to after signing in
+              schema:
+                type: string
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/projects/{projectId}:
+    get:
+      operationId: getProject
+      summary: Get project details
+      tags:
+        - Project
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+      responses:
+        '200':
+          description: Successfully retrieved project details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/projects/{projectId}/images/presigned-url:
+    post:
+      operationId: createUploadUrl
+      summary: Issue a presigned URL for uploading an image
+      tags:
+        - Image
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePresignedUrlRequest'
+      responses:
+        '200':
+          description: Successfully issued the presigned URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresignedUrl'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/projects/{projectId}/images/{imageId}:
+    get:
+      operationId: getImage
+      summary: Get image details
+      tags:
+        - Image
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+        - $ref: '#/components/parameters/ImageIdPath'
+      responses:
+        '200':
+          description: Successfully retrieved image details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+components:
+  parameters:
+    ###
+    # Path Parameters
+    ###
+    ProjectIdPath:
+      name: projectId
+      in: path
+      required: true
+      description: The ID of the project to which the image belongs.
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426
+        x-go-type: uuid.UUID
+        x-go-type-import:
+          path: github.com/google/uuid
+
+    ServiceAccountIdPath:
+      name: serviceAccountId
+      in: path
+      required: true
+      description: The ID of the service account.
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426
+        x-go-type: uuid.UUID
+        x-go-type-import:
+          path: github.com/google/uuid
+
+    ImageIdPath:
+      name: imageId
+      in: path
+      required: true
+      description: The ID of the image.
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426
+        x-go-type: uuid.UUID
+        x-go-type-import:
+          path: github.com/google/uuid
+
+    ###
+    # Query Parameters
+    ###
+    OffsetQuery:
+      name: offset
+      in: query
+      description: Offset for pagination
+      schema:
+        type: integer
+        format: int64
+        example: 0
+
+    LimitQuery:
+      name: limit
+      in: query
+      description: Limit for pagination
+      schema:
+        type: integer
+        format: int64
+        example: 10
+
+  responses:
+    ###
+    # Error Responses
+    ###
+    ErrorResponse:
+      description: Error occurred during the request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AppError'
+
+  schemas:
+    ###
+    # Enums
+    ###
+    ImageState:
+      type: string
+      enum:
+        - WAITING_UPLOAD
+        - PROCESSING
+        - READY
+      description: The current state of the image.
+      example: READY
+      x-go-type: images.State
+      x-go-import:
+        path: github.com/redshore/imageer/pkg/images
+
+    ImageContentType:
+      type: string
+      enum:
+        - image/jpeg
+        - image/png
+        - image/webp
+      description: The content type of the image.
+      example: image/png
+      x-go-type: images.ContentType
+      x-go-import:
+        path: github.com/redshore/imageer/pkg/images
+
+    UserAuthority:
+      type: string
+      enum:
+        - ADMIN
+        - GUEST
+      description: The authority level of the user.
+      example: GUEST
+      x-go-type: users.Authority
+      x-go-type-import:
+        path: github.com/isutare412/imageer/pkg/users
+
+    ###
+    # Request Schemas
+    ###
+    CreateProjectAdminRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the project.
+          example: My Project
+      required:
+        - name
+
+    UpdateProjectAdminRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the project.
+          example: My Project
+        transformations:
+          type: object
+          properties:
+            add:
+              type: array
+              description: List of transformations to add to the project.
+              items:
+                $ref: '#/components/schemas/CreateTransformationRequest'
+              x-go-type-skip-optional-pointer: true
+            modify:
+              type: array
+              description: List of transformations to modify in the project.
+              items:
+                $ref: '#/components/schemas/UpdateTransformationRequest'
+              x-go-type-skip-optional-pointer: true
+            remove:
+              type: array
+              description: List of transformations to remove from the project.
+              items:
+                $ref: '#/components/schemas/DeleteTransformationRequest'
+              x-go-type-skip-optional-pointer: true
+          x-go-type-skip-optional-pointer: true
+
+    CreateServiceAccountAdminRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the service account.
+          example: my-service-account
+        expireAt:
+          type: string
+          format: date-time
+          description: The expiration time of the service account token.
+          example: '2023-10-01T12:00:00Z'
+      required:
+        - name
+
+    UpdateServiceAccountAdminRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the service account.
+          example: my-service-account
+        expireAt:
+          type: string
+          format: date-time
+          description: The expiration time of the service account token.
+          example: '2023-10-01T12:00:00Z'
+
+    CreatePresignedUrlRequest:
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: The name of the file to be uploaded.
+          example: image.png
+        contentType:
+          $ref: '#/components/schemas/ImageContentType'
+        transformationNames:
+          type: array
+          description: >-
+            List of transformation names to apply to the image. If not provided,
+            default transformations will be applied.
+          items:
+            type: string
+            example: w600h800
+          x-go-type-skip-optional-pointer: true
+      required:
+        - fileName
+        - contentType
+
+    ReprocessImagesAdminRequest:
+      type: object
+      properties:
+        imageIds:
+          type: array
+          description: >-
+            List of image IDs to reprocess. If not provided and reprocessAll is true,
+            all images in the project will be reprocessed.
+          items:
+            type: string
+            format: uuid
+            example: 123e4567-e89b-12d3-a456-426
+            x-go-type: uuid.UUID
+            x-go-type-import:
+              path: github.com/google/uuid
+          x-go-type-skip-optional-pointer: true
+          x-go-name: ImageIDs
+        reprocessAll:
+          type: boolean
+          description: If true, reprocess all images in the project. Takes precedence over imageIds.
+          default: false
+          example: false
+          x-go-type-skip-optional-pointer: true
+
+    CreateTransformationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the transformation.
+          example: w600h800
+        default:
+          type: boolean
+          description: Indicates if this transformation is the default one.
+          example: false
+        width:
+          type: integer
+          format: int64
+          description: The width of the image in pixels.
+          example: 600
+        height:
+          type: integer
+          format: int64
+          description: The height of the image in pixels.
+          example: 800
+      required:
+        - name
+        - default
+        - width
+        - height
+
+    UpdateTransformationRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the transformation.
+          example: 123e4567-e89b-12d3-a456-426
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            path: github.com/google/uuid
+        name:
+          type: string
+          description: The name of the transformation.
+          example: w600h800
+        default:
+          type: boolean
+          description: Indicates if this transformation is the default one.
+          example: false
+        width:
+          type: integer
+          format: int64
+          description: The width of the image in pixels.
+          example: 600
+        height:
+          type: integer
+          format: int64
+          description: The height of the image in pixels.
+          example: 800
+      required:
+        - id
+
+    DeleteTransformationRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the transformation.
+          example: 123e4567-e89b-12d3-a456-426
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            path: github.com/google/uuid
+      required:
+        - id
+
+    ###
+    # Response Schemas
+    ###
+    AppError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Some complex error message
+          description: Error message
+        codeId:
+          type: integer
+          format: int64
+          example: 1000
+          description: Error code ID for programmatic handling
+        codeName:
+          type: string
+          example: BAD_REQUEST
+          description: Error code name for programmatic handling
+      required:
+        - message
+        - codeId
+        - codeName
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the project.
+          example: 123e4567-e89b-12d3-a456-426
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            path: github.com/google/uuid
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation time of the project.
+          example: '2023-10-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last update time of the project.
+          example: '2023-10-01T12:00:00Z'
+        name:
+          type: string
+          description: The name of the project.
+          example: My Project
+        transformations:
+          type: array
+          description: List of transformations to apply to the project.
+          items:
+            $ref: '#/components/schemas/Transformation'
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - name
+        - transformations
+
+    Projects:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+        total:
+          type: integer
+          format: int64
+          description: The total number of projects.
+          example: 100
+      required:
+        - items
+        - total
+
+    Transformation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the transformation.
+          example: 123e4567-e89b-12d3-a456-426
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            path: github.com/google/uuid
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation time of the transformation.
+          example: '2023-10-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last update time of the transformation.
+          example: '2023-10-01T12:00:00Z'
+        name:
+          type: string
+          description: The name of the transformation.
+          example: w600h800
+        default:
+          type: boolean
+          description: Indicates if this transformation is the default one.
+          example: false
+        width:
+          type: integer
+          format: int64
+          description: The width of the image in pixels.
+          example: 600
+        height:
+          type: integer
+          format: int64
+          description: The height of the image in pixels.
+          example: 800
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - name
+        - default
+        - width
+        - height
+
+    PresignedUrl:
+      type: object
+      properties:
+        imageId:
+          type: string
+          format: uuid
+          description: The unique identifier of the image.
+          example: 123e4567-e89b-12d3-a456-426
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            path: github.com/google/uuid
+        uploadUrl:
+          type: string
+          description: >-
+            The presigned URL for uploading the image. Check
+            https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html
+            for more details.
+          example: https://aws.com/upload?key=abc123
+        expiresAt:
+          type: string
+          format: date-time
+          description: The expiration time of the presigned URL.
+          example: '2023-10-01T12:00:00Z'
+      required:
+        - imageId
+        - uploadUrl
+        - expiresAt
+
+    Image:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the image.
+          example: 123e4567-e89b-12d3-a456-426
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            path: github.com/google/uuid
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation time of the image.
+          example: '2023-10-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last update time of the image.
+          example: '2023-10-01T12:00:00Z'
+        state:
+          $ref: '#/components/schemas/ImageState'
+        urlSet:
+          $ref: '#/components/schemas/ImageUrlSet'
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - state
+        - urlSet
+
+    Images:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+        total:
+          type: integer
+          format: int64
+          description: The total number of images.
+          example: 100
+      required:
+        - items
+        - total
+
+    ImageUrlSet:
+      type: object
+      description: URLs for accessing the image and its variants.
+      properties:
+        originalUrl:
+          type: string
+          description: The original URL of the image.
+          example: https://example.com/original/image.png
+        transformations:
+          type: array
+          description: List of URLs for the image with applied transformations.
+          items:
+            $ref: '#/components/schemas/VariantUrl'
+      required:
+        - originalUrl
+        - transformations
+
+    VariantUrl:
+      type: object
+      properties:
+        transformationId:
+          type: string
+          format: uuid
+          description: The unique identifier of the transformation.
+          example: 123e4567-e89b-12d3-a456-426
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            path: github.com/google/uuid
+        transformationName:
+          type: string
+          description: The name of the transformation.
+          example: w600h800
+        url:
+          type: string
+          description: The URL of the image with the applied transformation.
+          example: https://example.com/presets/w600h800/image.png
+      required:
+        - transformationId
+        - transformationName
+        - url
+
+    ServiceAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the service account.
+          example: 123e4567-e89b-12d3-a456-426
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            path: github.com/google/uuid
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation time of the service account.
+          example: '2023-10-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last update time of the service account.
+          example: '2023-10-01T12:00:00Z'
+        expireAt:
+          type: string
+          format: date-time
+          description: The expiration time of the service account token.
+          example: '2023-10-01T12:00:00Z'
+        name:
+          type: string
+          description: The name of the service account.
+          example: my-service-account
+        token:
+          type: string
+          description: The token for the service account.
+          example: abc123
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - name
+        - token
+
+    ServiceAccounts:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceAccount'
+      required:
+        - items
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the user.
+          example: 123e4567-e89b-12d3-a456-426
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            path: github.com/google/uuid
+        nickname:
+          type: string
+          description: The nickname of the user.
+          example: johndoe
+        authority:
+          $ref: '#/components/schemas/UserAuthority'
+        email:
+          type: string
+          description: The email address of the user.
+          example: user@example.com
+        photoUrl:
+          type: string
+          format: uri
+          description: The photo URL of the user.
+          example: https://example.com/photos/user.png
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation time of the user.
+          example: '2023-10-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The last update time of the user.
+          example: '2023-10-01T12:00:00Z'
+      required:
+        - id
+        - nickname
+        - authority
+        - email
+        - photoUrl
+        - createdAt
+        - updatedAt
