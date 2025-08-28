@@ -40,7 +40,7 @@ func accessLog(next echo.HandlerFunc) echo.HandlerFunc {
 			slog.Duration("elapsed", time.Since(before)),
 			slog.Int64("reqContentLength", req.ContentLength),
 			slog.Int64("respSize", resp.Size),
-		).Log(rctx, log.LevelAccess, "Handle HTTP request")
+		).Log(rctx, log.SlogLevelAccess, "Handle HTTP request")
 
 		return err
 	}

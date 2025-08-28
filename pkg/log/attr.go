@@ -6,13 +6,13 @@ import (
 	"github.com/lmittmann/tint"
 )
 
-var LevelAccess = slog.Level(1)
+var SlogLevelAccess = slog.Level(1)
 
 func replaceAttrJSON(groups []string, a slog.Attr) slog.Attr {
 	// Handle access log level
 	if a.Key == slog.LevelKey && len(groups) == 0 {
 		if level, ok := a.Value.Any().(slog.Level); ok {
-			if level == LevelAccess {
+			if level == SlogLevelAccess {
 				a.Value = slog.StringValue("ACCESS")
 			}
 		}
@@ -26,7 +26,7 @@ func replaceAttrTint(groups []string, a slog.Attr) slog.Attr {
 	if a.Key == slog.LevelKey && len(groups) == 0 {
 		if level, ok := a.Value.Any().(slog.Level); ok {
 			switch level {
-			case LevelAccess:
+			case SlogLevelAccess:
 				// Color access log level as cyan
 				a = tint.Attr(6, slog.String(a.Key, "ACC"))
 			case slog.LevelDebug:
@@ -51,7 +51,7 @@ func replaceAttrDevs(groups []string, a slog.Attr) slog.Attr {
 	// Handle access log level
 	if a.Key == slog.LevelKey && len(groups) == 0 {
 		if level, ok := a.Value.Any().(slog.Level); ok {
-			if level == LevelAccess {
+			if level == SlogLevelAccess {
 				a.Value = slog.StringValue("ACCESS")
 			}
 		}
