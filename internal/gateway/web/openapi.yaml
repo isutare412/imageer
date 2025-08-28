@@ -932,9 +932,9 @@ components:
           example: my-service-account
         authority:
           $ref: '#/components/schemas/ServiceAccountAuthority'
-        token:
+        apiKey:
           type: string
-          description: The token for the service account.
+          description: The API key for the service account.
           example: abc123
       required:
         - id
@@ -942,7 +942,7 @@ components:
         - updatedAt
         - name
         - authority
-        - token
+        - apiKey
 
     ServiceAccounts:
       type: object

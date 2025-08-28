@@ -15,18 +15,18 @@ type ServiceAccount struct {
 	ExpireAt  *time.Time
 	Name      string
 	Authority serviceaccounts.Authority
-	Token     string
+	APIKey    string
 }
 
 type CreateServiceAccountRequest struct {
 	Name      string                    `validate:"required,max=128"`
-	Authority serviceaccounts.Authority `validate:"required,max=24"`
+	Authority serviceaccounts.Authority `validate:"required,oneof=FULL_ACCESS PROJECT_ACCESS"`
 	ExpireAt  *time.Time                `validate:"omitempty,gt"`
 }
 
 type UpdateServiceAccountRequest struct {
 	Name      *string                    `validate:"omitempty,max=128"`
-	Authority *serviceaccounts.Authority `validate:"omitempty,required,max=24"`
+	Authority *serviceaccounts.Authority `validate:"omitempty,oneof=FULL_ACCESS PROJECT_ACCESS"`
 	ExpireAt  *time.Time                 `validate:"omitempty,gt"`
 }
 

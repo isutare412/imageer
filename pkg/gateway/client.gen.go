@@ -174,6 +174,9 @@ type ReprocessImagesAdminRequest struct {
 
 // ServiceAccount defines model for ServiceAccount.
 type ServiceAccount struct {
+	// APIKey The API key for the service account.
+	APIKey string `json:"apiKey"`
+
 	// Authority The authority level of the service account.
 	Authority ServiceAccountAuthority `json:"authority"`
 
@@ -188,9 +191,6 @@ type ServiceAccount struct {
 
 	// Name The name of the service account.
 	Name string `json:"name"`
-
-	// Token The token for the service account.
-	Token string `json:"token"`
 
 	// UpdatedAt The last update time of the service account.
 	UpdatedAt time.Time `json:"updatedAt"`
