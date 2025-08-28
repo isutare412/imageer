@@ -350,7 +350,7 @@ components:
       schema:
         type: string
         format: uuid
-        example: 123e4567-e89b-12d3-a456-426
+        example: 426e634f-50dd-41a0-881b-c991441b3cd5
         x-go-type: uuid.UUID
         x-go-type-import:
           path: github.com/google/uuid
@@ -363,7 +363,7 @@ components:
       schema:
         type: string
         format: uuid
-        example: 123e4567-e89b-12d3-a456-426
+        example: 426e634f-50dd-41a0-881b-c991441b3cd5
         x-go-type: uuid.UUID
         x-go-type-import:
           path: github.com/google/uuid
@@ -376,7 +376,7 @@ components:
       schema:
         type: string
         format: uuid
-        example: 123e4567-e89b-12d3-a456-426
+        example: 426e634f-50dd-41a0-881b-c991441b3cd5
         x-go-type: uuid.UUID
         x-go-type-import:
           path: github.com/google/uuid
@@ -572,7 +572,7 @@ components:
           items:
             type: string
             format: uuid
-            example: 123e4567-e89b-12d3-a456-426
+            example: 426e634f-50dd-41a0-881b-c991441b3cd5
             x-go-type: uuid.UUID
             x-go-type-import:
               path: github.com/google/uuid
@@ -619,7 +619,7 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the transformation.
-          example: 123e4567-e89b-12d3-a456-426
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type: uuid.UUID
           x-go-type-import:
             path: github.com/google/uuid
@@ -651,7 +651,7 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the transformation.
-          example: 123e4567-e89b-12d3-a456-426
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type: uuid.UUID
           x-go-type-import:
             path: github.com/google/uuid
@@ -689,7 +689,7 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the project.
-          example: 123e4567-e89b-12d3-a456-426
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type: uuid.UUID
           x-go-type-import:
             path: github.com/google/uuid
@@ -742,7 +742,7 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the transformation.
-          example: 123e4567-e89b-12d3-a456-426
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type: uuid.UUID
           x-go-type-import:
             path: github.com/google/uuid
@@ -790,7 +790,7 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the image.
-          example: 123e4567-e89b-12d3-a456-426
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type: uuid.UUID
           x-go-type-import:
             path: github.com/google/uuid
@@ -818,7 +818,7 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the image.
-          example: 123e4567-e89b-12d3-a456-426
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type: uuid.UUID
           x-go-type-import:
             path: github.com/google/uuid
@@ -883,7 +883,7 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the transformation.
-          example: 123e4567-e89b-12d3-a456-426
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type: uuid.UUID
           x-go-type-import:
             path: github.com/google/uuid
@@ -907,7 +907,7 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the service account.
-          example: 123e4567-e89b-12d3-a456-426
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type: uuid.UUID
           x-go-type-import:
             path: github.com/google/uuid
@@ -961,7 +961,7 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the user.
-          example: 123e4567-e89b-12d3-a456-426
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type: uuid.UUID
           x-go-type-import:
             path: github.com/google/uuid

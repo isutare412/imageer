@@ -6,6 +6,12 @@ help: ## Display this help.
 
 ##@ Development
 
+.PHONY: run-gateway
+run-gateway: ## Run the gateway service
+	@echo "🔄 Starting gateway service..." && \
+		go run ./cmd/gateway/... && \
+		echo "✅ Gateway service stopped."
+
 .PHONY: generate
 generate: ## Generate code
 	@echo "🔄 Generating code..." && \
