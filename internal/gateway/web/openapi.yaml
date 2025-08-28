@@ -452,6 +452,17 @@ components:
       x-go-type-import:
         path: github.com/isutare412/imageer/pkg/users
 
+    ServiceAccountAuthority:
+      type: string
+      enum:
+        - FULL_ACCESS
+        - PROJECT_ACCESS
+      description: The authority level of the service account.
+      example: PROJECT_ACCESS
+      x-go-type: serviceaccounts.Authority
+      x-go-type-import:
+        path: github.com/isutare412/imageer/pkg/serviceaccounts
+
     ###
     # Request Schemas
     ###
@@ -502,6 +513,8 @@ components:
           type: string
           description: The name of the service account.
           example: my-service-account
+        authority:
+          $ref: '#/components/schemas/ServiceAccountAuthority'
         expireAt:
           type: string
           format: date-time
@@ -509,6 +522,7 @@ components:
           example: '2023-10-01T12:00:00Z'
       required:
         - name
+        - authority
 
     UpdateServiceAccountAdminRequest:
       type: object
@@ -517,6 +531,8 @@ components:
           type: string
           description: The name of the service account.
           example: my-service-account
+        authority:
+          $ref: '#/components/schemas/ServiceAccountAuthority'
         expireAt:
           type: string
           format: date-time
@@ -914,6 +930,8 @@ components:
           type: string
           description: The name of the service account.
           example: my-service-account
+        authority:
+          $ref: '#/components/schemas/ServiceAccountAuthority'
         token:
           type: string
           description: The token for the service account.
@@ -923,6 +941,7 @@ components:
         - createdAt
         - updatedAt
         - name
+        - authority
         - token
 
     ServiceAccounts:

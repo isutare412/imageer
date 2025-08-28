@@ -16,6 +16,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/isutare412/imageer/pkg/images"
+	"github.com/isutare412/imageer/pkg/serviceaccounts"
 	"github.com/isutare412/imageer/pkg/users"
 	"github.com/oapi-codegen/runtime"
 )
@@ -52,6 +53,9 @@ type CreateProjectAdminRequest struct {
 
 // CreateServiceAccountAdminRequest defines model for CreateServiceAccountAdminRequest.
 type CreateServiceAccountAdminRequest struct {
+	// Authority The authority level of the service account.
+	Authority ServiceAccountAuthority `json:"authority"`
+
 	// ExpireAt The expiration time of the service account token.
 	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
@@ -170,6 +174,9 @@ type ReprocessImagesAdminRequest struct {
 
 // ServiceAccount defines model for ServiceAccount.
 type ServiceAccount struct {
+	// Authority The authority level of the service account.
+	Authority ServiceAccountAuthority `json:"authority"`
+
 	// CreatedAt The creation time of the service account.
 	CreatedAt time.Time `json:"createdAt"`
 
@@ -188,6 +195,9 @@ type ServiceAccount struct {
 	// UpdatedAt The last update time of the service account.
 	UpdatedAt time.Time `json:"updatedAt"`
 }
+
+// ServiceAccountAuthority The authority level of the service account.
+type ServiceAccountAuthority = serviceaccounts.Authority
 
 // ServiceAccounts defines model for ServiceAccounts.
 type ServiceAccounts struct {
@@ -236,6 +246,9 @@ type UpdateProjectAdminRequest struct {
 
 // UpdateServiceAccountAdminRequest defines model for UpdateServiceAccountAdminRequest.
 type UpdateServiceAccountAdminRequest struct {
+	// Authority The authority level of the service account.
+	Authority *ServiceAccountAuthority `json:"authority,omitempty"`
+
 	// ExpireAt The expiration time of the service account token.
 	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
