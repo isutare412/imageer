@@ -63,6 +63,19 @@ func (e *Error) Error() string {
 	return b.String()
 }
 
+func (e *Error) ClientMessage() string {
+	switch {
+	case e.Summary != "" && e.Detail != "":
+		return fmt.Sprintf("%s\n%s", e.Summary, e.Detail)
+	case e.Summary != "":
+		return e.Summary
+	case e.Detail != "":
+		return e.Detail
+	default:
+		return ""
+	}
+}
+
 // AsError checks if the error is of type *Error and returns it if so.
 func AsError(err error) (*Error, bool) {
 	var appErr *Error

@@ -44,7 +44,7 @@ func respondError(next echo.HandlerFunc) echo.HandlerFunc {
 
 			statusCode = aerr.Code.HTTPStatusCode()
 			appCode = aerr.Code
-			msg = cmp.Or(aerr.Detail, aerr.Summary, msg)
+			msg = cmp.Or(aerr.ClientMessage(), msg)
 
 		// Override if *echo.HTTPError
 		case errors.As(err, &herr):
