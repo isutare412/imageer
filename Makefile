@@ -19,22 +19,22 @@ generate: ## Generate code
 		echo "✅ Code generation complete."
 
 .PHONY: format
-format: ## Format Go code
-	@echo "🔄 Formatting Go code..." && \
+format: ## Check Go code formatting
+	@echo "🔍 Checking Go code formatting..." && \
+		gofmt -d . && \
+		echo "✅ Code formatting check complete."
+
+.PHONY: format-fix
+format-fix: ## Format Go code
+	@echo "🔧 Formatting Go code..." && \
 		gofmt -w . && \
 		echo "✅ Code formatting complete."
 
 .PHONY: lint
-lint: check-golangci-lint ## Run golangci-lint
+lint: golangci-lint ## Run golangci-lint
 	@echo "🔍 Running golangci-lint..." && \
-		golangci-lint run && \
+		$(GOLANGCI_LINT) run && \
 		echo "✅ Linting complete."
-
-.PHONY: lint-fix
-lint-fix: check-golangci-lint ## Run golangci-lint with auto-fix
-	@echo "🔧 Running golangci-lint with auto-fix..." && \
-		golangci-lint run --fix && \
-		echo "✅ Linting with auto-fix complete."
 
 .PHONY: test
 test: ## Run Go tests
@@ -44,11 +44,20 @@ test: ## Run Go tests
 
 ##@ Dependencies
 
-.PHONY: check-golangci-lint
-check-golangci-lint: ## Check and install golangci-lint if needed
-	@if ! command -v golangci-lint >/dev/null 2>&1; then \
-		echo "⚠️ golangci-lint not found. Installing via Homebrew..." && \
-		brew install golangci-lint && \
+# Location to install dependencies to.
+LOCALBIN ?= $(shell pwd)/bin
+$(LOCALBIN):
+	mkdir -p $(LOCALBIN)
+
+# Tool binaries
+GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
+
+.PHONY: golangci-lint
+golangci-lint: ## Check and install golangci-lint if needed
+	@GOPATH_BIN=$$(go env GOPATH)/bin; \
+	if [ ! -f "$(GOLANGCI_LINT)" ]; then \
+		echo "⚠️ golangci-lint not found in $$LOCALBIN. Installing..."; \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(LOCALBIN) v2.4.0 && \
 		echo "✅ golangci-lint installed successfully."; \
 	else \
 		echo "✅ golangci-lint is already installed."; \
