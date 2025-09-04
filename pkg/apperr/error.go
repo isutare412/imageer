@@ -9,7 +9,7 @@ import (
 type Error struct {
 	Code    Code
 	Stack   *StackTrace
-	Err     error  // optional
+	Cause   error  // optional
 	Summary string // optional
 	Detail  string // optional
 }
@@ -21,8 +21,8 @@ func NewError(code Code) *Error {
 	}
 }
 
-func (e *Error) WithError(err error) *Error {
-	e.Err = err
+func (e *Error) WithCause(err error) *Error {
+	e.Cause = err
 	return e
 }
 
@@ -37,7 +37,7 @@ func (e *Error) WithDetail(format string, args ...any) *Error {
 }
 
 func (e *Error) Unwrap() error {
-	return e.Err
+	return e.Cause
 }
 
 func (e *Error) Error() string {
@@ -55,9 +55,9 @@ func (e *Error) Error() string {
 		b.WriteString(e.Detail)
 	}
 
-	if e.Err != nil {
-		b.WriteString(", error=")
-		b.WriteString(e.Err.Error())
+	if e.Cause != nil {
+		b.WriteString(", cause=")
+		b.WriteString(e.Cause.Error())
 	}
 
 	return b.String()

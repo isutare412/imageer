@@ -27,7 +27,7 @@ func TestError_Unwrap(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := apperr.NewError(apperr.CodeBadRequest).WithError(tt.originErr)
+			err := apperr.NewError(apperr.CodeBadRequest).WithCause(tt.originErr)
 			got := errors.Is(err, tt.originErr)
 			assert.Equal(t, tt.originErr != nil, got, "Unwrap should return the original error if it exists")
 		})

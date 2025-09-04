@@ -20,14 +20,14 @@ func NewAESCrypter(cfg AESCrypterConfig) (*AESCrypter, error) {
 	if err != nil {
 		return nil, apperr.NewError(apperr.CodeInternalServerError).
 			WithSummary("failed to create AES cipher").
-			WithError(err)
+			WithCause(err)
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, apperr.NewError(apperr.CodeInternalServerError).
 			WithSummary("failed to create GCM cipher").
-			WithError(err)
+			WithCause(err)
 	}
 
 	return &AESCrypter{gcm: gcm}, nil
@@ -40,7 +40,7 @@ func (c *AESCrypter) Encrypt(data []byte) ([]byte, error) {
 	if _, err := rand.Read(nonce); err != nil {
 		return nil, apperr.NewError(apperr.CodeInternalServerError).
 			WithSummary("failed to generate nonce").
-			WithError(err)
+			WithCause(err)
 	}
 
 	ciphertext := c.gcm.Seal(nonce, nonce, data, nil)
@@ -63,7 +63,7 @@ func (c *AESCrypter) Decrypt(encryptedData []byte) ([]byte, error) {
 	if err != nil {
 		return nil, apperr.NewError(apperr.CodeBadRequest).
 			WithSummary("failed to decrypt data").
-			WithError(err)
+			WithCause(err)
 	}
 
 	return plaintext, nil

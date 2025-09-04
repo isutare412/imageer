@@ -3,7 +3,6 @@ package web
 import (
 	"cmp"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -98,10 +97,10 @@ func recoverPanic(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 
 			aerr := apperr.NewError(apperr.CodeInternalServerError).
-				WithError(fmt.Errorf("%v", r))
+				WithSummary("recover value: %v", r)
 
 			slog.With(
-				slog.Any("recovered", aerr.Err),
+				slog.Any("error", aerr),
 				slog.String("stackTrace", aerr.Stack.String()),
 			).ErrorContext(ctx.Request().Context(), "Recovered from panic")
 
