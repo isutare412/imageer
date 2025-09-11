@@ -8,6 +8,7 @@ tool (
 )
 
 require (
+	github.com/coreos/go-oidc/v3 v3.15.0
 	github.com/getkin/kin-openapi v0.132.0
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
@@ -27,6 +28,7 @@ require (
 	github.com/samber/slog-multi v1.4.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/mock v0.5.2
+	golang.org/x/oauth2 v0.30.0
 )
 
 require (
@@ -35,6 +37,7 @@ require (
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
