@@ -355,11 +355,7 @@ components:
       description: The ID of the project to which the image belongs.
       schema:
         type: string
-        format: uuid
         example: 426e634f-50dd-41a0-881b-c991441b3cd5
-        x-go-type: uuid.UUID
-        x-go-type-import:
-          path: github.com/google/uuid
 
     ServiceAccountIdPath:
       name: serviceAccountId
@@ -368,11 +364,7 @@ components:
       description: The ID of the service account.
       schema:
         type: string
-        format: uuid
         example: 426e634f-50dd-41a0-881b-c991441b3cd5
-        x-go-type: uuid.UUID
-        x-go-type-import:
-          path: github.com/google/uuid
 
     ImageIdPath:
       name: imageId
@@ -381,11 +373,7 @@ components:
       description: The ID of the image.
       schema:
         type: string
-        format: uuid
         example: 426e634f-50dd-41a0-881b-c991441b3cd5
-        x-go-type: uuid.UUID
-        x-go-type-import:
-          path: github.com/google/uuid
 
     ###
     # Query Parameters
@@ -577,11 +565,7 @@ components:
             all images in the project will be reprocessed.
           items:
             type: string
-            format: uuid
             example: 426e634f-50dd-41a0-881b-c991441b3cd5
-            x-go-type: uuid.UUID
-            x-go-type-import:
-              path: github.com/google/uuid
           x-go-type-skip-optional-pointer: true
           x-go-name: ImageIDs
         reprocessAll:
@@ -623,12 +607,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: The unique identifier of the transformation.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-          x-go-type: uuid.UUID
-          x-go-type-import:
-            path: github.com/google/uuid
         name:
           type: string
           description: The name of the transformation.
@@ -655,12 +635,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: The unique identifier of the transformation.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-          x-go-type: uuid.UUID
-          x-go-type-import:
-            path: github.com/google/uuid
       required:
         - id
 
@@ -693,12 +669,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: The unique identifier of the project.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-          x-go-type: uuid.UUID
-          x-go-type-import:
-            path: github.com/google/uuid
         createdAt:
           type: string
           format: date-time
@@ -746,12 +718,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: The unique identifier of the transformation.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-          x-go-type: uuid.UUID
-          x-go-type-import:
-            path: github.com/google/uuid
         createdAt:
           type: string
           format: date-time
@@ -794,12 +762,8 @@ components:
       properties:
         imageId:
           type: string
-          format: uuid
           description: The unique identifier of the image.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-          x-go-type: uuid.UUID
-          x-go-type-import:
-            path: github.com/google/uuid
         uploadUrl:
           type: string
           description: >-
@@ -822,12 +786,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: The unique identifier of the image.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-          x-go-type: uuid.UUID
-          x-go-type-import:
-            path: github.com/google/uuid
         createdAt:
           type: string
           format: date-time
@@ -887,12 +847,8 @@ components:
       properties:
         transformationId:
           type: string
-          format: uuid
           description: The unique identifier of the transformation.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-          x-go-type: uuid.UUID
-          x-go-type-import:
-            path: github.com/google/uuid
         transformationName:
           type: string
           description: The name of the transformation.
@@ -911,12 +867,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: The unique identifier of the service account.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-          x-go-type: uuid.UUID
-          x-go-type-import:
-            path: github.com/google/uuid
         createdAt:
           type: string
           format: date-time
@@ -965,12 +917,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: The unique identifier of the user.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-          x-go-type: uuid.UUID
-          x-go-type-import:
-            path: github.com/google/uuid
         nickname:
           type: string
           description: The nickname of the user.

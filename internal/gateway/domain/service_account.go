@@ -3,13 +3,11 @@ package domain
 import (
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/isutare412/imageer/pkg/serviceaccounts"
 )
 
 type ServiceAccount struct {
-	ID        uuid.UUID
+	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	ExpireAt  *time.Time

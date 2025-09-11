@@ -3,13 +3,11 @@ package domain
 import (
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/isutare412/imageer/pkg/images"
 )
 
 type Image struct {
-	ID        uuid.UUID
+	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	State     images.State
@@ -22,12 +20,12 @@ type Images struct {
 }
 
 type ReprocessImagesRequest struct {
-	ImageIDs     []uuid.UUID
+	ImageIDs     []string
 	ReprocessAll bool
 }
 
 type Transformation struct {
-	ID        uuid.UUID
+	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
@@ -44,15 +42,15 @@ type CreateTransformationRequest struct {
 }
 
 type UpdateTransformationRequest struct {
-	ID      uuid.UUID `validate:"required"`
-	Name    *string   `validate:"omitempty,max=64"`
+	ID      string  `validate:"required"`
+	Name    *string `validate:"omitempty,max=64"`
 	Default *bool
 	Width   *int64 `validate:"omitempty,min=1"`
 	Height  *int64 `validate:"omitempty,min=1"`
 }
 
 type DeleteTransformationRequest struct {
-	ID uuid.UUID `validate:"required"`
+	ID string `validate:"required"`
 }
 
 type ImageURLSet struct {
@@ -61,13 +59,13 @@ type ImageURLSet struct {
 }
 
 type VariantURL struct {
-	TransformationID   uuid.UUID
+	TransformationID   string
 	TransformationName string
 	URL                string
 }
 
 type PresignedURL struct {
-	ImageID   uuid.UUID
+	ImageID   string
 	ExpiresAt time.Time
 	UploadURL string
 }

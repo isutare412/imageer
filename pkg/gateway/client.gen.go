@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/isutare412/imageer/pkg/images"
 	"github.com/isutare412/imageer/pkg/serviceaccounts"
 	"github.com/isutare412/imageer/pkg/users"
@@ -81,7 +80,7 @@ type CreateTransformationRequest struct {
 // DeleteTransformationRequest defines model for DeleteTransformationRequest.
 type DeleteTransformationRequest struct {
 	// ID The unique identifier of the transformation.
-	ID uuid.UUID `json:"id"`
+	ID string `json:"id"`
 }
 
 // Image defines model for Image.
@@ -90,7 +89,7 @@ type Image struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	// ID The unique identifier of the image.
-	ID uuid.UUID `json:"id"`
+	ID string `json:"id"`
 
 	// State The current state of the image.
 	State ImageState `json:"state"`
@@ -131,7 +130,7 @@ type PresignedURL struct {
 	ExpiresAt time.Time `json:"expiresAt"`
 
 	// ImageID The unique identifier of the image.
-	ImageID uuid.UUID `json:"imageId"`
+	ImageID string `json:"imageId"`
 
 	// UploadURL The presigned URL for uploading the image. Check https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html for more details.
 	UploadURL string `json:"uploadUrl"`
@@ -143,7 +142,7 @@ type Project struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	// ID The unique identifier of the project.
-	ID uuid.UUID `json:"id"`
+	ID string `json:"id"`
 
 	// Name The name of the project.
 	Name string `json:"name"`
@@ -166,7 +165,7 @@ type Projects struct {
 // ReprocessImagesAdminRequest defines model for ReprocessImagesAdminRequest.
 type ReprocessImagesAdminRequest struct {
 	// ImageIDs List of image IDs to reprocess. If not provided and reprocessAll is true, all images in the project will be reprocessed.
-	ImageIDs []uuid.UUID `json:"imageIds,omitempty"`
+	ImageIDs []string `json:"imageIds,omitempty"`
 
 	// ReprocessAll If true, reprocess all images in the project. Takes precedence over imageIds.
 	ReprocessAll bool `json:"reprocessAll,omitempty"`
@@ -187,7 +186,7 @@ type ServiceAccount struct {
 	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
 	// ID The unique identifier of the service account.
-	ID uuid.UUID `json:"id"`
+	ID string `json:"id"`
 
 	// Name The name of the service account.
 	Name string `json:"name"`
@@ -216,7 +215,7 @@ type Transformation struct {
 	Height int64 `json:"height"`
 
 	// ID The unique identifier of the transformation.
-	ID uuid.UUID `json:"id"`
+	ID string `json:"id"`
 
 	// Name The name of the transformation.
 	Name string `json:"name"`
@@ -265,7 +264,7 @@ type UpdateTransformationRequest struct {
 	Height *int64 `json:"height,omitempty"`
 
 	// ID The unique identifier of the transformation.
-	ID uuid.UUID `json:"id"`
+	ID string `json:"id"`
 
 	// Name The name of the transformation.
 	Name *string `json:"name,omitempty"`
@@ -286,7 +285,7 @@ type User struct {
 	Email string `json:"email"`
 
 	// ID The unique identifier of the user.
-	ID uuid.UUID `json:"id"`
+	ID string `json:"id"`
 
 	// Nickname The nickname of the user.
 	Nickname string `json:"nickname"`
@@ -304,7 +303,7 @@ type UserAuthority = users.Authority
 // VariantURL defines model for VariantUrl.
 type VariantURL struct {
 	// TransformationID The unique identifier of the transformation.
-	TransformationID uuid.UUID `json:"transformationId"`
+	TransformationID string `json:"transformationId"`
 
 	// TransformationName The name of the transformation.
 	TransformationName string `json:"transformationName"`
@@ -314,7 +313,7 @@ type VariantURL struct {
 }
 
 // ImageIDPath defines model for ImageIdPath.
-type ImageIDPath = uuid.UUID
+type ImageIDPath = string
 
 // LimitQuery defines model for LimitQuery.
 type LimitQuery = int64
@@ -323,10 +322,10 @@ type LimitQuery = int64
 type OffsetQuery = int64
 
 // ProjectIDPath defines model for ProjectIdPath.
-type ProjectIDPath = uuid.UUID
+type ProjectIDPath = string
 
 // ServiceAccountIDPath defines model for ServiceAccountIdPath.
-type ServiceAccountIDPath = uuid.UUID
+type ServiceAccountIDPath = string
 
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse = AppError
