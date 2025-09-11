@@ -346,6 +346,9 @@ type ListProjectsAdminParams struct {
 type FinishGoogleSignInParams struct {
 	// Code The authorization code returned by Google after sign-in.
 	Code string `form:"code" json:"code"`
+
+	// State The state parameter to prevent CSRF attacks.
+	State string `form:"state" json:"state"`
 }
 
 // CreateProjectAdminJSONRequestBody defines body for CreateProjectAdmin for application/json ContentType.
@@ -631,6 +634,13 @@ func (w *ServerInterfaceWrapper) FinishGoogleSignIn(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter code: %s", err))
 	}
 
+	// ------------- Required query parameter "state" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "state", ctx.QueryParams(), &params.State)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter state: %s", err))
+	}
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.FinishGoogleSignIn(ctx, params)
 	return err
@@ -798,11 +808,11 @@ var swaggerSpec = []string{
 	"GJ7tDx2G9wg3JrDZh7Y4/LvotrLze4nq2+bYMro/NFHuKzn4atxDnirsywBkqUIfA1B2BqkM8yKoIAs6",
 	"ILQ1pptKzOWVbjslCzox5ZYSd09Gx8063w0EhIMv9f0khkx/pAYY6BFCwEH2obBr5hfH4exVUX1kwYxX",
 	"lNjVQ+X+GiOvxVivcK52xXTNkubMOcP11uAmfns+jqI77N+3Mv5nQokIa5yvqXLrrsQfZrdQf7GHg0w5",
-	"VXnIMl80nkvgKFvKsOUbX6pz5+eg6gz+2AcZFfXI7rQRaordZnW7gseaSF1YfiVwGLFtg45n1s2+l8xe",
-	"XjLL17lRHnkRpbiHOcj2cbqSLnOLcnZzfdCplu0TV3svtJWuHW/CCBEihaB5tXhnEJmoCXQe1X7HFlNT",
-	"USlhx9z07o2cp+z2UKdqT7I59hyxlb/NuVc7kN2G720FTI1sHzagOnKnFPUeuWf2gNsEdW6+WaGN+R75",
-	"p8fvz778SxraA+6Di9YJmr5N9QP+YI9SzvPPfegW2R7ymeNpJGYj5QebnfV10uJR/oWF4oFh0vq/CXhX",
-	"H1f/DwAA//+h5akZoVYAAA==",
+	"VXnIMl80nkvgKFvKsOUbX6pz5+egGiVk24LMrd5i3UpuCYcHoBKdT29+RlhK7N+LtkXkN6v7r+JjH3xW",
+	"lDS7WUeoKbkbHu0KpGtW6/L2K0HUgGcbjD6zeve9cPfywl2+zo3yyEs5xW3QQbab1JX6mbucs5vrg074",
+	"bB/a2nu5r3T5eRNGiBApBM0LzjuDyERNoLO59pu+mJq6Tgk75r55b+Q8ZXeYOlV7ks2x57ix/IXQvdqB",
+	"7E5+bytgKnX7sAHVkTulqHfqPbMT3Saoc/PlDG3M98g/PX5/9uXf89AecB9ctE7Q9G2qH/AHe6x0nn90",
+	"RLfIdrLPHE8jMRspP17trC+1Fo/y7zwUDwyT1v9N2L36uPp/AAAA//820U1XJ1cAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

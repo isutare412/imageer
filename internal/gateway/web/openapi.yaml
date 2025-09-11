@@ -266,6 +266,12 @@ paths:
           description: The authorization code returned by Google after sign-in.
           schema:
             type: string
+        - name: state
+          in: query
+          required: true
+          description: The state parameter to prevent CSRF attacks.
+          schema:
+            type: string
       responses:
         '302':
           description: Successfully signed in with Google

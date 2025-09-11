@@ -344,6 +344,9 @@ type ListProjectsAdminParams struct {
 type FinishGoogleSignInParams struct {
 	// Code The authorization code returned by Google after sign-in.
 	Code string `form:"code" json:"code"`
+
+	// State The state parameter to prevent CSRF attacks.
+	State string `form:"state" json:"state"`
 }
 
 // CreateProjectAdminJSONRequestBody defines body for CreateProjectAdmin for application/json ContentType.
@@ -1262,6 +1265,18 @@ func NewFinishGoogleSignInRequest(server string, params *FinishGoogleSignInParam
 		queryValues := queryURL.Query()
 
 		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "code", runtime.ParamLocationQuery, params.Code); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "state", runtime.ParamLocationQuery, params.State); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
