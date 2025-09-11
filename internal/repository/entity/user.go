@@ -1,0 +1,48 @@
+package entity
+
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+
+	"github.com/isutare412/imageer/internal/gateway/domain"
+	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/users"
+)
+
+type User struct {
+	ID        string `gorm:"size:36"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Authority users.Authority `gorm:"size:32"`
+	Nickname  string          `gorm:"size:128"`
+	Email     string          `gorm:"size:1024"`
+	PhotoURL  string          `gorm:"size:2048"`
+}
+
+func NewUser(u domain.User) *User {
+	return &User{
+		ID:        u.ID,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+		Authority: u.Authority,
+		Nickname:  u.Nickname,
+		Email:     u.Email,
+		PhotoURL:  u.PhotoURL,
+	}
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+	if u.ID == "" {
+		id, err := uuid.NewV7()
+		if err != nil {
+			return apperr.NewError(apperr.CodeInternalServerError).
+				WithSummary("failed to generate UUIDv7 for user ID").
+				WithCause(err)
+		}
+
+		u.ID = id.String()
+	}
+	return nil
+}
