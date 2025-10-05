@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm/clause"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
-	"github.com/isutare412/imageer/internal/repository/entity"
+	"github.com/isutare412/imageer/internal/gateway/repository/entity"
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
