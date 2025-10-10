@@ -55,8 +55,7 @@ func LoadValidated[T any](dir string) (cfg T, err error) {
 		return cfg, fmt.Errorf("unmarshaling into config struct: %w", err)
 	}
 
-	validator := validation.NewValidator()
-	if err := validator.Validate(&cfg); err != nil {
+	if err := validation.Validate(&cfg); err != nil {
 		return cfg, fmt.Errorf("validating config struct: %w", err)
 	}
 

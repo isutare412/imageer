@@ -13,6 +13,16 @@ import (
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
+var globalValidator = NewValidator()
+
+// Validate validates a struct using validator tags. This is a shortcut for
+// creating a Validator and calling its Validate method.
+// If you need custom validation behavior, create a Validator using
+// [NewValidator].
+func Validate(i any) error {
+	return globalValidator.Validate(i)
+}
+
 // Validator validates structs using tags.
 // Ref: https://pkg.go.dev/github.com/go-playground/validator/v10
 type Validator struct {
