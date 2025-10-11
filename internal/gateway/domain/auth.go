@@ -36,10 +36,27 @@ type UserTokenPayload struct {
 	PictureURL string
 }
 
+type OIDCState struct {
+	OriginURL string `json:"originUrl"`
+}
+
 type StartGoogleSignInRequest struct {
 	HTTPReq *http.Request
 }
 
 type StartGoogleSignInResponse struct {
-	OIDCCookie string
+	RedirectURL string
+	OIDCCookie  *http.Cookie
+}
+
+type FinishGoogleSignInRequest struct {
+	HTTPReq  *http.Request
+	AuthCode string
+	State    string
+}
+
+type FinishGoogleSignInResponse struct {
+	RedirectURL string
+	OIDCCookie  *http.Cookie
+	UserCookie  *http.Cookie
 }
