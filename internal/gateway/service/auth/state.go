@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -22,28 +23,30 @@ func (s *AuthService) createOIDCState(r *http.Request) (string, error) {
 	}
 
 	stateEcrypted, err := s.crypter.Encrypt(stateBytes)
+	if err != nil {
+		return "", fmt.Errorf("ecrypting OIDC state: %w", err)
+	}
 
 	return base64.RawURLEncoding.EncodeToString(stateEcrypted), nil
 }
 
-func (s *AuthService) decryptOIDCState(state string) (domain.OIDCState, error) {
+func (s *AuthService) decryptOIDCState(state string) (oidcState domain.OIDCState, err error) {
 	stateBytes, err := base64.RawURLEncoding.DecodeString(state)
 	if err != nil {
-		return domain.OIDCState{}, apperr.NewError(apperr.CodeBadRequest).
+		return oidcState, apperr.NewError(apperr.CodeBadRequest).
 			WithSummary("unexpected OIDC state format").
 			WithCause(err)
 	}
 
 	stateDecrypted, err := s.crypter.Decrypt(stateBytes)
 	if err != nil {
-		return domain.OIDCState{}, apperr.NewError(apperr.CodeBadRequest).
+		return oidcState, apperr.NewError(apperr.CodeBadRequest).
 			WithSummary("cannot verify OIDC state").
 			WithCause(err)
 	}
 
-	var oidcState domain.OIDCState
 	if err := json.Unmarshal(stateDecrypted, &oidcState); err != nil {
-		return domain.OIDCState{}, apperr.NewError(apperr.CodeInternalServerError).
+		return oidcState, apperr.NewError(apperr.CodeInternalServerError).
 			WithSummary("failed to unmarshal OIDC state").
 			WithCause(err)
 	}
