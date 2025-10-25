@@ -1,14 +1,15 @@
 package web
 
+import "github.com/isutare412/imageer/internal/gateway/port"
+
 // handler implements the ServerInterface for handling HTTP requests
 type handler struct {
-	// Add dependencies here when implementing real functionality
-	// userUsecase UserUsecase
-	// projectUsecase ProjectUsecase
-	// etc.
+	authSvc port.AuthService
 }
 
 // newHandler creates a new Handler instance
-func newHandler() *handler {
-	return &handler{}
+func newHandler(authSvc port.AuthService) *handler {
+	return &handler{
+		authSvc: authSvc,
+	}
 }

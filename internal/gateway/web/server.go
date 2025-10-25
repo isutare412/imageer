@@ -10,6 +10,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+	"github.com/isutare412/imageer/internal/gateway/port"
 )
 
 //go:embed openapi.yaml openapi.html
@@ -21,8 +23,8 @@ type Server struct {
 	handler *handler
 }
 
-func NewServer(cfg Config) *Server {
-	handler := newHandler()
+func NewServer(cfg Config, authSvc port.AuthService) *Server {
+	handler := newHandler(authSvc)
 
 	e := echo.New()
 	e.HidePort = true
