@@ -14,7 +14,7 @@ import (
 	"github.com/isutare412/imageer/pkg/users"
 )
 
-type AuthService struct {
+type Service struct {
 	oidcProvider port.OIDCProvider
 	crypter      port.Crypter
 	jwtSigner    port.JWTSigner
@@ -22,9 +22,9 @@ type AuthService struct {
 	cfg          ServiceConfig
 }
 
-func NewAuthService(cfg ServiceConfig, oidcProvider port.OIDCProvider, crypter port.Crypter,
-	jwtSigner port.JWTSigner, userRepo port.UserRepository) *AuthService {
-	return &AuthService{
+func NewService(cfg ServiceConfig, oidcProvider port.OIDCProvider, crypter port.Crypter,
+	jwtSigner port.JWTSigner, userRepo port.UserRepository) *Service {
+	return &Service{
 		oidcProvider: oidcProvider,
 		crypter:      crypter,
 		userRepo:     userRepo,
@@ -33,7 +33,7 @@ func NewAuthService(cfg ServiceConfig, oidcProvider port.OIDCProvider, crypter p
 	}
 }
 
-func (s *AuthService) StartGoogleSignIn(ctx context.Context, req domain.StartGoogleSignInRequest,
+func (s *Service) StartGoogleSignIn(ctx context.Context, req domain.StartGoogleSignInRequest,
 ) (resp domain.StartGoogleSignInResponse, err error) {
 	state, err := s.createOIDCState(req.HTTPReq)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *AuthService) StartGoogleSignIn(ctx context.Context, req domain.StartGoo
 	return resp, nil
 }
 
-func (s *AuthService) FinishGoogleSignIn(ctx context.Context, req domain.FinishGoogleSignInRequest,
+func (s *Service) FinishGoogleSignIn(ctx context.Context, req domain.FinishGoogleSignInRequest,
 ) (resp domain.FinishGoogleSignInResponse, err error) {
 	state, err := s.decryptOIDCState(req.State)
 	if err != nil {

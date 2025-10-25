@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func (s *AuthService) createOIDCStateCookie(state string) *http.Cookie {
+func (s *Service) createOIDCStateCookie(state string) *http.Cookie {
 	return &http.Cookie{
 		Name:     s.cfg.StateCookieName,
 		Value:    state,
@@ -16,7 +16,7 @@ func (s *AuthService) createOIDCStateCookie(state string) *http.Cookie {
 	}
 }
 
-func (s *AuthService) deleteOIDCStateCookie() *http.Cookie {
+func (s *Service) deleteOIDCStateCookie() *http.Cookie {
 	return &http.Cookie{
 		Name:     s.cfg.StateCookieName,
 		Path:     "/",
@@ -26,7 +26,7 @@ func (s *AuthService) deleteOIDCStateCookie() *http.Cookie {
 	}
 }
 
-func (s *AuthService) createUserCookie(token string) *http.Cookie {
+func (s *Service) createUserCookie(token string) *http.Cookie {
 	return &http.Cookie{
 		Name:     s.cfg.UserCookieName,
 		Value:    token,

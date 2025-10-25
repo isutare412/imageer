@@ -10,7 +10,7 @@ import (
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
-func (s *AuthService) createOIDCState(r *http.Request) (string, error) {
+func (s *Service) createOIDCState(r *http.Request) (string, error) {
 	state := domain.OIDCState{
 		OriginURL: httpReferer(r),
 	}
@@ -30,7 +30,7 @@ func (s *AuthService) createOIDCState(r *http.Request) (string, error) {
 	return base64.RawURLEncoding.EncodeToString(stateEcrypted), nil
 }
 
-func (s *AuthService) decryptOIDCState(state string) (oidcState domain.OIDCState, err error) {
+func (s *Service) decryptOIDCState(state string) (oidcState domain.OIDCState, err error) {
 	stateBytes, err := base64.RawURLEncoding.DecodeString(state)
 	if err != nil {
 		return oidcState, apperr.NewError(apperr.CodeBadRequest).
