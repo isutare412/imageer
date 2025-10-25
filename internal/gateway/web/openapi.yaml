@@ -10,9 +10,9 @@ servers:
     description: Current server
 
 tags:
+  - name: Authentication
   - name: Project
   - name: Image
-  - name: User
   - name: Admin
 
 paths:
@@ -225,7 +225,7 @@ paths:
       operationId: getCurrentUser
       summary: Get current user details
       tags:
-        - User
+        - Authentication
       responses:
         '200':
           description: Successfully retrieved current user details
@@ -241,7 +241,7 @@ paths:
       operationId: startGoogleSignIn
       summary: Start Google Sign-In
       tags:
-        - User
+        - Authentication
       responses:
         '302':
           description: Redirecting to Google Sign-In
@@ -258,7 +258,7 @@ paths:
       operationId: finishGoogleSignIn
       summary: Finish Google Sign-In
       tags:
-        - User
+        - Authentication
       parameters:
         - name: code
           in: query
