@@ -39,13 +39,22 @@ func NewValidator() Validator {
 		panic(fmt.Errorf("registering translator: %w", err))
 	}
 
-	// Use json tag as field name if exists
+	// Use some tags as field name if exists
 	validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
-		if name == "-" {
-			return ""
+		switch name {
+		case "", "-": // try next tag
+		default:
+			return name
 		}
-		return name
+
+		name = strings.SplitN(fld.Tag.Get("koanf"), ",", 2)[0]
+		switch name {
+		case "", "-": // try next tag
+		default:
+			return name
+		}
+		return ""
 	})
 
 	return Validator{
