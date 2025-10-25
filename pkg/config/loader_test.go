@@ -47,7 +47,7 @@ func TestLoadValidated(t *testing.T) {
 			},
 			wantErr: false,
 			setup: func(t *testing.T, dir string) {
-				copyTestFile(t, "testdata/valid_config.yaml", filepath.Join(dir, "config.yaml"))
+				copyTestFile(t, "testdata/valid_config.yaml", filepath.Join(dir, "config.default.yaml"))
 			},
 		},
 		{
@@ -58,7 +58,7 @@ func TestLoadValidated(t *testing.T) {
 			},
 			wantErr: false,
 			setup: func(t *testing.T, dir string) {
-				copyTestFile(t, "testdata/valid_config.yaml", filepath.Join(dir, "config.yaml"))
+				copyTestFile(t, "testdata/valid_config.yaml", filepath.Join(dir, "config.default.yaml"))
 				copyTestFile(t, "testdata/valid_local.yaml", filepath.Join(dir, "config.local.yaml"))
 			},
 		},
@@ -70,7 +70,7 @@ func TestLoadValidated(t *testing.T) {
 			},
 			wantErr: false,
 			setup: func(t *testing.T, dir string) {
-				copyTestFile(t, "testdata/valid_config.yaml", filepath.Join(dir, "config.yaml"))
+				copyTestFile(t, "testdata/valid_config.yaml", filepath.Join(dir, "config.default.yaml"))
 				t.Setenv("APP_NAME", "env-app")
 				t.Setenv("APP_NESTED_AGE", "35")
 			},
@@ -80,7 +80,7 @@ func TestLoadValidated(t *testing.T) {
 			want:    configModel{},
 			wantErr: true,
 			setup: func(t *testing.T, dir string) {
-				copyTestFile(t, "testdata/missing_required.yaml", filepath.Join(dir, "config.yaml"))
+				copyTestFile(t, "testdata/missing_required.yaml", filepath.Join(dir, "config.default.yaml"))
 			},
 		},
 		{
@@ -88,7 +88,7 @@ func TestLoadValidated(t *testing.T) {
 			want:    configModel{},
 			wantErr: true,
 			setup: func(t *testing.T, dir string) {
-				copyTestFile(t, "testdata/invalid_validation.yaml", filepath.Join(dir, "config.yaml"))
+				copyTestFile(t, "testdata/invalid_validation.yaml", filepath.Join(dir, "config.default.yaml"))
 			},
 		},
 		{
@@ -102,7 +102,7 @@ func TestLoadValidated(t *testing.T) {
 			want:    configModel{},
 			wantErr: true,
 			setup: func(t *testing.T, dir string) {
-				copyTestFile(t, "testdata/invalid_yaml.yaml", filepath.Join(dir, "config.yaml"))
+				copyTestFile(t, "testdata/invalid_yaml.yaml", filepath.Join(dir, "config.default.yaml"))
 			},
 		},
 		{

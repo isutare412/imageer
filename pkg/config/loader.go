@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -17,6 +16,7 @@ import (
 )
 
 var configFileNames = []string{
+	"config.default.yaml",
 	"config.yaml",
 	"config.local.yaml",
 }
@@ -28,13 +28,14 @@ func LoadValidated[T any](dir string) (cfg T, err error) {
 		configFileNames,
 		func(f string, _ int) string { return filepath.Join(dir, f) })
 	for i, f := range configFiles {
-		if i != 0 { // file is optional except first one
-			if _, err := os.Stat(f); err != nil {
-				if errors.Is(err, os.ErrNotExist) {
-					continue
-				}
-				return cfg, fmt.Errorf("checking config file existence: %w", err)
-			}
+		_, err := os.Stat(f)
+		switch {
+		case i == 0 && os.IsNotExist(err):
+			return cfg, fmt.Errorf("default config file %s does not exist: %w", f, err)
+		case i > 0 && os.IsNotExist(err):
+			continue // optional file missing, skip
+		case err != nil:
+			return cfg, fmt.Errorf("checking config file %s: %w", f, err)
 		}
 
 		if err := k.Load(file.Provider(f), yaml.Parser()); err != nil {
