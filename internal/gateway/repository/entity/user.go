@@ -15,10 +15,10 @@ type User struct {
 	ID        string `gorm:"size:36"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Authority users.Authority `gorm:"size:32"`
-	Nickname  string          `gorm:"size:128"`
-	Email     string          `gorm:"size:1024"`
-	PhotoURL  string          `gorm:"size:2048"`
+	Role      users.Role `gorm:"size:32"`
+	Nickname  string     `gorm:"size:128"`
+	Email     string     `gorm:"size:1024"`
+	PhotoURL  string     `gorm:"size:2048"`
 }
 
 func NewUser(u domain.User) *User {
@@ -26,7 +26,7 @@ func NewUser(u domain.User) *User {
 		ID:        u.ID,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
-		Authority: u.Authority,
+		Role:      u.Role,
 		Nickname:  u.Nickname,
 		Email:     u.Email,
 		PhotoURL:  u.PhotoURL,

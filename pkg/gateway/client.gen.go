@@ -275,9 +275,6 @@ type UpdateTransformationRequest struct {
 
 // User defines model for User.
 type User struct {
-	// Authority The authority level of the user.
-	Authority UserAuthority `json:"authority"`
-
 	// CreatedAt The creation time of the user.
 	CreatedAt time.Time `json:"createdAt"`
 
@@ -293,12 +290,15 @@ type User struct {
 	// PhotoURL The photo URL of the user.
 	PhotoURL string `json:"photoUrl"`
 
+	// Role The role of the user.
+	Role UserRole `json:"role"`
+
 	// UpdatedAt The last update time of the user.
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// UserAuthority The authority level of the user.
-type UserAuthority = users.Authority
+// UserRole The role of the user.
+type UserRole = users.Role
 
 // VariantURL defines model for VariantUrl.
 type VariantURL struct {

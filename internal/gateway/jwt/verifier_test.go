@@ -44,7 +44,7 @@ func TestVerifySignedToken(t *testing.T) {
 				UserID:     "user-123",
 				IssuedAt:   time.Now(),
 				ExpireAt:   time.Now().Add(42 * time.Hour),
-				Authority:  users.AuthorityAdmin,
+				Role:       users.RoleAdmin,
 				Nickname:   "test-user",
 				Email:      "test-email",
 				PictureURL: "https://example.com/picture.png",
@@ -62,7 +62,7 @@ func TestVerifySignedToken(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, tt.payload.IssuedAt.Unix(), verified.IssuedAt.Unix())
 			assert.Equal(t, tt.payload.ExpireAt.Unix(), verified.ExpireAt.Unix())
-			assert.Equal(t, tt.payload.Authority, verified.Authority)
+			assert.Equal(t, tt.payload.Role, verified.Role)
 			assert.Equal(t, tt.payload.Nickname, verified.Nickname)
 			assert.Equal(t, tt.payload.Email, verified.Email)
 			assert.Equal(t, tt.payload.PictureURL, verified.PictureURL)

@@ -1,8 +1,8 @@
 package users
 
-type Authority string
+type Role string
 
 const (
-	AuthorityAdmin Authority = "ADMIN"
-	AuthorityGuest Authority = "GUEST"
+	RoleAdmin Role = "ADMIN"
+	RoleGuest Role = "GUEST"
 )

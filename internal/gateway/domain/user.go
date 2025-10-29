@@ -10,7 +10,7 @@ type User struct {
 	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Authority users.Authority
+	Role      users.Role
 	Nickname  string
 	Email     string
 	PhotoURL  string

@@ -11,11 +11,11 @@ const imageerGatewayIssuer = "imageer-gateway"
 
 type appClaims struct {
 	jwt.RegisteredClaims
-	UserID     string          `json:"user_id"`
-	Authority  users.Authority `json:"authority"`
-	Nickname   string          `json:"nickname"`
-	Email      string          `json:"email"`
-	PictureURL string          `json:"picture_url"`
+	UserID     string     `json:"user_id"`
+	Role       users.Role `json:"role"`
+	Nickname   string     `json:"nickname"`
+	Email      string     `json:"email"`
+	PictureURL string     `json:"picture_url"`
 }
 
 func newAppClaims(payload domain.UserTokenPayload) appClaims {
@@ -27,7 +27,7 @@ func newAppClaims(payload domain.UserTokenPayload) appClaims {
 			ExpiresAt: jwt.NewNumericDate(payload.ExpireAt),
 		},
 		UserID:     payload.UserID,
-		Authority:  payload.Authority,
+		Role:       payload.Role,
 		Nickname:   payload.Nickname,
 		Email:      payload.Email,
 		PictureURL: payload.PictureURL,
@@ -39,7 +39,7 @@ func (c *appClaims) toUserTokenPayload() domain.UserTokenPayload {
 		UserID:     c.UserID,
 		IssuedAt:   c.IssuedAt.Time,
 		ExpireAt:   c.ExpiresAt.Time,
-		Authority:  c.Authority,
+		Role:       c.Role,
 		Nickname:   c.Nickname,
 		Email:      c.Email,
 		PictureURL: c.PictureURL,

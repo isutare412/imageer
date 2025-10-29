@@ -30,7 +30,7 @@ type UserTokenPayload struct {
 	UserID     string
 	IssuedAt   time.Time
 	ExpireAt   time.Time
-	Authority  users.Authority
+	Role       users.Role
 	Nickname   string
 	Email      string
 	PictureURL string

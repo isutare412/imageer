@@ -60,10 +60,10 @@ func (s *Service) FinishGoogleSignIn(ctx context.Context, req domain.FinishGoogl
 	}
 
 	user := domain.User{
-		Authority: users.AuthorityGuest, // default to guest
-		Nickname:  idToken.FullName,
-		Email:     idToken.Email,
-		PhotoURL:  lo.FromPtr(idToken.PictureURL),
+		Role:     users.RoleGuest, // default to guest
+		Nickname: idToken.FullName,
+		Email:    idToken.Email,
+		PhotoURL: lo.FromPtr(idToken.PictureURL),
 	}
 
 	user, err = s.userRepo.Upsert(ctx, user)
@@ -76,7 +76,7 @@ func (s *Service) FinishGoogleSignIn(ctx context.Context, req domain.FinishGoogl
 		UserID:     user.ID,
 		IssuedAt:   issuedAt,
 		ExpireAt:   issuedAt.Add(s.cfg.UserCookieTTL),
-		Authority:  user.Authority,
+		Role:       user.Role,
 		Nickname:   user.Nickname,
 		Email:      user.Email,
 		PictureURL: user.PhotoURL,

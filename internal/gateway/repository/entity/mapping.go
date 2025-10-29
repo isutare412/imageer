@@ -7,7 +7,7 @@ func UserToDomain(u *User) domain.User {
 		ID:        u.ID,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
-		Authority: u.Authority,
+		Role:      u.Role,
 		Nickname:  u.Nickname,
 		Email:     u.Email,
 		PhotoURL:  u.PhotoURL,
