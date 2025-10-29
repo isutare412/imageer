@@ -911,6 +911,7 @@ components:
         - id
         - createdAt
         - updatedAt
+        - expireAt
         - name
         - accessScope
         - projects

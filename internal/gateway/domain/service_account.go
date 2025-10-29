@@ -10,7 +10,7 @@ type ServiceAccount struct {
 	ID          string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	ExpireAt    *time.Time
+	ExpireAt    time.Time
 	Name        string
 	AccessScope serviceaccounts.AccessScope
 	Projects    []ProjectReference
@@ -21,14 +21,14 @@ type CreateServiceAccountRequest struct {
 	Name        string                      `validate:"required,max=128"`
 	AccessScope serviceaccounts.AccessScope `validate:"required,oneof=FULL PROJECT"`
 	ProjectIDs  []string                    `validate:"dive,required"`
-	ExpireAt    *time.Time                  `validate:"omitempty,gt"`
+	ExpireAt    *time.Time
 }
 
 type UpdateServiceAccountRequest struct {
 	Name        *string                      `validate:"omitempty,max=128"`
 	AccessScope *serviceaccounts.AccessScope `validate:"omitempty,oneof=FULL PROJECT"`
 	ProjectIDs  []string                     `validate:"dive,required"`
-	ExpireAt    *time.Time                   `validate:"omitempty,gt"`
+	ExpireAt    *time.Time
 }
 
 type ServiceAccounts struct {
