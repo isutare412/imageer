@@ -1,9 +1,10 @@
 package repository
 
 type ClientConfig struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	Database string
+	Host        string
+	Port        int
+	User        string
+	Password    string
+	Database    string
+	UseInMemory bool
 }
