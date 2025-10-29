@@ -7,8 +7,9 @@ import (
 )
 
 type person struct {
-	Address   address
+	Address   *address  `validate:"omitempty"`
 	Addresses []address `validate:"dive"`
+	Names     []string  `validate:"dive,required"`
 }
 
 type address struct {
@@ -24,22 +25,22 @@ func TestValidator_Validate(t *testing.T) {
 		{
 			name: "all set",
 			input: person{
-				Address:   address{Street: "foo"},
+				Address:   &address{Street: "foo"},
 				Addresses: []address{{Street: "bar"}},
+				Names:     []string{"Alice", "Bob"},
 			},
 			wantErr: false,
 		},
 		{
-			name: "nested struct",
+			name: "nested struct pointer",
 			input: person{
-				Address: address{Street: ""},
+				Address: &address{Street: ""},
 			},
 			wantErr: true,
 		},
 		{
 			name: "nested struct slice",
 			input: person{
-				Address:   address{Street: "foo"},
 				Addresses: []address{{Street: ""}},
 			},
 			wantErr: true,
@@ -47,7 +48,6 @@ func TestValidator_Validate(t *testing.T) {
 		{
 			name: "empty slice",
 			input: person{
-				Address:   address{Street: "foo"},
 				Addresses: []address{},
 			},
 			wantErr: false,
@@ -55,10 +55,16 @@ func TestValidator_Validate(t *testing.T) {
 		{
 			name: "nil slice",
 			input: person{
-				Address:   address{Street: "foo"},
 				Addresses: nil,
 			},
 			wantErr: false,
+		},
+		{
+			name: "blank name",
+			input: person{
+				Names: []string{""},
+			},
+			wantErr: true,
 		},
 	}
 
