@@ -7,25 +7,28 @@ import (
 )
 
 type ServiceAccount struct {
-	ID        string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	ExpireAt  *time.Time
-	Name      string
-	Authority serviceaccounts.Authority
-	APIKey    string
+	ID          string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	ExpireAt    *time.Time
+	Name        string
+	AccessScope serviceaccounts.AccessScope
+	Projects    []ProjectReference
+	APIKey      string
 }
 
 type CreateServiceAccountRequest struct {
-	Name      string                    `validate:"required,max=128"`
-	Authority serviceaccounts.Authority `validate:"required,oneof=FULL_ACCESS PROJECT_ACCESS"`
-	ExpireAt  *time.Time                `validate:"omitempty,gt"`
+	Name        string                      `validate:"required,max=128"`
+	AccessScope serviceaccounts.AccessScope `validate:"required,oneof=FULL PROJECT"`
+	ProjectIDs  []string                    `validate:"dive,required"`
+	ExpireAt    *time.Time                  `validate:"omitempty,gt"`
 }
 
 type UpdateServiceAccountRequest struct {
-	Name      *string                    `validate:"omitempty,max=128"`
-	Authority *serviceaccounts.Authority `validate:"omitempty,oneof=FULL_ACCESS PROJECT_ACCESS"`
-	ExpireAt  *time.Time                 `validate:"omitempty,gt"`
+	Name        *string                      `validate:"omitempty,max=128"`
+	AccessScope *serviceaccounts.AccessScope `validate:"omitempty,oneof=FULL PROJECT"`
+	ProjectIDs  []string                     `validate:"dive,required"`
+	ExpireAt    *time.Time                   `validate:"omitempty,gt"`
 }
 
 type ServiceAccounts struct {

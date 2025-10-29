@@ -54,14 +54,17 @@ type CreateProjectAdminRequest struct {
 
 // CreateServiceAccountAdminRequest defines model for CreateServiceAccountAdminRequest.
 type CreateServiceAccountAdminRequest struct {
-	// Authority The authority level of the service account.
-	Authority ServiceAccountAuthority `json:"authority"`
+	// AccessScope The access scope of the service account.
+	AccessScope ServiceAccountAccessScope `json:"accessScope"`
 
 	// ExpireAt The expiration time of the service account token.
 	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
 	// Name The name of the service account.
 	Name string `json:"name"`
+
+	// ProjectIDs List of project IDs to associate with the service account.
+	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
 // CreateTransformationRequest defines model for CreateTransformationRequest.
@@ -156,6 +159,15 @@ type Project struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// ProjectReference defines model for ProjectReference.
+type ProjectReference struct {
+	// ID The unique identifier of the project.
+	ID string `json:"id"`
+
+	// Name The name of the project.
+	Name string `json:"name"`
+}
+
 // Projects defines model for Projects.
 type Projects struct {
 	Items []Project `json:"items"`
@@ -175,11 +187,11 @@ type ReprocessImagesAdminRequest struct {
 
 // ServiceAccount defines model for ServiceAccount.
 type ServiceAccount struct {
+	// AccessScope The access scope of the service account.
+	AccessScope ServiceAccountAccessScope `json:"accessScope"`
+
 	// APIKey The API key for the service account.
 	APIKey string `json:"apiKey"`
-
-	// Authority The authority level of the service account.
-	Authority ServiceAccountAuthority `json:"authority"`
 
 	// CreatedAt The creation time of the service account.
 	CreatedAt time.Time `json:"createdAt"`
@@ -193,16 +205,22 @@ type ServiceAccount struct {
 	// Name The name of the service account.
 	Name string `json:"name"`
 
+	// Projects List of projects associated with the service account.
+	Projects []ProjectReference `json:"projects"`
+
 	// UpdatedAt The last update time of the service account.
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// ServiceAccountAuthority The authority level of the service account.
-type ServiceAccountAuthority = serviceaccounts.Authority
+// ServiceAccountAccessScope The access scope of the service account.
+type ServiceAccountAccessScope = serviceaccounts.AccessScope
 
 // ServiceAccounts defines model for ServiceAccounts.
 type ServiceAccounts struct {
 	Items []ServiceAccount `json:"items"`
+
+	// Total The total number of service accounts.
+	Total int64 `json:"total"`
 }
 
 // Transformation defines model for Transformation.
@@ -247,14 +265,17 @@ type UpdateProjectAdminRequest struct {
 
 // UpdateServiceAccountAdminRequest defines model for UpdateServiceAccountAdminRequest.
 type UpdateServiceAccountAdminRequest struct {
-	// Authority The authority level of the service account.
-	Authority *ServiceAccountAuthority `json:"authority,omitempty"`
+	// AccessScope The access scope of the service account.
+	AccessScope *ServiceAccountAccessScope `json:"accessScope,omitempty"`
 
 	// ExpireAt The expiration time of the service account token.
 	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
 	// Name The name of the service account.
 	Name *string `json:"name,omitempty"`
+
+	// ProjectIDs List of project IDs to associate with the service account.
+	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
 // UpdateTransformationRequest defines model for UpdateTransformationRequest.
@@ -341,6 +362,15 @@ type ListProjectsAdminParams struct {
 	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// ListServiceAccountsAdminParams defines parameters for ListServiceAccountsAdmin.
+type ListServiceAccountsAdminParams struct {
+	// Offset Offset for pagination
+	Offset *OffsetQuery `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// Limit Limit for pagination
+	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
 // FinishGoogleSignInParams defines parameters for FinishGoogleSignIn.
 type FinishGoogleSignInParams struct {
 	// Code The authorization code returned by Google after sign-in.
@@ -385,21 +415,21 @@ type ServerInterface interface {
 	// Reprocess multiple images in a project
 	// (POST /api/v1/admin/projects/{projectId}/images/reprocess)
 	ReprocessImagesAdmin(ctx echo.Context, projectID ProjectIDPath) error
-	// List service accounts of a project
-	// (GET /api/v1/admin/projects/{projectId}/service-accounts)
-	ListServiceAccountsAdmin(ctx echo.Context, projectID ProjectIDPath) error
-	// Create a new service account for a project
-	// (POST /api/v1/admin/projects/{projectId}/service-accounts)
-	CreateServiceAccountAdmin(ctx echo.Context, projectID ProjectIDPath) error
+	// List service accounts
+	// (GET /api/v1/admin/service-accounts)
+	ListServiceAccountsAdmin(ctx echo.Context, params ListServiceAccountsAdminParams) error
+	// Create a new service account
+	// (POST /api/v1/admin/service-accounts)
+	CreateServiceAccountAdmin(ctx echo.Context) error
 	// Delete a service account
-	// (DELETE /api/v1/admin/projects/{projectId}/service-accounts/{serviceAccountId})
-	DeleteServiceAccountAdmin(ctx echo.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath) error
+	// (DELETE /api/v1/admin/service-accounts/{serviceAccountId})
+	DeleteServiceAccountAdmin(ctx echo.Context, serviceAccountID ServiceAccountIDPath) error
 	// Get service account details
-	// (GET /api/v1/admin/projects/{projectId}/service-accounts/{serviceAccountId})
-	GetServiceAccountAdmin(ctx echo.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath) error
+	// (GET /api/v1/admin/service-accounts/{serviceAccountId})
+	GetServiceAccountAdmin(ctx echo.Context, serviceAccountID ServiceAccountIDPath) error
 	// Update a service account
-	// (PUT /api/v1/admin/projects/{projectId}/service-accounts/{serviceAccountId})
-	UpdateServiceAccountAdmin(ctx echo.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath) error
+	// (PUT /api/v1/admin/service-accounts/{serviceAccountId})
+	UpdateServiceAccountAdmin(ctx echo.Context, serviceAccountID ServiceAccountIDPath) error
 	// Start Google Sign-In
 	// (GET /api/v1/auth/google/sign-in)
 	StartGoogleSignIn(ctx echo.Context) error
@@ -510,46 +540,40 @@ func (w *ServerInterfaceWrapper) ReprocessImagesAdmin(ctx echo.Context) error {
 // ListServiceAccountsAdmin converts echo context to params.
 func (w *ServerInterfaceWrapper) ListServiceAccountsAdmin(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "projectId" -------------
-	var projectID ProjectIDPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", ctx.Param("projectId"), &projectID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListServiceAccountsAdminParams
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "offset", ctx.QueryParams(), &params.Offset)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset: %s", err))
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ListServiceAccountsAdmin(ctx, projectID)
+	err = w.Handler.ListServiceAccountsAdmin(ctx, params)
 	return err
 }
 
 // CreateServiceAccountAdmin converts echo context to params.
 func (w *ServerInterfaceWrapper) CreateServiceAccountAdmin(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "projectId" -------------
-	var projectID ProjectIDPath
-
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", ctx.Param("projectId"), &projectID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
-	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.CreateServiceAccountAdmin(ctx, projectID)
+	err = w.Handler.CreateServiceAccountAdmin(ctx)
 	return err
 }
 
 // DeleteServiceAccountAdmin converts echo context to params.
 func (w *ServerInterfaceWrapper) DeleteServiceAccountAdmin(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "projectId" -------------
-	var projectID ProjectIDPath
-
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", ctx.Param("projectId"), &projectID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
-	}
-
 	// ------------- Path parameter "serviceAccountId" -------------
 	var serviceAccountID ServiceAccountIDPath
 
@@ -559,21 +583,13 @@ func (w *ServerInterfaceWrapper) DeleteServiceAccountAdmin(ctx echo.Context) err
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.DeleteServiceAccountAdmin(ctx, projectID, serviceAccountID)
+	err = w.Handler.DeleteServiceAccountAdmin(ctx, serviceAccountID)
 	return err
 }
 
 // GetServiceAccountAdmin converts echo context to params.
 func (w *ServerInterfaceWrapper) GetServiceAccountAdmin(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "projectId" -------------
-	var projectID ProjectIDPath
-
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", ctx.Param("projectId"), &projectID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
-	}
-
 	// ------------- Path parameter "serviceAccountId" -------------
 	var serviceAccountID ServiceAccountIDPath
 
@@ -583,21 +599,13 @@ func (w *ServerInterfaceWrapper) GetServiceAccountAdmin(ctx echo.Context) error 
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetServiceAccountAdmin(ctx, projectID, serviceAccountID)
+	err = w.Handler.GetServiceAccountAdmin(ctx, serviceAccountID)
 	return err
 }
 
 // UpdateServiceAccountAdmin converts echo context to params.
 func (w *ServerInterfaceWrapper) UpdateServiceAccountAdmin(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "projectId" -------------
-	var projectID ProjectIDPath
-
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", ctx.Param("projectId"), &projectID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
-	}
-
 	// ------------- Path parameter "serviceAccountId" -------------
 	var serviceAccountID ServiceAccountIDPath
 
@@ -607,7 +615,7 @@ func (w *ServerInterfaceWrapper) UpdateServiceAccountAdmin(ctx echo.Context) err
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.UpdateServiceAccountAdmin(ctx, projectID, serviceAccountID)
+	err = w.Handler.UpdateServiceAccountAdmin(ctx, serviceAccountID)
 	return err
 }
 
@@ -743,11 +751,11 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/api/v1/admin/projects/:projectId", wrapper.GetProjectAdmin)
 	router.PUT(baseURL+"/api/v1/admin/projects/:projectId", wrapper.UpdateProjectAdmin)
 	router.POST(baseURL+"/api/v1/admin/projects/:projectId/images/reprocess", wrapper.ReprocessImagesAdmin)
-	router.GET(baseURL+"/api/v1/admin/projects/:projectId/service-accounts", wrapper.ListServiceAccountsAdmin)
-	router.POST(baseURL+"/api/v1/admin/projects/:projectId/service-accounts", wrapper.CreateServiceAccountAdmin)
-	router.DELETE(baseURL+"/api/v1/admin/projects/:projectId/service-accounts/:serviceAccountId", wrapper.DeleteServiceAccountAdmin)
-	router.GET(baseURL+"/api/v1/admin/projects/:projectId/service-accounts/:serviceAccountId", wrapper.GetServiceAccountAdmin)
-	router.PUT(baseURL+"/api/v1/admin/projects/:projectId/service-accounts/:serviceAccountId", wrapper.UpdateServiceAccountAdmin)
+	router.GET(baseURL+"/api/v1/admin/service-accounts", wrapper.ListServiceAccountsAdmin)
+	router.POST(baseURL+"/api/v1/admin/service-accounts", wrapper.CreateServiceAccountAdmin)
+	router.DELETE(baseURL+"/api/v1/admin/service-accounts/:serviceAccountId", wrapper.DeleteServiceAccountAdmin)
+	router.GET(baseURL+"/api/v1/admin/service-accounts/:serviceAccountId", wrapper.GetServiceAccountAdmin)
+	router.PUT(baseURL+"/api/v1/admin/service-accounts/:serviceAccountId", wrapper.UpdateServiceAccountAdmin)
 	router.GET(baseURL+"/api/v1/auth/google/sign-in", wrapper.StartGoogleSignIn)
 	router.GET(baseURL+"/api/v1/auth/google/sign-in/callback", wrapper.FinishGoogleSignIn)
 	router.GET(baseURL+"/api/v1/projects/:projectId", wrapper.GetProject)
@@ -760,58 +768,59 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

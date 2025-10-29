@@ -12,6 +12,11 @@ type Project struct {
 	Transformations []Transformation
 }
 
+type ProjectReference struct {
+	ID   string
+	Name string
+}
+
 type CreateProjectRequest struct {
 	Name string `validate:"required,max=128"`
 }
@@ -19,9 +24,9 @@ type CreateProjectRequest struct {
 type UpdateProjectRequest struct {
 	Name            *string `validate:"omitempty,max=128"`
 	Transformations struct {
-		Add    []CreateTransformationRequest
-		Update []UpdateTransformationRequest
-		Remove []DeleteTransformationRequest
+		Add    []CreateTransformationRequest `validate:"dive"`
+		Update []UpdateTransformationRequest `validate:"dive"`
+		Remove []DeleteTransformationRequest `validate:"dive"`
 	}
 }
 

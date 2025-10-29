@@ -1,8 +1,8 @@
 package serviceaccounts
 
-type Authority string
+type AccessScope string
 
 const (
-	AuthorityFullAccess    Authority = "FULL_ACCESS"
-	AuthorityProjectAccess Authority = "PROJECT_ACCESS"
+	AccessScopeFull    AccessScope = "FULL"
+	AccessScopeProject AccessScope = "PROJECT"
 )

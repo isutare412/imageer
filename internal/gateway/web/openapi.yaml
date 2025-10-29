@@ -119,14 +119,16 @@ paths:
         default:
           $ref: '#/components/responses/ErrorResponse'
 
-  /api/v1/admin/projects/{projectId}/service-accounts:
+  /api/v1/admin/service-accounts:
     get:
       operationId: listServiceAccountsAdmin
-      summary: List service accounts of a project
+      summary: List service accounts
       tags:
         - Admin
       parameters:
-        - $ref: '#/components/parameters/ProjectIdPath'
+        # Pagination parameters
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/LimitQuery'
       responses:
         '200':
           description: Successfully retrieved service accounts
@@ -139,11 +141,9 @@ paths:
 
     post:
       operationId: createServiceAccountAdmin
-      summary: Create a new service account for a project
+      summary: Create a new service account
       tags:
         - Admin
-      parameters:
-        - $ref: '#/components/parameters/ProjectIdPath'
       requestBody:
         content:
           application/json:
@@ -159,15 +159,13 @@ paths:
         default:
           $ref: '#/components/responses/ErrorResponse'
 
-
-  /api/v1/admin/projects/{projectId}/service-accounts/{serviceAccountId}:
+  /api/v1/admin/service-accounts/{serviceAccountId}:
     get:
       operationId: getServiceAccountAdmin
       summary: Get service account details
       tags:
         - Admin
       parameters:
-        - $ref: '#/components/parameters/ProjectIdPath'
         - $ref: '#/components/parameters/ServiceAccountIdPath'
       responses:
         '200':
@@ -185,7 +183,6 @@ paths:
       tags:
         - Admin
       parameters:
-        - $ref: '#/components/parameters/ProjectIdPath'
         - $ref: '#/components/parameters/ServiceAccountIdPath'
       requestBody:
         content:
@@ -208,15 +205,10 @@ paths:
       tags:
         - Admin
       parameters:
-        - $ref: '#/components/parameters/ProjectIdPath'
         - $ref: '#/components/parameters/ServiceAccountIdPath'
       responses:
         '200':
           description: Successfully deleted service account
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServiceAccount'
         default:
           $ref: '#/components/responses/ErrorResponse'
 
@@ -446,14 +438,14 @@ components:
       x-go-type-import:
         path: github.com/isutare412/imageer/pkg/users
 
-    ServiceAccountAuthority:
+    ServiceAccountAccessScope:
       type: string
       enum:
-        - FULL_ACCESS
-        - PROJECT_ACCESS
-      description: The authority level of the service account.
-      example: PROJECT_ACCESS
-      x-go-type: serviceaccounts.Authority
+        - FULL
+        - PROJECT
+      description: The access scope of the service account.
+      example: PROJECT
+      x-go-type: serviceaccounts.AccessScope
       x-go-type-import:
         path: github.com/isutare412/imageer/pkg/serviceaccounts
 
@@ -507,8 +499,16 @@ components:
           type: string
           description: The name of the service account.
           example: my-service-account
-        authority:
-          $ref: '#/components/schemas/ServiceAccountAuthority'
+        accessScope:
+          $ref: '#/components/schemas/ServiceAccountAccessScope'
+        projectIds:
+          type: array
+          description: List of project IDs to associate with the service account.
+          items:
+            type: string
+            example: 426e634f-50dd-41a0-881b-c991441b3cd5
+          x-go-name: ProjectIDs
+          x-go-type-skip-optional-pointer: true
         expireAt:
           type: string
           format: date-time
@@ -516,7 +516,7 @@ components:
           example: '2023-10-01T12:00:00Z'
       required:
         - name
-        - authority
+        - accessScope
 
     UpdateServiceAccountAdminRequest:
       type: object
@@ -525,8 +525,16 @@ components:
           type: string
           description: The name of the service account.
           example: my-service-account
-        authority:
-          $ref: '#/components/schemas/ServiceAccountAuthority'
+        accessScope:
+          $ref: '#/components/schemas/ServiceAccountAccessScope'
+        projectIds:
+          type: array
+          description: List of project IDs to associate with the service account.
+          items:
+            type: string
+            example: 426e634f-50dd-41a0-881b-c991441b3cd5
+          x-go-name: ProjectIDs
+          x-go-type-skip-optional-pointer: true
         expireAt:
           type: string
           format: date-time
@@ -888,8 +896,13 @@ components:
           type: string
           description: The name of the service account.
           example: my-service-account
-        authority:
-          $ref: '#/components/schemas/ServiceAccountAuthority'
+        accessScope:
+          $ref: '#/components/schemas/ServiceAccountAccessScope'
+        projects:
+          type: array
+          description: List of projects associated with the service account.
+          items:
+            $ref: '#/components/schemas/ProjectReference'
         apiKey:
           type: string
           description: The API key for the service account.
@@ -899,7 +912,8 @@ components:
         - createdAt
         - updatedAt
         - name
-        - authority
+        - accessScope
+        - projects
         - apiKey
 
     ServiceAccounts:
@@ -909,8 +923,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ServiceAccount'
+        total:
+          type: integer
+          format: int64
+          description: The total number of service accounts.
+          example: 100
       required:
         - items
+        - total
+
+    ProjectReference:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the project.
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
+        name:
+          type: string
+          description: The name of the project.
+          example: My Project
+      required:
+        - id
+        - name
 
     User:
       type: object

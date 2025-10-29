@@ -122,9 +122,9 @@ func (mr *MockClientInterfaceMockRecorder) CreateProjectAdminWithBody(ctx, conte
 }
 
 // CreateServiceAccountAdmin mocks base method.
-func (m *MockClientInterface) CreateServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (m *MockClientInterface) CreateServiceAccountAdmin(ctx context.Context, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, body}
+	varargs := []any{ctx, body}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -135,16 +135,16 @@ func (m *MockClientInterface) CreateServiceAccountAdmin(ctx context.Context, pro
 }
 
 // CreateServiceAccountAdmin indicates an expected call of CreateServiceAccountAdmin.
-func (mr *MockClientInterfaceMockRecorder) CreateServiceAccountAdmin(ctx, projectID, body any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateServiceAccountAdmin(ctx, body any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, body}, reqEditors...)
+	varargs := append([]any{ctx, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateServiceAccountAdmin", reflect.TypeOf((*MockClientInterface)(nil).CreateServiceAccountAdmin), varargs...)
 }
 
 // CreateServiceAccountAdminWithBody mocks base method.
-func (m *MockClientInterface) CreateServiceAccountAdminWithBody(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (m *MockClientInterface) CreateServiceAccountAdminWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, contentType, body}
+	varargs := []any{ctx, contentType, body}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -155,9 +155,9 @@ func (m *MockClientInterface) CreateServiceAccountAdminWithBody(ctx context.Cont
 }
 
 // CreateServiceAccountAdminWithBody indicates an expected call of CreateServiceAccountAdminWithBody.
-func (mr *MockClientInterfaceMockRecorder) CreateServiceAccountAdminWithBody(ctx, projectID, contentType, body any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateServiceAccountAdminWithBody(ctx, contentType, body any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, contentType, body}, reqEditors...)
+	varargs := append([]any{ctx, contentType, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateServiceAccountAdminWithBody", reflect.TypeOf((*MockClientInterface)(nil).CreateServiceAccountAdminWithBody), varargs...)
 }
 
@@ -202,9 +202,9 @@ func (mr *MockClientInterfaceMockRecorder) CreateUploadURLWithBody(ctx, projectI
 }
 
 // DeleteServiceAccountAdmin mocks base method.
-func (m *MockClientInterface) DeleteServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (m *MockClientInterface) DeleteServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, serviceAccountID}
+	varargs := []any{ctx, serviceAccountID}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -215,9 +215,9 @@ func (m *MockClientInterface) DeleteServiceAccountAdmin(ctx context.Context, pro
 }
 
 // DeleteServiceAccountAdmin indicates an expected call of DeleteServiceAccountAdmin.
-func (mr *MockClientInterfaceMockRecorder) DeleteServiceAccountAdmin(ctx, projectID, serviceAccountID any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) DeleteServiceAccountAdmin(ctx, serviceAccountID any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, serviceAccountID}, reqEditors...)
+	varargs := append([]any{ctx, serviceAccountID}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteServiceAccountAdmin", reflect.TypeOf((*MockClientInterface)(nil).DeleteServiceAccountAdmin), varargs...)
 }
 
@@ -322,9 +322,9 @@ func (mr *MockClientInterfaceMockRecorder) GetProjectAdmin(ctx, projectID any, r
 }
 
 // GetServiceAccountAdmin mocks base method.
-func (m *MockClientInterface) GetServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (m *MockClientInterface) GetServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, serviceAccountID}
+	varargs := []any{ctx, serviceAccountID}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -335,9 +335,9 @@ func (m *MockClientInterface) GetServiceAccountAdmin(ctx context.Context, projec
 }
 
 // GetServiceAccountAdmin indicates an expected call of GetServiceAccountAdmin.
-func (mr *MockClientInterfaceMockRecorder) GetServiceAccountAdmin(ctx, projectID, serviceAccountID any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetServiceAccountAdmin(ctx, serviceAccountID any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, serviceAccountID}, reqEditors...)
+	varargs := append([]any{ctx, serviceAccountID}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServiceAccountAdmin", reflect.TypeOf((*MockClientInterface)(nil).GetServiceAccountAdmin), varargs...)
 }
 
@@ -362,9 +362,9 @@ func (mr *MockClientInterfaceMockRecorder) ListProjectsAdmin(ctx, params any, re
 }
 
 // ListServiceAccountsAdmin mocks base method.
-func (m *MockClientInterface) ListServiceAccountsAdmin(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (m *MockClientInterface) ListServiceAccountsAdmin(ctx context.Context, params *ListServiceAccountsAdminParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID}
+	varargs := []any{ctx, params}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -375,9 +375,9 @@ func (m *MockClientInterface) ListServiceAccountsAdmin(ctx context.Context, proj
 }
 
 // ListServiceAccountsAdmin indicates an expected call of ListServiceAccountsAdmin.
-func (mr *MockClientInterfaceMockRecorder) ListServiceAccountsAdmin(ctx, projectID any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) ListServiceAccountsAdmin(ctx, params any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID}, reqEditors...)
+	varargs := append([]any{ctx, params}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListServiceAccountsAdmin", reflect.TypeOf((*MockClientInterface)(nil).ListServiceAccountsAdmin), varargs...)
 }
 
@@ -482,9 +482,9 @@ func (mr *MockClientInterfaceMockRecorder) UpdateProjectAdminWithBody(ctx, proje
 }
 
 // UpdateServiceAccountAdmin mocks base method.
-func (m *MockClientInterface) UpdateServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (m *MockClientInterface) UpdateServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, serviceAccountID, body}
+	varargs := []any{ctx, serviceAccountID, body}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -495,16 +495,16 @@ func (m *MockClientInterface) UpdateServiceAccountAdmin(ctx context.Context, pro
 }
 
 // UpdateServiceAccountAdmin indicates an expected call of UpdateServiceAccountAdmin.
-func (mr *MockClientInterfaceMockRecorder) UpdateServiceAccountAdmin(ctx, projectID, serviceAccountID, body any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) UpdateServiceAccountAdmin(ctx, serviceAccountID, body any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, serviceAccountID, body}, reqEditors...)
+	varargs := append([]any{ctx, serviceAccountID, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateServiceAccountAdmin", reflect.TypeOf((*MockClientInterface)(nil).UpdateServiceAccountAdmin), varargs...)
 }
 
 // UpdateServiceAccountAdminWithBody mocks base method.
-func (m *MockClientInterface) UpdateServiceAccountAdminWithBody(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (m *MockClientInterface) UpdateServiceAccountAdminWithBody(ctx context.Context, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, serviceAccountID, contentType, body}
+	varargs := []any{ctx, serviceAccountID, contentType, body}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -515,9 +515,9 @@ func (m *MockClientInterface) UpdateServiceAccountAdminWithBody(ctx context.Cont
 }
 
 // UpdateServiceAccountAdminWithBody indicates an expected call of UpdateServiceAccountAdminWithBody.
-func (mr *MockClientInterfaceMockRecorder) UpdateServiceAccountAdminWithBody(ctx, projectID, serviceAccountID, contentType, body any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) UpdateServiceAccountAdminWithBody(ctx, serviceAccountID, contentType, body any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, serviceAccountID, contentType, body}, reqEditors...)
+	varargs := append([]any{ctx, serviceAccountID, contentType, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateServiceAccountAdminWithBody", reflect.TypeOf((*MockClientInterface)(nil).UpdateServiceAccountAdminWithBody), varargs...)
 }
 
@@ -586,9 +586,9 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) CreateProjectAdminWithRe
 }
 
 // CreateServiceAccountAdminWithBodyWithResponse mocks base method.
-func (m *MockClientWithResponsesInterface) CreateServiceAccountAdminWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error) {
+func (m *MockClientWithResponsesInterface) CreateServiceAccountAdminWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, contentType, body}
+	varargs := []any{ctx, contentType, body}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -599,16 +599,16 @@ func (m *MockClientWithResponsesInterface) CreateServiceAccountAdminWithBodyWith
 }
 
 // CreateServiceAccountAdminWithBodyWithResponse indicates an expected call of CreateServiceAccountAdminWithBodyWithResponse.
-func (mr *MockClientWithResponsesInterfaceMockRecorder) CreateServiceAccountAdminWithBodyWithResponse(ctx, projectID, contentType, body any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientWithResponsesInterfaceMockRecorder) CreateServiceAccountAdminWithBodyWithResponse(ctx, contentType, body any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, contentType, body}, reqEditors...)
+	varargs := append([]any{ctx, contentType, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateServiceAccountAdminWithBodyWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).CreateServiceAccountAdminWithBodyWithResponse), varargs...)
 }
 
 // CreateServiceAccountAdminWithResponse mocks base method.
-func (m *MockClientWithResponsesInterface) CreateServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error) {
+func (m *MockClientWithResponsesInterface) CreateServiceAccountAdminWithResponse(ctx context.Context, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, body}
+	varargs := []any{ctx, body}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -619,9 +619,9 @@ func (m *MockClientWithResponsesInterface) CreateServiceAccountAdminWithResponse
 }
 
 // CreateServiceAccountAdminWithResponse indicates an expected call of CreateServiceAccountAdminWithResponse.
-func (mr *MockClientWithResponsesInterfaceMockRecorder) CreateServiceAccountAdminWithResponse(ctx, projectID, body any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientWithResponsesInterfaceMockRecorder) CreateServiceAccountAdminWithResponse(ctx, body any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, body}, reqEditors...)
+	varargs := append([]any{ctx, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateServiceAccountAdminWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).CreateServiceAccountAdminWithResponse), varargs...)
 }
 
@@ -666,9 +666,9 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) CreateUploadURLWithRespo
 }
 
 // DeleteServiceAccountAdminWithResponse mocks base method.
-func (m *MockClientWithResponsesInterface) DeleteServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*DeleteServiceAccountAdminResponse, error) {
+func (m *MockClientWithResponsesInterface) DeleteServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*DeleteServiceAccountAdminResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, serviceAccountID}
+	varargs := []any{ctx, serviceAccountID}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -679,9 +679,9 @@ func (m *MockClientWithResponsesInterface) DeleteServiceAccountAdminWithResponse
 }
 
 // DeleteServiceAccountAdminWithResponse indicates an expected call of DeleteServiceAccountAdminWithResponse.
-func (mr *MockClientWithResponsesInterfaceMockRecorder) DeleteServiceAccountAdminWithResponse(ctx, projectID, serviceAccountID any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientWithResponsesInterfaceMockRecorder) DeleteServiceAccountAdminWithResponse(ctx, serviceAccountID any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, serviceAccountID}, reqEditors...)
+	varargs := append([]any{ctx, serviceAccountID}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteServiceAccountAdminWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).DeleteServiceAccountAdminWithResponse), varargs...)
 }
 
@@ -786,9 +786,9 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) GetProjectWithResponse(c
 }
 
 // GetServiceAccountAdminWithResponse mocks base method.
-func (m *MockClientWithResponsesInterface) GetServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*GetServiceAccountAdminResponse, error) {
+func (m *MockClientWithResponsesInterface) GetServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*GetServiceAccountAdminResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, serviceAccountID}
+	varargs := []any{ctx, serviceAccountID}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -799,9 +799,9 @@ func (m *MockClientWithResponsesInterface) GetServiceAccountAdminWithResponse(ct
 }
 
 // GetServiceAccountAdminWithResponse indicates an expected call of GetServiceAccountAdminWithResponse.
-func (mr *MockClientWithResponsesInterfaceMockRecorder) GetServiceAccountAdminWithResponse(ctx, projectID, serviceAccountID any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientWithResponsesInterfaceMockRecorder) GetServiceAccountAdminWithResponse(ctx, serviceAccountID any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, serviceAccountID}, reqEditors...)
+	varargs := append([]any{ctx, serviceAccountID}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServiceAccountAdminWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).GetServiceAccountAdminWithResponse), varargs...)
 }
 
@@ -826,9 +826,9 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) ListProjectsAdminWithRes
 }
 
 // ListServiceAccountsAdminWithResponse mocks base method.
-func (m *MockClientWithResponsesInterface) ListServiceAccountsAdminWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*ListServiceAccountsAdminResponse, error) {
+func (m *MockClientWithResponsesInterface) ListServiceAccountsAdminWithResponse(ctx context.Context, params *ListServiceAccountsAdminParams, reqEditors ...RequestEditorFn) (*ListServiceAccountsAdminResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID}
+	varargs := []any{ctx, params}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -839,9 +839,9 @@ func (m *MockClientWithResponsesInterface) ListServiceAccountsAdminWithResponse(
 }
 
 // ListServiceAccountsAdminWithResponse indicates an expected call of ListServiceAccountsAdminWithResponse.
-func (mr *MockClientWithResponsesInterfaceMockRecorder) ListServiceAccountsAdminWithResponse(ctx, projectID any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientWithResponsesInterfaceMockRecorder) ListServiceAccountsAdminWithResponse(ctx, params any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID}, reqEditors...)
+	varargs := append([]any{ctx, params}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListServiceAccountsAdminWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).ListServiceAccountsAdminWithResponse), varargs...)
 }
 
@@ -946,9 +946,9 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) UpdateProjectAdminWithRe
 }
 
 // UpdateServiceAccountAdminWithBodyWithResponse mocks base method.
-func (m *MockClientWithResponsesInterface) UpdateServiceAccountAdminWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error) {
+func (m *MockClientWithResponsesInterface) UpdateServiceAccountAdminWithBodyWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, serviceAccountID, contentType, body}
+	varargs := []any{ctx, serviceAccountID, contentType, body}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -959,16 +959,16 @@ func (m *MockClientWithResponsesInterface) UpdateServiceAccountAdminWithBodyWith
 }
 
 // UpdateServiceAccountAdminWithBodyWithResponse indicates an expected call of UpdateServiceAccountAdminWithBodyWithResponse.
-func (mr *MockClientWithResponsesInterfaceMockRecorder) UpdateServiceAccountAdminWithBodyWithResponse(ctx, projectID, serviceAccountID, contentType, body any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientWithResponsesInterfaceMockRecorder) UpdateServiceAccountAdminWithBodyWithResponse(ctx, serviceAccountID, contentType, body any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, serviceAccountID, contentType, body}, reqEditors...)
+	varargs := append([]any{ctx, serviceAccountID, contentType, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateServiceAccountAdminWithBodyWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).UpdateServiceAccountAdminWithBodyWithResponse), varargs...)
 }
 
 // UpdateServiceAccountAdminWithResponse mocks base method.
-func (m *MockClientWithResponsesInterface) UpdateServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error) {
+func (m *MockClientWithResponsesInterface) UpdateServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, serviceAccountID, body}
+	varargs := []any{ctx, serviceAccountID, body}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -979,8 +979,8 @@ func (m *MockClientWithResponsesInterface) UpdateServiceAccountAdminWithResponse
 }
 
 // UpdateServiceAccountAdminWithResponse indicates an expected call of UpdateServiceAccountAdminWithResponse.
-func (mr *MockClientWithResponsesInterfaceMockRecorder) UpdateServiceAccountAdminWithResponse(ctx, projectID, serviceAccountID, body any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientWithResponsesInterfaceMockRecorder) UpdateServiceAccountAdminWithResponse(ctx, serviceAccountID, body any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, serviceAccountID, body}, reqEditors...)
+	varargs := append([]any{ctx, serviceAccountID, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateServiceAccountAdminWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).UpdateServiceAccountAdminWithResponse), varargs...)
 }

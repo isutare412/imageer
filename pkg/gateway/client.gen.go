@@ -52,14 +52,17 @@ type CreateProjectAdminRequest struct {
 
 // CreateServiceAccountAdminRequest defines model for CreateServiceAccountAdminRequest.
 type CreateServiceAccountAdminRequest struct {
-	// Authority The authority level of the service account.
-	Authority ServiceAccountAuthority `json:"authority"`
+	// AccessScope The access scope of the service account.
+	AccessScope ServiceAccountAccessScope `json:"accessScope"`
 
 	// ExpireAt The expiration time of the service account token.
 	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
 	// Name The name of the service account.
 	Name string `json:"name"`
+
+	// ProjectIDs List of project IDs to associate with the service account.
+	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
 // CreateTransformationRequest defines model for CreateTransformationRequest.
@@ -154,6 +157,15 @@ type Project struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// ProjectReference defines model for ProjectReference.
+type ProjectReference struct {
+	// ID The unique identifier of the project.
+	ID string `json:"id"`
+
+	// Name The name of the project.
+	Name string `json:"name"`
+}
+
 // Projects defines model for Projects.
 type Projects struct {
 	Items []Project `json:"items"`
@@ -173,11 +185,11 @@ type ReprocessImagesAdminRequest struct {
 
 // ServiceAccount defines model for ServiceAccount.
 type ServiceAccount struct {
+	// AccessScope The access scope of the service account.
+	AccessScope ServiceAccountAccessScope `json:"accessScope"`
+
 	// APIKey The API key for the service account.
 	APIKey string `json:"apiKey"`
-
-	// Authority The authority level of the service account.
-	Authority ServiceAccountAuthority `json:"authority"`
 
 	// CreatedAt The creation time of the service account.
 	CreatedAt time.Time `json:"createdAt"`
@@ -191,16 +203,22 @@ type ServiceAccount struct {
 	// Name The name of the service account.
 	Name string `json:"name"`
 
+	// Projects List of projects associated with the service account.
+	Projects []ProjectReference `json:"projects"`
+
 	// UpdatedAt The last update time of the service account.
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// ServiceAccountAuthority The authority level of the service account.
-type ServiceAccountAuthority = serviceaccounts.Authority
+// ServiceAccountAccessScope The access scope of the service account.
+type ServiceAccountAccessScope = serviceaccounts.AccessScope
 
 // ServiceAccounts defines model for ServiceAccounts.
 type ServiceAccounts struct {
 	Items []ServiceAccount `json:"items"`
+
+	// Total The total number of service accounts.
+	Total int64 `json:"total"`
 }
 
 // Transformation defines model for Transformation.
@@ -245,14 +263,17 @@ type UpdateProjectAdminRequest struct {
 
 // UpdateServiceAccountAdminRequest defines model for UpdateServiceAccountAdminRequest.
 type UpdateServiceAccountAdminRequest struct {
-	// Authority The authority level of the service account.
-	Authority *ServiceAccountAuthority `json:"authority,omitempty"`
+	// AccessScope The access scope of the service account.
+	AccessScope *ServiceAccountAccessScope `json:"accessScope,omitempty"`
 
 	// ExpireAt The expiration time of the service account token.
 	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
 	// Name The name of the service account.
 	Name *string `json:"name,omitempty"`
+
+	// ProjectIDs List of project IDs to associate with the service account.
+	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
 // UpdateTransformationRequest defines model for UpdateTransformationRequest.
@@ -332,6 +353,15 @@ type ErrorResponse = AppError
 
 // ListProjectsAdminParams defines parameters for ListProjectsAdmin.
 type ListProjectsAdminParams struct {
+	// Offset Offset for pagination
+	Offset *OffsetQuery `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// Limit Limit for pagination
+	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// ListServiceAccountsAdminParams defines parameters for ListServiceAccountsAdmin.
+type ListServiceAccountsAdminParams struct {
 	// Offset Offset for pagination
 	Offset *OffsetQuery `form:"offset,omitempty" json:"offset,omitempty"`
 
@@ -461,23 +491,23 @@ type ClientInterface interface {
 	ReprocessImagesAdmin(ctx context.Context, projectID ProjectIDPath, body ReprocessImagesAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListServiceAccountsAdmin request
-	ListServiceAccountsAdmin(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ListServiceAccountsAdmin(ctx context.Context, params *ListServiceAccountsAdminParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateServiceAccountAdminWithBody request with any body
-	CreateServiceAccountAdminWithBody(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateServiceAccountAdminWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateServiceAccountAdmin(ctx context.Context, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteServiceAccountAdmin request
-	DeleteServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetServiceAccountAdmin request
-	GetServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateServiceAccountAdminWithBody request with any body
-	UpdateServiceAccountAdminWithBody(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateServiceAccountAdminWithBody(ctx context.Context, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// StartGoogleSignIn request
 	StartGoogleSignIn(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -596,8 +626,8 @@ func (c *Client) ReprocessImagesAdmin(ctx context.Context, projectID ProjectIDPa
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListServiceAccountsAdmin(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListServiceAccountsAdminRequest(c.Server, projectID)
+func (c *Client) ListServiceAccountsAdmin(ctx context.Context, params *ListServiceAccountsAdminParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListServiceAccountsAdminRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -608,8 +638,8 @@ func (c *Client) ListServiceAccountsAdmin(ctx context.Context, projectID Project
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateServiceAccountAdminWithBody(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateServiceAccountAdminRequestWithBody(c.Server, projectID, contentType, body)
+func (c *Client) CreateServiceAccountAdminWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateServiceAccountAdminRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -620,8 +650,8 @@ func (c *Client) CreateServiceAccountAdminWithBody(ctx context.Context, projectI
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateServiceAccountAdminRequest(c.Server, projectID, body)
+func (c *Client) CreateServiceAccountAdmin(ctx context.Context, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateServiceAccountAdminRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -632,8 +662,8 @@ func (c *Client) CreateServiceAccountAdmin(ctx context.Context, projectID Projec
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteServiceAccountAdminRequest(c.Server, projectID, serviceAccountID)
+func (c *Client) DeleteServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteServiceAccountAdminRequest(c.Server, serviceAccountID)
 	if err != nil {
 		return nil, err
 	}
@@ -644,8 +674,8 @@ func (c *Client) DeleteServiceAccountAdmin(ctx context.Context, projectID Projec
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetServiceAccountAdminRequest(c.Server, projectID, serviceAccountID)
+func (c *Client) GetServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetServiceAccountAdminRequest(c.Server, serviceAccountID)
 	if err != nil {
 		return nil, err
 	}
@@ -656,8 +686,8 @@ func (c *Client) GetServiceAccountAdmin(ctx context.Context, projectID ProjectID
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateServiceAccountAdminWithBody(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateServiceAccountAdminRequestWithBody(c.Server, projectID, serviceAccountID, contentType, body)
+func (c *Client) UpdateServiceAccountAdminWithBody(ctx context.Context, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateServiceAccountAdminRequestWithBody(c.Server, serviceAccountID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -668,8 +698,8 @@ func (c *Client) UpdateServiceAccountAdminWithBody(ctx context.Context, projectI
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateServiceAccountAdmin(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateServiceAccountAdminRequest(c.Server, projectID, serviceAccountID, body)
+func (c *Client) UpdateServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateServiceAccountAdminRequest(c.Server, serviceAccountID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -998,22 +1028,15 @@ func NewReprocessImagesAdminRequestWithBody(server string, projectID ProjectIDPa
 }
 
 // NewListServiceAccountsAdminRequest generates requests for ListServiceAccountsAdmin
-func NewListServiceAccountsAdminRequest(server string, projectID ProjectIDPath) (*http.Request, error) {
+func NewListServiceAccountsAdminRequest(server string, params *ListServiceAccountsAdminParams) (*http.Request, error) {
 	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
-	if err != nil {
-		return nil, err
-	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/admin/projects/%s/service-accounts", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/admin/service-accounts")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1021,6 +1044,44 @@ func NewListServiceAccountsAdminRequest(server string, projectID ProjectIDPath) 
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -1032,33 +1093,26 @@ func NewListServiceAccountsAdminRequest(server string, projectID ProjectIDPath) 
 }
 
 // NewCreateServiceAccountAdminRequest calls the generic CreateServiceAccountAdmin builder with application/json body
-func NewCreateServiceAccountAdminRequest(server string, projectID ProjectIDPath, body CreateServiceAccountAdminJSONRequestBody) (*http.Request, error) {
+func NewCreateServiceAccountAdminRequest(server string, body CreateServiceAccountAdminJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateServiceAccountAdminRequestWithBody(server, projectID, "application/json", bodyReader)
+	return NewCreateServiceAccountAdminRequestWithBody(server, "application/json", bodyReader)
 }
 
 // NewCreateServiceAccountAdminRequestWithBody generates requests for CreateServiceAccountAdmin with any type of body
-func NewCreateServiceAccountAdminRequestWithBody(server string, projectID ProjectIDPath, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateServiceAccountAdminRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
-	if err != nil {
-		return nil, err
-	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/admin/projects/%s/service-accounts", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/admin/service-accounts")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1079,19 +1133,12 @@ func NewCreateServiceAccountAdminRequestWithBody(server string, projectID Projec
 }
 
 // NewDeleteServiceAccountAdminRequest generates requests for DeleteServiceAccountAdmin
-func NewDeleteServiceAccountAdminRequest(server string, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath) (*http.Request, error) {
+func NewDeleteServiceAccountAdminRequest(server string, serviceAccountID ServiceAccountIDPath) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountID)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountID)
 	if err != nil {
 		return nil, err
 	}
@@ -1101,7 +1148,7 @@ func NewDeleteServiceAccountAdminRequest(server string, projectID ProjectIDPath,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/admin/projects/%s/service-accounts/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/api/v1/admin/service-accounts/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1120,19 +1167,12 @@ func NewDeleteServiceAccountAdminRequest(server string, projectID ProjectIDPath,
 }
 
 // NewGetServiceAccountAdminRequest generates requests for GetServiceAccountAdmin
-func NewGetServiceAccountAdminRequest(server string, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath) (*http.Request, error) {
+func NewGetServiceAccountAdminRequest(server string, serviceAccountID ServiceAccountIDPath) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountID)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountID)
 	if err != nil {
 		return nil, err
 	}
@@ -1142,7 +1182,7 @@ func NewGetServiceAccountAdminRequest(server string, projectID ProjectIDPath, se
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/admin/projects/%s/service-accounts/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/api/v1/admin/service-accounts/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1161,30 +1201,23 @@ func NewGetServiceAccountAdminRequest(server string, projectID ProjectIDPath, se
 }
 
 // NewUpdateServiceAccountAdminRequest calls the generic UpdateServiceAccountAdmin builder with application/json body
-func NewUpdateServiceAccountAdminRequest(server string, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody) (*http.Request, error) {
+func NewUpdateServiceAccountAdminRequest(server string, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateServiceAccountAdminRequestWithBody(server, projectID, serviceAccountID, "application/json", bodyReader)
+	return NewUpdateServiceAccountAdminRequestWithBody(server, serviceAccountID, "application/json", bodyReader)
 }
 
 // NewUpdateServiceAccountAdminRequestWithBody generates requests for UpdateServiceAccountAdmin with any type of body
-func NewUpdateServiceAccountAdminRequestWithBody(server string, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateServiceAccountAdminRequestWithBody(server string, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountID)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountID)
 	if err != nil {
 		return nil, err
 	}
@@ -1194,7 +1227,7 @@ func NewUpdateServiceAccountAdminRequestWithBody(server string, projectID Projec
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/admin/projects/%s/service-accounts/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/api/v1/admin/service-accounts/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1512,23 +1545,23 @@ type ClientWithResponsesInterface interface {
 	ReprocessImagesAdminWithResponse(ctx context.Context, projectID ProjectIDPath, body ReprocessImagesAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*ReprocessImagesAdminResponse, error)
 
 	// ListServiceAccountsAdminWithResponse request
-	ListServiceAccountsAdminWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*ListServiceAccountsAdminResponse, error)
+	ListServiceAccountsAdminWithResponse(ctx context.Context, params *ListServiceAccountsAdminParams, reqEditors ...RequestEditorFn) (*ListServiceAccountsAdminResponse, error)
 
 	// CreateServiceAccountAdminWithBodyWithResponse request with any body
-	CreateServiceAccountAdminWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error)
+	CreateServiceAccountAdminWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error)
 
-	CreateServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error)
+	CreateServiceAccountAdminWithResponse(ctx context.Context, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error)
 
 	// DeleteServiceAccountAdminWithResponse request
-	DeleteServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*DeleteServiceAccountAdminResponse, error)
+	DeleteServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*DeleteServiceAccountAdminResponse, error)
 
 	// GetServiceAccountAdminWithResponse request
-	GetServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*GetServiceAccountAdminResponse, error)
+	GetServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*GetServiceAccountAdminResponse, error)
 
 	// UpdateServiceAccountAdminWithBodyWithResponse request with any body
-	UpdateServiceAccountAdminWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error)
+	UpdateServiceAccountAdminWithBodyWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error)
 
-	UpdateServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error)
+	UpdateServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error)
 
 	// StartGoogleSignInWithResponse request
 	StartGoogleSignInWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*StartGoogleSignInResponse, error)
@@ -1715,7 +1748,6 @@ func (r CreateServiceAccountAdminResponse) StatusCode() int {
 type DeleteServiceAccountAdminResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ServiceAccount
 	JSONDefault  *ErrorResponse
 }
 
@@ -1987,8 +2019,8 @@ func (c *ClientWithResponses) ReprocessImagesAdminWithResponse(ctx context.Conte
 }
 
 // ListServiceAccountsAdminWithResponse request returning *ListServiceAccountsAdminResponse
-func (c *ClientWithResponses) ListServiceAccountsAdminWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*ListServiceAccountsAdminResponse, error) {
-	rsp, err := c.ListServiceAccountsAdmin(ctx, projectID, reqEditors...)
+func (c *ClientWithResponses) ListServiceAccountsAdminWithResponse(ctx context.Context, params *ListServiceAccountsAdminParams, reqEditors ...RequestEditorFn) (*ListServiceAccountsAdminResponse, error) {
+	rsp, err := c.ListServiceAccountsAdmin(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1996,16 +2028,16 @@ func (c *ClientWithResponses) ListServiceAccountsAdminWithResponse(ctx context.C
 }
 
 // CreateServiceAccountAdminWithBodyWithResponse request with arbitrary body returning *CreateServiceAccountAdminResponse
-func (c *ClientWithResponses) CreateServiceAccountAdminWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error) {
-	rsp, err := c.CreateServiceAccountAdminWithBody(ctx, projectID, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateServiceAccountAdminWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error) {
+	rsp, err := c.CreateServiceAccountAdminWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateServiceAccountAdminResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error) {
-	rsp, err := c.CreateServiceAccountAdmin(ctx, projectID, body, reqEditors...)
+func (c *ClientWithResponses) CreateServiceAccountAdminWithResponse(ctx context.Context, body CreateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountAdminResponse, error) {
+	rsp, err := c.CreateServiceAccountAdmin(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2013,8 +2045,8 @@ func (c *ClientWithResponses) CreateServiceAccountAdminWithResponse(ctx context.
 }
 
 // DeleteServiceAccountAdminWithResponse request returning *DeleteServiceAccountAdminResponse
-func (c *ClientWithResponses) DeleteServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*DeleteServiceAccountAdminResponse, error) {
-	rsp, err := c.DeleteServiceAccountAdmin(ctx, projectID, serviceAccountID, reqEditors...)
+func (c *ClientWithResponses) DeleteServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*DeleteServiceAccountAdminResponse, error) {
+	rsp, err := c.DeleteServiceAccountAdmin(ctx, serviceAccountID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2022,8 +2054,8 @@ func (c *ClientWithResponses) DeleteServiceAccountAdminWithResponse(ctx context.
 }
 
 // GetServiceAccountAdminWithResponse request returning *GetServiceAccountAdminResponse
-func (c *ClientWithResponses) GetServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*GetServiceAccountAdminResponse, error) {
-	rsp, err := c.GetServiceAccountAdmin(ctx, projectID, serviceAccountID, reqEditors...)
+func (c *ClientWithResponses) GetServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*GetServiceAccountAdminResponse, error) {
+	rsp, err := c.GetServiceAccountAdmin(ctx, serviceAccountID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2031,16 +2063,16 @@ func (c *ClientWithResponses) GetServiceAccountAdminWithResponse(ctx context.Con
 }
 
 // UpdateServiceAccountAdminWithBodyWithResponse request with arbitrary body returning *UpdateServiceAccountAdminResponse
-func (c *ClientWithResponses) UpdateServiceAccountAdminWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error) {
-	rsp, err := c.UpdateServiceAccountAdminWithBody(ctx, projectID, serviceAccountID, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateServiceAccountAdminWithBodyWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error) {
+	rsp, err := c.UpdateServiceAccountAdminWithBody(ctx, serviceAccountID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateServiceAccountAdminResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateServiceAccountAdminWithResponse(ctx context.Context, projectID ProjectIDPath, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error) {
-	rsp, err := c.UpdateServiceAccountAdmin(ctx, projectID, serviceAccountID, body, reqEditors...)
+func (c *ClientWithResponses) UpdateServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error) {
+	rsp, err := c.UpdateServiceAccountAdmin(ctx, serviceAccountID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2354,13 +2386,6 @@ func ParseDeleteServiceAccountAdminResponse(rsp *http.Response) (*DeleteServiceA
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ServiceAccount
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
