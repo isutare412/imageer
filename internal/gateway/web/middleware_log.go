@@ -35,11 +35,11 @@ func accessLog(next echo.HandlerFunc) echo.HandlerFunc {
 			slog.Int("status", resp.Status),
 			slog.String("method", req.Method),
 			slog.String("path", req.URL.Path),
-			slog.String("remoteAddr", ctx.RealIP()),
+			slog.String("remoteAddress", ctx.RealIP()),
 			slog.String("userAgent", req.UserAgent()),
-			slog.Duration("elapsed", time.Since(before)),
-			slog.Int64("reqContentLength", req.ContentLength),
-			slog.Int64("respSize", resp.Size),
+			slog.Duration("elapsedTime", time.Since(before)),
+			slog.Int64("requestContentLength", req.ContentLength),
+			slog.Int64("responseSize", resp.Size),
 		).Log(rctx, log.SlogLevelAccess, "Handle HTTP request")
 
 		return err
