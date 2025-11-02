@@ -111,7 +111,7 @@ func TestLoadValidated(t *testing.T) {
 				Name:   "local-app",
 				Nested: nestedConfig{Age: 30},
 			},
-			wantErr: true,
+			wantErr: false,
 			setup: func(t *testing.T, dir string) {
 				copyTestFile(t, "testdata/valid_local.yaml", filepath.Join(dir, "config.local.yaml"))
 			},
