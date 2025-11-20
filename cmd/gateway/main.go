@@ -1,40 +1,39 @@
 package main
 
 import (
+	"flag"
 	"log/slog"
-	"os"
-	"os/signal"
-	"syscall"
 
-	"github.com/isutare412/imageer/internal/gateway/web"
+	gwconfig "github.com/isutare412/imageer/internal/gateway/config"
+	"github.com/isutare412/imageer/pkg/config"
 	"github.com/isutare412/imageer/pkg/log"
 )
 
+var cfgPath = flag.String("configs", "./configs/gateway", "Path to config directory")
+
+func init() {
+	flag.Parse()
+}
+
 func main() {
-	log.Init(log.Config{
-		Format:    log.FormatPretty,
-		Level:     log.LevelDebug,
-		AddSource: true,
-	})
+	cfg, err := config.LoadValidated[gwconfig.Config](*cfgPath)
+	if err != nil {
+		slog.Error("Failed to load config", "error", err)
+		return
+	}
+	log.Init(cfg.ToLogConfig())
 
-	webServer := web.NewServer(web.Config{
-		Port:            8080,
-		ShowBanner:      true,
-		ShowOpenAPIDocs: true,
-	})
-
-	webServerErrs := webServer.Run()
-
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	select {
-	case sig := <-signals:
-		slog.Info("Received signal, shutting down", "signal", sig)
-	case err := <-webServerErrs:
-		slog.Error("Web server error", "error", err)
+	app, err := newApplication(cfg)
+	if err != nil {
+		slog.Error("Failed to create application", "error", err)
+		return
 	}
 
-	if err := webServer.Shutdown(); err != nil {
-		slog.Error("Failed to shutdown web server", "error", err)
+	if err := app.initialize(); err != nil {
+		slog.Error("Failed to initialize application", "error", err)
+		return
 	}
+
+	app.run()
+	app.shutdown()
 }
