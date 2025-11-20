@@ -841,14 +841,14 @@ components:
           type: string
           description: The original URL of the image.
           example: https://example.com/original/image.png
-        transformations:
+        variants:
           type: array
           description: List of URLs for the image with applied transformations.
           items:
             $ref: '#/components/schemas/VariantUrl'
       required:
         - originalUrl
-        - transformations
+        - variants
 
     VariantUrl:
       type: object

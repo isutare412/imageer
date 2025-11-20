@@ -115,8 +115,8 @@ type ImageURLSet struct {
 	// OriginalURL The original URL of the image.
 	OriginalURL string `json:"originalUrl"`
 
-	// Transformations List of URLs for the image with applied transformations.
-	Transformations []VariantURL `json:"transformations"`
+	// Variants List of URLs for the image with applied transformations.
+	Variants []VariantURL `json:"variants"`
 }
 
 // Images defines model for Images.
