@@ -32,6 +32,10 @@ func NewClient(cfg ClientConfig) (*Client, error) {
 func (c *Client) MigrateSchemas(ctx context.Context) error {
 	if err := c.db.AutoMigrate(
 		&entity.User{},
+		&entity.Project{},
+		&entity.Transformation{},
+		&entity.ServiceAccount{},
+		&entity.Image{},
 	); err != nil {
 		return apperr.NewError(apperr.CodeInternalServerError).
 			WithSummary("failed to migrate database schemas").

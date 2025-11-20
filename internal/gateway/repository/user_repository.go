@@ -35,7 +35,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (user domain.U
 			WithCause(err)
 	}
 
-	return entity.UserToDomain(&u), nil
+	return u.ToDomain(), nil
 }
 
 func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (userCreated domain.User, err error) {
@@ -56,5 +56,5 @@ func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (userCrea
 			WithCause(err)
 	}
 
-	return entity.UserToDomain(u), nil
+	return u.ToDomain(), nil
 }
