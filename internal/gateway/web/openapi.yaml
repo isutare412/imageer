@@ -9,6 +9,11 @@ servers:
   - url: /
     description: Current server
 
+security:
+  - cookieAuth: []
+  - apiKeyAuth: []
+  - bearerAuth: []
+
 tags:
   - name: Authentication
   - name: Project
@@ -232,6 +237,7 @@ paths:
     get:
       operationId: startGoogleSignIn
       summary: Start Google Sign-In
+      security: []
       tags:
         - Authentication
       responses:
@@ -249,6 +255,7 @@ paths:
     get:
       operationId: finishGoogleSignIn
       summary: Finish Google Sign-In
+      security: []
       tags:
         - Authentication
       parameters:
@@ -336,6 +343,20 @@ paths:
           $ref: '#/components/responses/ErrorResponse'
 
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session_id
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   parameters:
     ###
     # Path Parameters

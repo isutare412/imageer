@@ -22,6 +22,12 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+const (
+	ApiKeyAuthScopes = "apiKeyAuth.Scopes"
+	BearerAuthScopes = "bearerAuth.Scopes"
+	CookieAuthScopes = "cookieAuth.Scopes"
+)
+
 // AppError defines model for AppError.
 type AppError struct {
 	// CodeID Error code ID for programmatic handling
@@ -459,6 +465,12 @@ type ServerInterfaceWrapper struct {
 func (w *ServerInterfaceWrapper) ListProjectsAdmin(ctx echo.Context) error {
 	var err error
 
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
+
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListProjectsAdminParams
 	// ------------- Optional query parameter "offset" -------------
@@ -484,6 +496,12 @@ func (w *ServerInterfaceWrapper) ListProjectsAdmin(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) CreateProjectAdmin(ctx echo.Context) error {
 	var err error
 
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateProjectAdmin(ctx)
 	return err
@@ -499,6 +517,12 @@ func (w *ServerInterfaceWrapper) GetProjectAdmin(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetProjectAdmin(ctx, projectID)
@@ -516,6 +540,12 @@ func (w *ServerInterfaceWrapper) UpdateProjectAdmin(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
 
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.UpdateProjectAdmin(ctx, projectID)
 	return err
@@ -532,6 +562,12 @@ func (w *ServerInterfaceWrapper) ReprocessImagesAdmin(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
 
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ReprocessImagesAdmin(ctx, projectID)
 	return err
@@ -540,6 +576,12 @@ func (w *ServerInterfaceWrapper) ReprocessImagesAdmin(ctx echo.Context) error {
 // ListServiceAccountsAdmin converts echo context to params.
 func (w *ServerInterfaceWrapper) ListServiceAccountsAdmin(ctx echo.Context) error {
 	var err error
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListServiceAccountsAdminParams
@@ -566,6 +608,12 @@ func (w *ServerInterfaceWrapper) ListServiceAccountsAdmin(ctx echo.Context) erro
 func (w *ServerInterfaceWrapper) CreateServiceAccountAdmin(ctx echo.Context) error {
 	var err error
 
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateServiceAccountAdmin(ctx)
 	return err
@@ -581,6 +629,12 @@ func (w *ServerInterfaceWrapper) DeleteServiceAccountAdmin(ctx echo.Context) err
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter serviceAccountId: %s", err))
 	}
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.DeleteServiceAccountAdmin(ctx, serviceAccountID)
@@ -598,6 +652,12 @@ func (w *ServerInterfaceWrapper) GetServiceAccountAdmin(ctx echo.Context) error 
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter serviceAccountId: %s", err))
 	}
 
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetServiceAccountAdmin(ctx, serviceAccountID)
 	return err
@@ -613,6 +673,12 @@ func (w *ServerInterfaceWrapper) UpdateServiceAccountAdmin(ctx echo.Context) err
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter serviceAccountId: %s", err))
 	}
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.UpdateServiceAccountAdmin(ctx, serviceAccountID)
@@ -664,6 +730,12 @@ func (w *ServerInterfaceWrapper) GetProject(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
 
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetProject(ctx, projectID)
 	return err
@@ -679,6 +751,12 @@ func (w *ServerInterfaceWrapper) CreateUploadURL(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateUploadURL(ctx, projectID)
@@ -704,6 +782,12 @@ func (w *ServerInterfaceWrapper) GetImage(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter imageId: %s", err))
 	}
 
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetImage(ctx, projectID, imageID)
 	return err
@@ -712,6 +796,12 @@ func (w *ServerInterfaceWrapper) GetImage(ctx echo.Context) error {
 // GetCurrentUser converts echo context to params.
 func (w *ServerInterfaceWrapper) GetCurrentUser(ctx echo.Context) error {
 	var err error
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(BearerAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetCurrentUser(ctx)
@@ -768,59 +858,61 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

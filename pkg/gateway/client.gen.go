@@ -20,6 +20,12 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+const (
+	ApiKeyAuthScopes = "apiKeyAuth.Scopes"
+	BearerAuthScopes = "bearerAuth.Scopes"
+	CookieAuthScopes = "cookieAuth.Scopes"
+)
+
 // AppError defines model for AppError.
 type AppError struct {
 	// CodeID Error code ID for programmatic handling
