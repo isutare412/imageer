@@ -13,12 +13,12 @@ type Transformation struct {
 	ID        string `gorm:"size:36"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Name      string `gorm:"size:128"`
+	Name      string `gorm:"size:128; uniqueIndex:idx_project_id_name,priority:2"`
 	Default   bool
 	Width     int64
 	Height    int64
 
-	ProjectID string `gorm:"size:36"`
+	ProjectID string `gorm:"size:36; uniqueIndex:idx_project_id_name,priority:1"`
 }
 
 func (t *Transformation) BeforeCreate(tx *gorm.DB) error {
