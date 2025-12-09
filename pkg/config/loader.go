@@ -21,18 +21,30 @@ var configFileNames = []string{
 	"config.local.yaml",
 }
 
-// Load loads configuration from the given directory into the config struct of
-// type T. It loads configuration files in the following order.
-//
-//  1. config.default.yaml
-//  2. config.yaml
-//  3. config.local.yaml
-//
-// At least one of the files must exist. If multiple files exist, later files
-// override earlier one's fields.
+// Load loads configuration into a struct of type T from multiple sources.
+// Order of precedence (highest to lowest):
+//  1. Environment variables (prefixed with APP_)
+//  2. Configuration files in the specified directory in the following order:
+//     config.local.yaml, config.yaml, config.default.yaml
 func Load[T any](dir string) (cfg T, err error) {
 	k := koanf.New(".")
 
+	if err := loadFromFile(k, dir); err != nil {
+		return cfg, fmt.Errorf("loading from files: %w", err)
+	}
+
+	if err := loadFromEnv(k); err != nil {
+		return cfg, fmt.Errorf("loading from env: %w", err)
+	}
+
+	if err := k.UnmarshalWithConf("", &cfg, koanf.UnmarshalConf{Tag: "koanf"}); err != nil {
+		return cfg, fmt.Errorf("unmarshaling into config struct: %w", err)
+	}
+
+	return cfg, nil
+}
+
+func loadFromFile(k *koanf.Koanf, dir string) error {
 	configFiles := lo.Map(
 		configFileNames,
 		func(f string, _ int) string { return filepath.Join(dir, f) })
@@ -43,33 +55,33 @@ func Load[T any](dir string) (cfg T, err error) {
 		case os.IsNotExist(err):
 			continue
 		case err != nil:
-			return cfg, fmt.Errorf("checking config file %s: %w", f, err)
+			return fmt.Errorf("checking config file %s: %w", f, err)
 		}
 
 		anyFileExists = true
 		if err := k.Load(file.Provider(f), yaml.Parser()); err != nil {
-			return cfg, fmt.Errorf("loading from file(%s): %w", f, err)
+			return fmt.Errorf("loading from file(%s): %w", f, err)
 		}
 	}
 
 	if !anyFileExists {
-		return cfg, fmt.Errorf("no config files %v found in %s", configFileNames, dir)
+		return fmt.Errorf("no config files %v found in %s", configFileNames, dir)
 	}
 
+	return nil
+}
+
+func loadFromEnv(k *koanf.Koanf) error {
 	// APP_FOO_BAR=baz -> foo.bar=baz
 	if err := k.Load(env.Provider("APP_", ".", func(s string) string {
 		s = strings.TrimPrefix(s, "APP_")
 		s = strings.ToLower(s)
 		return strings.ReplaceAll(s, "_", ".")
 	}), nil); err != nil {
-		return cfg, fmt.Errorf("loading from env: %w", err)
+		return fmt.Errorf("loading from env: %w", err)
 	}
 
-	if err := k.UnmarshalWithConf("", &cfg, koanf.UnmarshalConf{Tag: "koanf"}); err != nil {
-		return cfg, fmt.Errorf("unmarshaling into config struct: %w", err)
-	}
-
-	return cfg, nil
+	return nil
 }
 
 // LoadValidated loads configuration using [Load] and validates the resulting
