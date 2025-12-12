@@ -124,7 +124,7 @@ func TestLoadValidated(t *testing.T) {
 				tt.setup(t, testDir)
 			}
 
-			got, err := config.LoadValidated[configModel](testDir)
+			got, err := config.LoadValidated[configModel]("", testDir)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {

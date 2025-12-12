@@ -1,6 +1,7 @@
 package config
 
 import (
+	"cmp"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -23,17 +24,17 @@ var configFileNames = []string{
 
 // Load loads configuration into a struct of type T from multiple sources.
 // Order of precedence (highest to lowest):
-//  1. Environment variables (prefixed with APP_)
-//  2. Configuration files in the specified directory in the following order:
+//  1. Environment variables (prefixed with {appName}_)
+//  2. Configuration files in the specified dir directory in the following order:
 //     config.local.yaml, config.yaml, config.default.yaml
-func Load[T any](dir string) (cfg T, err error) {
+func Load[T any](appName, dir string) (cfg T, err error) {
 	k := koanf.New(".")
 
 	if err := loadFromFile(k, dir); err != nil {
 		return cfg, fmt.Errorf("loading from files: %w", err)
 	}
 
-	if err := loadFromEnv(k); err != nil {
+	if err := loadFromEnv(k, appName); err != nil {
 		return cfg, fmt.Errorf("loading from env: %w", err)
 	}
 
@@ -71,10 +72,11 @@ func loadFromFile(k *koanf.Koanf, dir string) error {
 	return nil
 }
 
-func loadFromEnv(k *koanf.Koanf) error {
+func loadFromEnv(k *koanf.Koanf, appName string) error {
 	// APP_FOO_BAR=baz -> foo.bar=baz
-	if err := k.Load(env.Provider("APP_", ".", func(s string) string {
-		s = strings.TrimPrefix(s, "APP_")
+	prefix := appNamePrefixedKey(appName, "")
+	if err := k.Load(env.Provider(prefix, ".", func(s string) string {
+		s = strings.TrimPrefix(s, prefix)
 		s = strings.ToLower(s)
 		return strings.ReplaceAll(s, "_", ".")
 	}), nil); err != nil {
@@ -84,10 +86,17 @@ func loadFromEnv(k *koanf.Koanf) error {
 	return nil
 }
 
+func appNamePrefixedKey(appName, key string) string {
+	appName = cmp.Or(appName, "APP") // default to APP if empty
+	appName = strings.ReplaceAll(appName, "-", "_")
+	appName = strings.ToUpper(appName)
+	return fmt.Sprintf("%s_%s", appName, key)
+}
+
 // LoadValidated loads configuration using [Load] and validates the resulting
 // config struct using the validation package.
-func LoadValidated[T any](dir string) (cfg T, err error) {
-	cfg, err = Load[T](dir)
+func LoadValidated[T any](appName, dir string) (cfg T, err error) {
+	cfg, err = Load[T](appName, dir)
 	if err != nil {
 		return cfg, fmt.Errorf("loading config: %w", err)
 	}

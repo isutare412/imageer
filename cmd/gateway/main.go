@@ -16,7 +16,7 @@ func init() {
 }
 
 func main() {
-	cfg, err := config.LoadValidated[gwconfig.Config](*cfgPath)
+	cfg, err := config.LoadValidated[gwconfig.Config]("GATEWAY", *cfgPath)
 	if err != nil {
 		slog.Error("Failed to load config", "error", err)
 		return
