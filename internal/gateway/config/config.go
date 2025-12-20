@@ -53,12 +53,8 @@ type AuthConfig struct {
 	} `koanf:"cookies"`
 
 	JWT struct {
-		ActiveKeyPairName string `koanf:"active-key-pair-name" validate:"required"`
-		KeyPairs          []struct {
-			Name    string `koanf:"name" validate:"required"`
-			Private string `koanf:"private" validate:"required"`
-			Public  string `koanf:"public" validate:"required"`
-		} `koanf:"key-pairs" validate:"dive,required"`
+		ActiveKeyPairName string                       `koanf:"active-key-pair-name" validate:"required"`
+		KeyPairs          map[string]AuthKeyPairConfig `koanf:"key-pairs" validate:"required,dive,keys,required,endkeys,required"`
 	} `koanf:"jwt"`
 
 	Google struct {
@@ -66,6 +62,11 @@ type AuthConfig struct {
 		ClientSecret string `koanf:"client-secret" validate:"required"`
 		CallbackPath string `koanf:"callback-path" validate:"required"`
 	} `koanf:"google"`
+}
+
+type AuthKeyPairConfig struct {
+	Private string `koanf:"private" validate:"required"`
+	Public  string `koanf:"public" validate:"required"`
 }
 
 type CryptConfig struct {

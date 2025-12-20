@@ -40,9 +40,9 @@ func (c *Config) ToAuthServiceConfig() auth.ServiceConfig {
 
 func (c *Config) toRSAKeyPairs() []jwt.RSAKeyBytesPair {
 	keyPairs := make([]jwt.RSAKeyBytesPair, 0, len(c.Auth.JWT.KeyPairs))
-	for _, pair := range c.Auth.JWT.KeyPairs {
+	for name, pair := range c.Auth.JWT.KeyPairs {
 		keyPairs = append(keyPairs, jwt.RSAKeyBytesPair{
-			Name:    pair.Name,
+			Name:    name,
 			Private: []byte(pair.Private),
 			Public:  []byte(pair.Public),
 		})
