@@ -1,12 +1,12 @@
 log:
-  format: text # pretty, text, json
-  level: debug # debug, info, warn, error
+  format: json # pretty, text, json
+  level: info # debug, info, warn, error
   add-source: true
 
 web:
   port: 8080
-  show-banner: true
-  show-openapi-docs: true
+  show-banner: false
+  show-openapi-docs: false
 
 database:
   use-in-memory: false

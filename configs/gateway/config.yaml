@@ -1,3 +1,12 @@
+log:
+  format: text # pretty, text, json
+  level: debug # debug, info, warn, error
+  add-source: true
+
+web:
+  show-banner: true
+  show-openapi-docs: true
+
 database:
   use-in-memory: true
   postgres:
