@@ -3,7 +3,7 @@
 package gen
 
 import (
-	"github.com/isutare412/imageer/internal/gateway/repository/entity"
+	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
 	"github.com/isutare412/imageer/pkg/serviceaccounts"
 	"gorm.io/cli/gorm/field"
 )

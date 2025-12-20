@@ -4,7 +4,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/crypt"
 	"github.com/isutare412/imageer/internal/gateway/jwt"
 	"github.com/isutare412/imageer/internal/gateway/oidc"
-	"github.com/isutare412/imageer/internal/gateway/repository"
+	"github.com/isutare412/imageer/internal/gateway/postgres"
 	"github.com/isutare412/imageer/internal/gateway/service/auth"
 	"github.com/isutare412/imageer/internal/gateway/web"
 	"github.com/isutare412/imageer/pkg/log"
@@ -18,8 +18,8 @@ func (c *Config) ToWebConfig() web.Config {
 	return web.Config(c.Web)
 }
 
-func (c *Config) ToRepositoryClientConfig() repository.ClientConfig {
-	return repository.ClientConfig{
+func (c *Config) ToRepositoryClientConfig() postgres.ClientConfig {
+	return postgres.ClientConfig{
 		Host:        c.Database.Postgres.Host,
 		Port:        c.Database.Postgres.Port,
 		User:        c.Database.Postgres.User,

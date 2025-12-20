@@ -13,14 +13,14 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/crypt"
 	"github.com/isutare412/imageer/internal/gateway/jwt"
 	"github.com/isutare412/imageer/internal/gateway/oidc"
-	"github.com/isutare412/imageer/internal/gateway/repository"
+	"github.com/isutare412/imageer/internal/gateway/postgres"
 	"github.com/isutare412/imageer/internal/gateway/service/auth"
 	"github.com/isutare412/imageer/internal/gateway/web"
 )
 
 type application struct {
 	webServer  *web.Server
-	repoClient *repository.Client
+	repoClient *postgres.Client
 
 	cfg config.Config
 }
@@ -47,13 +47,13 @@ func newApplication(cfg config.Config) (*application, error) {
 	}
 
 	slog.Info("Create repository client")
-	repoClient, err := repository.NewClient(cfg.ToRepositoryClientConfig())
+	repoClient, err := postgres.NewClient(cfg.ToRepositoryClientConfig())
 	if err != nil {
 		return nil, fmt.Errorf("creating repository client: %w", err)
 	}
 
 	slog.Info("Create user repository")
-	userRepo := repository.NewUserRepository(repoClient)
+	userRepo := postgres.NewUserRepository(repoClient)
 
 	slog.Info("Create auth service")
 	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider, aesCrypter, jwtSigner, userRepo)

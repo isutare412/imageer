@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm/clause"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
-	"github.com/isutare412/imageer/internal/gateway/repository/entity"
-	"github.com/isutare412/imageer/internal/gateway/repository/entity/gen"
+	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
+	"github.com/isutare412/imageer/internal/gateway/postgres/entity/gen"
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
