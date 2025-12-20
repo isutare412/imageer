@@ -71,8 +71,15 @@ func (v Validator) Validate(i any) error {
 
 	errs := err.(validator.ValidationErrors)
 	errorMsgs := make([]string, 0, len(errs))
-	for _, e := range errs {
-		errorMsgs = append(errorMsgs, e.Translate(v.translator))
+	for key, msg := range errs.Translate(v.translator) {
+		// Remove top-level struct name from the key
+		// e.g. Request.user.name -> user.name
+		if i := strings.Index(key, "."); i != -1 {
+			key = key[i+1:]
+		}
+
+		msg := fmt.Sprintf("%s: %s", key, msg)
+		errorMsgs = append(errorMsgs, msg)
 	}
 
 	return apperr.NewError(apperr.CodeBadRequest).
