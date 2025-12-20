@@ -1,5 +1,11 @@
 ##@ Infrastructure
 
+.PHONY: infra-ps
+infra-ps: ## List infrastructure services
+	@echo "🔄 Listing infrastructure services..." && \
+		docker compose -f ./compose.yaml ps && \
+		echo "✅ Infrastructure services are listed."
+
 .PHONY: infra-up
 infra-up: ## Start infrastructure services
 	@echo "🔄 Starting infrastructure services..." && \

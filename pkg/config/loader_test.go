@@ -28,7 +28,7 @@ func copyTestFile(t *testing.T, src, dst string) {
 	t.Helper()
 	content, err := testFS.ReadFile(src)
 	require.NoError(t, err)
-	err = os.WriteFile(dst, content, 0644)
+	err = os.WriteFile(dst, content, 0o644)
 	require.NoError(t, err)
 }
 

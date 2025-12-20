@@ -23,7 +23,8 @@ type Service struct {
 }
 
 func NewService(cfg ServiceConfig, oidcProvider port.OIDCProvider, crypter port.Crypter,
-	jwtSigner port.JWTSigner, userRepo port.UserRepository) *Service {
+	jwtSigner port.JWTSigner, userRepo port.UserRepository,
+) *Service {
 	return &Service{
 		oidcProvider: oidcProvider,
 		crypter:      crypter,

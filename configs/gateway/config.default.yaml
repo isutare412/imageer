@@ -9,7 +9,7 @@ web:
   show-openapi-docs: true
 
 database:
-  use-in-memory: true
+  use-in-memory: false
   postgres:
     host: localhost
     port: 5432
@@ -27,47 +27,13 @@ auth:
       ttl: 720h
 
   jwt:
-    active-key-pair-name: '2025-10-25-sample'
+    active-key-pair-name: '<key-pair-name>'
     key-pairs:
-      - name: '2025-10-25-sample'
+      - name: '<key-pair-name>'
         private: |
-          -----BEGIN RSA PRIVATE KEY-----
-          MIIEogIBAAKCAQEAoA4gTWFJPErSTxnVmEBaQylyG3lE9yB4AS1oIeZmBqpMMitS
-          LVV/9I3QXA5v4RqTpwLx1xhFQpZd3mdtDyrM4mTXasNo2dZedAiKrJp8opP/Xoj7
-          sWfUOj6rc2LrGmhBaOgKbHWSdm+rdoBfpz/27Ylsal5lYWQPBIi5xPxR5+v/E+7B
-          lI+fjig8dBNoLky07yzXSdIwm2Ee1IY97ykxseH4YYzMotaCVzaAWueTE57r8+Yf
-          /TY2tYf3AAgzf0pc+M1sf5XmAjNOiEWF9yJ4gYmo9luwfZGfvjl28LEg6nh2FCKs
-          hnuicYbgGc0iHpjphD7Yg3VwQSWmb6HAfMnzTwIDAQABAoIBACIvojqk4u2b1ZvL
-          mtGwPRdHTPYNSuu15avqtOk4uuYFjczRb/X64x+rAqwG8WKVOKBdgqY8qt50G4yb
-          brHkpGpeu5w0LLsKjJYgFO6U+LYJAmyAubHEyZG/PQOiRzEWv5HWrhNIcYYWh/sB
-          pGymvukxhxSZIPJSWtrPEU6/zgbJDPLUNCKXQr++I/68BYmaIfdRqZExzTxtWIQM
-          M4ILsHS2WlQuhCQc9Gv6NsBH3+mC/jnW3NiJ88GfbuOOEoVws2nRsxgsuGRju41/
-          zGw2AT2La1DpheBsjfFLJHh2DNZRfPi5V7ZRFsoU3nr60yK6wrj2rLnfBEiWNWx0
-          TDFKn1ECgYEAzHMJUjCmu0kXZhDV511w1/cEbbJSyI709RqsBgfC9RAYNc+udR/2
-          TVTTS88Guy2/UktMp0Ue8/2r5bAv4n6Bw6GMT/+egob7v+qwzjexMXwzv/kloqju
-          wsCtXJSjuRCMISDnQrnnbBUChp9NiHE1KYHELQux6sMWh3odHvZNKnsCgYEAyGl/
-          g9J0lwnCPTBJ5c+VrjKmlfGPmh4my+Gie9J+AKOQyoiiwKhYyl8Ppp60LgK3Qs91
-          6BHDIQCWvtmcldlnnmD//Pkck6Hpr7tBp1MhlkENnnCYW46VgY0zVfNAL9h9oJY2
-          P3x2IEjFl41GZG4KcJtYEu7mDAdSfrRhUpm2PD0CgYAM2LWfOntfjUoxGaG3NgHf
-          MCBRHEFjZMgzlod0oYw4hdhfmTsnFOkPFuNoAgw0Or2o2B5q7Ebzod7pQdbgbn6M
-          4lvEsxUssnqjJoYRjyJNL7a4u1kIDYFjL2Q1Swm2mTmU41JkuPW3ruJHvz7J8gMb
-          JpJDGlcFn1iNDrlBtsxGfQKBgDoARlZJV1LLETsSOaDYBhLHN+0XXx8UcNf6skKx
-          taPLssDa8HdfgWr4PhhTwAO853rffdkvItDvUbFkW2wG4nU0z4FQO1QCvRYN1L9v
-          UL4ij6V2IrIEvwIicmQCpWXzetA6CPMwuyM2zHDDA0dXjY/vdXrtRwjeKaLf43a7
-          Y8FlAoGARTd3fr/ZMWzim3dhB8VvbWAlYaSmfi4YEn82KOn/ug8vtaXs5au2mgYy
-          1RTwong6C6tzRtNq10xHnXc/pHdaX+rgrCWHJJ7O7cThvxa/OzuHUD47+nMeEZ6J
-          PNKwvj1x+XUpwIeUvtyd03PFDIdmn8nqdoBmtKYWvmYe3bWi+9s=
-          -----END RSA PRIVATE KEY-----
+          <private_key_content>
         public: |
-          -----BEGIN PUBLIC KEY-----
-          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoA4gTWFJPErSTxnVmEBa
-          QylyG3lE9yB4AS1oIeZmBqpMMitSLVV/9I3QXA5v4RqTpwLx1xhFQpZd3mdtDyrM
-          4mTXasNo2dZedAiKrJp8opP/Xoj7sWfUOj6rc2LrGmhBaOgKbHWSdm+rdoBfpz/2
-          7Ylsal5lYWQPBIi5xPxR5+v/E+7BlI+fjig8dBNoLky07yzXSdIwm2Ee1IY97ykx
-          seH4YYzMotaCVzaAWueTE57r8+Yf/TY2tYf3AAgzf0pc+M1sf5XmAjNOiEWF9yJ4
-          gYmo9luwfZGfvjl28LEg6nh2FCKshnuicYbgGc0iHpjphD7Yg3VwQSWmb6HAfMnz
-          TwIDAQAB
-          -----END PUBLIC KEY-----
+          <public_key_content>
 
   google:
     client-id: <your-google-client-id>
