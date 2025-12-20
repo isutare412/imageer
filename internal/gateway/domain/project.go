@@ -25,7 +25,7 @@ type UpdateProjectRequest struct {
 	Name            *string `validate:"omitempty,max=128"`
 	Transformations struct {
 		Add    []CreateTransformationRequest `validate:"dive"`
-		Update []UpdateTransformationRequest `validate:"dive"`
+		Modify []UpdateTransformationRequest `validate:"dive"`
 		Remove []DeleteTransformationRequest `validate:"dive"`
 	}
 }

@@ -25,6 +25,7 @@ func (c *Config) ToRepositoryClientConfig() repository.ClientConfig {
 		User:        c.Database.Postgres.User,
 		Password:    c.Database.Postgres.Password,
 		Database:    c.Database.Postgres.Database,
+		TraceLog:    c.Database.TraceLog,
 		UseInMemory: c.Database.UseInMemory,
 	}
 }

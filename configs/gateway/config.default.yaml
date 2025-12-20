@@ -10,6 +10,7 @@ web:
 
 database:
   use-in-memory: false
+  trace-log: false
   postgres:
     host: localhost
     port: 5432

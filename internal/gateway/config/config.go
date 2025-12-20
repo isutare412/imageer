@@ -28,6 +28,7 @@ type WebConfig struct {
 
 type DatabaseConfig struct {
 	UseInMemory bool           `koanf:"use-in-memory"`
+	TraceLog    bool           `koanf:"trace-log"`
 	Postgres    PostgresConfig `koanf:"postgres"`
 }
 

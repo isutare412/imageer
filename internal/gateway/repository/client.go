@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	sloggorm "github.com/orandin/slog-gorm"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -17,8 +18,11 @@ type Client struct {
 }
 
 func NewClient(cfg ClientConfig) (*Client, error) {
+	slogAdapter := sloggorm.New(cfg.buildSlogGORMOption()...)
+
 	db, err := gorm.Open(newDialector(cfg), &gorm.Config{
 		TranslateError: true,
+		Logger:         slogAdapter,
 	})
 	if err != nil {
 		return nil, apperr.NewError(apperr.CodeInternalServerError).
