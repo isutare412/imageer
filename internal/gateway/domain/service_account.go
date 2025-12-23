@@ -25,6 +25,7 @@ type CreateServiceAccountRequest struct {
 }
 
 type UpdateServiceAccountRequest struct {
+	ID          string                       `validate:"max=36"`
 	Name        *string                      `validate:"omitempty,max=128"`
 	AccessScope *serviceaccounts.AccessScope `validate:"omitempty,oneof=FULL PROJECT"`
 	ProjectIDs  []string                     `validate:"dive,required"`

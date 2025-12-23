@@ -71,27 +71,6 @@ type CreateServiceAccountAdminRequest struct {
 	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
-// CreateTransformationRequest defines model for CreateTransformationRequest.
-type CreateTransformationRequest struct {
-	// Default Indicates if this transformation is the default one.
-	Default bool `json:"default"`
-
-	// Height The height of the image in pixels.
-	Height int64 `json:"height"`
-
-	// Name The name of the transformation.
-	Name string `json:"name"`
-
-	// Width The width of the image in pixels.
-	Width int64 `json:"width"`
-}
-
-// DeleteTransformationRequest defines model for DeleteTransformationRequest.
-type DeleteTransformationRequest struct {
-	// ID The unique identifier of the transformation.
-	ID string `json:"id"`
-}
-
 // Image defines model for Image.
 type Image struct {
 	// CreatedAt The creation time of the image.
@@ -254,17 +233,8 @@ type Transformation struct {
 // UpdateProjectAdminRequest defines model for UpdateProjectAdminRequest.
 type UpdateProjectAdminRequest struct {
 	// Name The name of the project.
-	Name            *string `json:"name,omitempty"`
-	Transformations struct {
-		// Add List of transformations to add to the project.
-		Add []CreateTransformationRequest `json:"add,omitempty"`
-
-		// Modify List of transformations to modify in the project.
-		Modify []UpdateTransformationRequest `json:"modify,omitempty"`
-
-		// Remove List of transformations to remove from the project.
-		Remove []DeleteTransformationRequest `json:"remove,omitempty"`
-	} `json:"transformations,omitempty"`
+	Name            *string                       `json:"name,omitempty"`
+	Transformations []UpsertTransformationRequest `json:"transformations,omitempty"`
 }
 
 // UpdateServiceAccountAdminRequest defines model for UpdateServiceAccountAdminRequest.
@@ -282,8 +252,8 @@ type UpdateServiceAccountAdminRequest struct {
 	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
-// UpdateTransformationRequest defines model for UpdateTransformationRequest.
-type UpdateTransformationRequest struct {
+// UpsertTransformationRequest If id is provided, the transformation will be updated; otherwise, a new transformation will be created.
+type UpsertTransformationRequest struct {
 	// Default Indicates if this transformation is the default one.
 	Default *bool `json:"default,omitempty"`
 
@@ -291,7 +261,7 @@ type UpdateTransformationRequest struct {
 	Height *int64 `json:"height,omitempty"`
 
 	// ID The unique identifier of the transformation.
-	ID string `json:"id"`
+	ID *string `json:"id,omitempty"`
 
 	// Name The name of the transformation.
 	Name *string `json:"name,omitempty"`

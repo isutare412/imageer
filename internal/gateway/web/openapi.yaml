@@ -491,26 +491,9 @@ components:
           description: The name of the project.
           example: My Project
         transformations:
-          type: object
-          properties:
-            add:
-              type: array
-              description: List of transformations to add to the project.
-              items:
-                $ref: '#/components/schemas/CreateTransformationRequest'
-              x-go-type-skip-optional-pointer: true
-            modify:
-              type: array
-              description: List of transformations to modify in the project.
-              items:
-                $ref: '#/components/schemas/UpdateTransformationRequest'
-              x-go-type-skip-optional-pointer: true
-            remove:
-              type: array
-              description: List of transformations to remove from the project.
-              items:
-                $ref: '#/components/schemas/DeleteTransformationRequest'
-              x-go-type-skip-optional-pointer: true
+          type: array
+          items:
+            $ref: '#/components/schemas/UpsertTransformationRequest'
           x-go-type-skip-optional-pointer: true
 
     CreateServiceAccountAdminRequest:
@@ -604,35 +587,9 @@ components:
           example: false
           x-go-type-skip-optional-pointer: true
 
-    CreateTransformationRequest:
+    UpsertTransformationRequest:
       type: object
-      properties:
-        name:
-          type: string
-          description: The name of the transformation.
-          example: w600h800
-        default:
-          type: boolean
-          description: Indicates if this transformation is the default one.
-          example: false
-        width:
-          type: integer
-          format: int64
-          description: The width of the image in pixels.
-          example: 600
-        height:
-          type: integer
-          format: int64
-          description: The height of the image in pixels.
-          example: 800
-      required:
-        - name
-        - default
-        - width
-        - height
-
-    UpdateTransformationRequest:
-      type: object
+      description: If id is provided, the transformation will be updated; otherwise, a new transformation will be created.
       properties:
         id:
           type: string
@@ -656,18 +613,6 @@ components:
           format: int64
           description: The height of the image in pixels.
           example: 800
-      required:
-        - id
-
-    DeleteTransformationRequest:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the transformation.
-          example: 426e634f-50dd-41a0-881b-c991441b3cd5
-      required:
-        - id
 
     ###
     # Response Schemas
