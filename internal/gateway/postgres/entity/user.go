@@ -7,7 +7,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
-	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/users"
 )
 
@@ -35,14 +34,7 @@ func NewUser(u domain.User) *User {
 
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	if u.ID == "" {
-		id, err := uuid.NewV7()
-		if err != nil {
-			return apperr.NewError(apperr.CodeInternalServerError).
-				WithSummary("failed to generate UUIDv7 for user ID").
-				WithCause(err)
-		}
-
-		u.ID = id.String()
+		u.ID = uuid.NewString()
 	}
 	return nil
 }

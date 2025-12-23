@@ -23,14 +23,7 @@ type Transformation struct {
 
 func (t *Transformation) BeforeCreate(tx *gorm.DB) error {
 	if t.ID == "" {
-		id, err := uuid.NewV7()
-		if err != nil {
-			return apperr.NewError(apperr.CodeInternalServerError).
-				WithSummary("failed to generate UUIDv7 for transformation ID").
-				WithCause(err)
-		}
-
-		t.ID = id.String()
+		t.ID = uuid.NewString()
 	}
 	return nil
 }

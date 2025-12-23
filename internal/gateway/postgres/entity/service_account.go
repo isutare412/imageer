@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/serviceaccounts"
 )
 
@@ -24,13 +23,7 @@ type ServiceAccount struct {
 
 func (sa *ServiceAccount) BeforeCreate(tx *gorm.DB) error {
 	if sa.ID == "" {
-		id, err := uuid.NewV7()
-		if err != nil {
-			return apperr.NewError(apperr.CodeInternalServerError).
-				WithSummary("failed to generate UUIDv7 for service account ID").
-				WithCause(err)
-		}
-		sa.ID = id.String()
+		sa.ID = uuid.NewString()
 	}
 	return nil
 }

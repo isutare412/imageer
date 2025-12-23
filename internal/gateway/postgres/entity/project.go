@@ -20,14 +20,7 @@ type Project struct {
 
 func (p *Project) BeforeCreate(tx *gorm.DB) error {
 	if p.ID == "" {
-		id, err := uuid.NewV7()
-		if err != nil {
-			return apperr.NewError(apperr.CodeInternalServerError).
-				WithSummary("failed to generate UUIDv7 for project ID").
-				WithCause(err)
-		}
-
-		p.ID = id.String()
+		p.ID = uuid.NewString()
 	}
 	return nil
 }

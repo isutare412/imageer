@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/images"
 )
 
@@ -24,14 +23,7 @@ type Image struct {
 
 func (i *Image) BeforeCreate(tx *gorm.DB) error {
 	if i.ID == "" {
-		id, err := uuid.NewV7()
-		if err != nil {
-			return apperr.NewError(apperr.CodeInternalServerError).
-				WithSummary("failed to generate UUIDv7 for image ID").
-				WithCause(err)
-		}
-
-		i.ID = id.String()
+		i.ID = uuid.NewString()
 	}
 	return nil
 }
