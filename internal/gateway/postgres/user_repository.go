@@ -44,8 +44,8 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (user domain.U
 func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (userCreated domain.User, err error) {
 	u := entity.NewUser(user)
 
-	if err := r.db.WithContext(ctx).
-		Clauses(clause.OnConflict{
+	if err := gorm.G[entity.User](r.db,
+		clause.OnConflict{
 			Columns: []clause.Column{{Name: gen.User.ID.Column().Name}},
 			DoUpdates: clause.AssignmentColumns([]string{
 				gen.User.UpdatedAt.Column().Name,
@@ -53,7 +53,8 @@ func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (userCrea
 				gen.User.Email.Column().Name,
 				gen.User.PhotoURL.Column().Name,
 			}),
-		}).Create(&u).Error; err != nil {
+		}).
+		Create(ctx, u); err != nil {
 		return userCreated, apperr.NewError(apperr.CodeInternalServerError).
 			WithSummary("Failed to upsert user").
 			WithCause(err)
