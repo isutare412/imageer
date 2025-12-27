@@ -1,20 +1,10 @@
 package log
 
-import "fmt"
-
-type Format string
+//go:generate go tool enumer -type=Format -trimprefix Format -output format_enum.go -transform lower -text
+type Format int
 
 const (
-	FormatJSON   Format = "json"
-	FormatText   Format = "text"
-	FormatPretty Format = "pretty"
+	FormatJSON Format = iota
+	FormatText
+	FormatPretty
 )
-
-func (f Format) Validate() error {
-	switch f {
-	case FormatJSON, FormatText, FormatPretty:
-		return nil
-	default:
-		return fmt.Errorf("invalid log format: %q", f)
-	}
-}

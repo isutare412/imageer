@@ -15,8 +15,8 @@ type Config struct {
 }
 
 type LogConfig struct {
-	Format    log.Format `koanf:"format" validate:"required,oneof=pretty text json"`
-	Level     log.Level  `koanf:"level" validate:"required,oneof=debug info warn error"`
+	Format    log.Format `koanf:"format" validate:"validateFn=IsAFormat"`
+	Level     log.Level  `koanf:"level" validate:"validateFn=IsALevel"`
 	AddSource bool       `koanf:"add-source"`
 }
 

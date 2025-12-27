@@ -38,18 +38,6 @@ type AppError struct {
 	Message string `json:"message"`
 }
 
-// CreatePresignedURLRequest defines model for CreatePresignedUrlRequest.
-type CreatePresignedURLRequest struct {
-	// ContentType The content type of the image.
-	ContentType ImageContentType `json:"contentType"`
-
-	// FileName The name of the file to be uploaded.
-	FileName string `json:"fileName"`
-
-	// TransformationNames List of transformation names to apply to the image. If not provided, default transformations will be applied.
-	TransformationNames []string `json:"transformationNames,omitempty"`
-}
-
 // CreateProjectAdminRequest defines model for CreateProjectAdminRequest.
 type CreateProjectAdminRequest struct {
 	// Name The name of the project.
@@ -69,6 +57,18 @@ type CreateServiceAccountAdminRequest struct {
 
 	// ProjectIDs List of project IDs to associate with the service account.
 	ProjectIDs []string `json:"projectIds,omitempty"`
+}
+
+// CreateUploadURLRequest defines model for CreateUploadUrlRequest.
+type CreateUploadURLRequest struct {
+	// ContentType The content type of the image.
+	ContentType ImageContentType `json:"contentType"`
+
+	// FileName The name of the file to be uploaded.
+	FileName string `json:"fileName"`
+
+	// TransformationNames List of transformation names to apply to the image. If not provided, default transformations will be applied.
+	TransformationNames []string `json:"transformationNames,omitempty"`
 }
 
 // Image defines model for Image.
@@ -370,7 +370,7 @@ type CreateServiceAccountAdminJSONRequestBody = CreateServiceAccountAdminRequest
 type UpdateServiceAccountAdminJSONRequestBody = UpdateServiceAccountAdminRequest
 
 // CreateUploadURLJSONRequestBody defines body for CreateUploadURL for application/json ContentType.
-type CreateUploadURLJSONRequestBody = CreatePresignedURLRequest
+type CreateUploadURLJSONRequestBody = CreateUploadURLRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -1368,7 +1368,7 @@ func NewCreateUploadURLRequestWithBody(server string, projectID ProjectIDPath, c
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/projects/%s/images/presigned-url", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/projects/%s/images/upload-url", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}

@@ -19,7 +19,7 @@ type ServiceAccount struct {
 
 type CreateServiceAccountRequest struct {
 	Name        string                      `validate:"required,max=128"`
-	AccessScope serviceaccounts.AccessScope `validate:"required,oneof=FULL PROJECT"`
+	AccessScope serviceaccounts.AccessScope `validate:"required,validateFn=IsAAccessScope"`
 	ProjectIDs  []string                    `validate:"dive,required"`
 	ExpireAt    *time.Time                  `validate:"omitempty,gt"`
 }
@@ -27,7 +27,7 @@ type CreateServiceAccountRequest struct {
 type UpdateServiceAccountRequest struct {
 	ID          string                       `validate:"max=36"`
 	Name        *string                      `validate:"omitempty,max=128"`
-	AccessScope *serviceaccounts.AccessScope `validate:"omitempty,oneof=FULL PROJECT"`
+	AccessScope *serviceaccounts.AccessScope `validate:"omitempty,validateFn=IsAAccessScope"`
 	ProjectIDs  []string                     `validate:"dive,required"`
 	ExpireAt    *time.Time
 }

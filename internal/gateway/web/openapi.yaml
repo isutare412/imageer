@@ -300,7 +300,7 @@ paths:
         default:
           $ref: '#/components/responses/ErrorResponse'
 
-  /api/v1/projects/{projectId}/images/presigned-url:
+  /api/v1/projects/{projectId}/images/upload-url:
     post:
       operationId: createUploadUrl
       summary: Issue a presigned URL for uploading an image
@@ -312,7 +312,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePresignedUrlRequest'
+              $ref: '#/components/schemas/CreateUploadUrlRequest'
       responses:
         '200':
           description: Successfully issued the presigned URL
@@ -439,11 +439,11 @@ components:
     ImageContentType:
       type: string
       enum:
-        - image/jpeg
-        - image/png
-        - image/webp
+        - IMAGE_JPEG
+        - IMAGE_PNG
+        - IMAGE_WEBP
       description: The content type of the image.
-      example: image/png
+      example: IMAGE_JPEG
       x-go-type: images.ContentType
       x-go-import:
         path: github.com/redshore/imageer/pkg/images
@@ -545,7 +545,7 @@ components:
           description: The expiration time of the service account token.
           example: '2023-10-01T12:00:00Z'
 
-    CreatePresignedUrlRequest:
+    CreateUploadUrlRequest:
       type: object
       properties:
         fileName:

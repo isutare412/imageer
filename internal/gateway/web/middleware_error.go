@@ -58,8 +58,8 @@ func respondError(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		errorResp := ErrorResponse{
-			CodeID:   int64(appCode.ID()),
-			CodeName: appCode.Name(),
+			CodeID:   int64(appCode),
+			CodeName: appCode.String(),
 			Message:  msg,
 		}
 
@@ -67,8 +67,8 @@ func respondError(next echo.HandlerFunc) echo.HandlerFunc {
 			"statusCode", statusCode,
 			"error", err.Error(),
 			"clientMsg", msg,
-			"appCodeId", appCode.ID(),
-			"appCodeName", appCode.Name(),
+			"appCodeId", int64(appCode),
+			"appCodeName", appCode.String(),
 		)
 		if stackTrace != "" {
 			entry = entry.With("stackTrace", stackTrace)

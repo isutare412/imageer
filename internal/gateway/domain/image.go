@@ -45,6 +45,6 @@ type PresignedURL struct {
 
 type CreatePresignedURLRequest struct {
 	FileName            string             `validate:"required,max=1024"`
-	ContentType         images.ContentType `validate:"oneof=image/jpeg image/png image/webp"`
+	ContentType         images.ContentType `validate:"validateFn=IsAContentType"`
 	TransformationNames []string           `validate:"dive,required,max=64"`
 }

@@ -3,6 +3,7 @@ package apperr
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -44,6 +45,9 @@ func (e *Error) Error() string {
 	var b strings.Builder
 	b.WriteString("code=")
 	b.WriteString(e.Code.String())
+	b.WriteString("(")
+	b.WriteString(strconv.Itoa(int(e.Code)))
+	b.WriteString(")")
 
 	if e.Summary != "" {
 		b.WriteString(", summary=")

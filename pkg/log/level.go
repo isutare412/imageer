@@ -1,27 +1,18 @@
 package log
 
 import (
-	"fmt"
 	"log/slog"
 )
 
-type Level string
+//go:generate go tool enumer -type=Level -trimprefix Level -output level_enum.go -transform lower -text
+type Level int
 
 const (
-	LevelDebug Level = "debug"
-	LevelInfo  Level = "info"
-	LevelWarn  Level = "warn"
-	LevelError Level = "error"
+	LevelDebug Level = iota
+	LevelInfo
+	LevelWarn
+	LevelError
 )
-
-func (l Level) Validate() error {
-	switch l {
-	case LevelDebug, LevelInfo, LevelWarn, LevelError:
-		return nil
-	default:
-		return fmt.Errorf("invalid log level: %q", l)
-	}
-}
 
 func (l Level) SlogLevel() slog.Level {
 	sl := slog.LevelInfo
