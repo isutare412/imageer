@@ -4,9 +4,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 
-	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/internal/gateway/domain"
 )
 
 type Project struct {
@@ -18,9 +19,27 @@ type Project struct {
 	Transformations []*Transformation `gorm:"constraint:OnDelete:CASCADE"`
 }
 
+func NewProject(req domain.CreateProjectRequest) *Project {
+	return &Project{
+		Name: req.Name,
+	}
+}
+
 func (p *Project) BeforeCreate(tx *gorm.DB) error {
 	if p.ID == "" {
 		p.ID = uuid.NewString()
 	}
 	return nil
+}
+
+func (p *Project) ToDomain() domain.Project {
+	return domain.Project{
+		ID:        p.ID,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+		Name:      p.Name,
+		Transformations: lo.Map(p.Transformations, func(t *Transformation, _ int) domain.Transformation {
+			return t.ToDomain()
+		}),
+	}
 }

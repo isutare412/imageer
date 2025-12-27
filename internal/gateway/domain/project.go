@@ -2,6 +2,10 @@ package domain
 
 import (
 	"time"
+
+	"github.com/samber/lo"
+
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 )
 
 type Project struct {
@@ -29,10 +33,31 @@ type UpdateProjectRequest struct {
 
 type Projects struct {
 	Items []Project
-	Total int64
+	Total int
 }
 
 type ListProjectsParams struct {
-	Offset *int64 `validate:"omitempty,min=0"`
-	Limit  *int64 `validate:"omitempty,min=1,max=100"`
+	Offset *int `validate:"omitempty,min=0"`
+	Limit  *int `validate:"omitempty,min=1,max=100"`
+
+	SearchFilter ProjectSearchFilter
+	SortFilter   ProjectSortFilter
+}
+
+func (p *ListProjectsParams) OffsetOrDefault() int {
+	return lo.FromPtrOr(p.Offset, 0)
+}
+
+func (p *ListProjectsParams) LimitOrDefault() int {
+	return lo.FromPtrOr(p.Limit, 20)
+}
+
+type ProjectSearchFilter struct {
+	Name *string
+}
+
+type ProjectSortFilter struct {
+	CreatedAt bool
+	UpdatedAt bool
+	Direction dbhelpers.SortDirection
 }

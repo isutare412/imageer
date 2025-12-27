@@ -13,7 +13,7 @@ var ServiceAccount = struct {
 	CreatedAt   field.Time
 	UpdatedAt   field.Time
 	Name        field.String
-	AccessScope field.Struct[serviceaccounts.AccessScope]
+	AccessScope field.Field[serviceaccounts.AccessScope]
 	ExpireAt    field.Time
 	APIKey      field.String
 	Projects    field.Slice[entity.Project]
@@ -22,7 +22,7 @@ var ServiceAccount = struct {
 	CreatedAt:   field.Time{}.WithColumn("created_at"),
 	UpdatedAt:   field.Time{}.WithColumn("updated_at"),
 	Name:        field.String{}.WithColumn("name"),
-	AccessScope: field.Struct[serviceaccounts.AccessScope]{}.WithName("AccessScope"),
+	AccessScope: field.Field[serviceaccounts.AccessScope]{}.WithColumn("access_scope"),
 	ExpireAt:    field.Time{}.WithColumn("expire_at"),
 	APIKey:      field.String{}.WithColumn("api_key"),
 	Projects:    field.Slice[entity.Project]{}.WithName("Projects"),

@@ -11,7 +11,7 @@ var User = struct {
 	ID        field.String
 	CreatedAt field.Time
 	UpdatedAt field.Time
-	Role      field.Struct[users.Role]
+	Role      field.Field[users.Role]
 	Nickname  field.String
 	Email     field.String
 	PhotoURL  field.String
@@ -19,7 +19,7 @@ var User = struct {
 	ID:        field.String{}.WithColumn("id"),
 	CreatedAt: field.Time{}.WithColumn("created_at"),
 	UpdatedAt: field.Time{}.WithColumn("updated_at"),
-	Role:      field.Struct[users.Role]{}.WithName("Role"),
+	Role:      field.Field[users.Role]{}.WithColumn("role"),
 	Nickname:  field.String{}.WithColumn("nickname"),
 	Email:     field.String{}.WithColumn("email"),
 	PhotoURL:  field.String{}.WithColumn("photo_url"),

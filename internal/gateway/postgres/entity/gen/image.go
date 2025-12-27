@@ -13,8 +13,8 @@ var Image = struct {
 	CreatedAt        field.Time
 	UpdatedAt        field.Time
 	OriginalFileName field.String
-	ContentType      field.Struct[images.ContentType]
-	State            field.Struct[images.State]
+	ContentType      field.Field[images.ContentType]
+	State            field.Field[images.State]
 	ProjectID        field.String
 	Project          field.Struct[entity.Project]
 }{
@@ -22,8 +22,8 @@ var Image = struct {
 	CreatedAt:        field.Time{}.WithColumn("created_at"),
 	UpdatedAt:        field.Time{}.WithColumn("updated_at"),
 	OriginalFileName: field.String{}.WithColumn("original_file_name"),
-	ContentType:      field.Struct[images.ContentType]{}.WithName("ContentType"),
-	State:            field.Struct[images.State]{}.WithName("State"),
+	ContentType:      field.Field[images.ContentType]{}.WithColumn("content_type"),
+	State:            field.Field[images.State]{}.WithColumn("state"),
 	ProjectID:        field.String{}.WithColumn("project_id"),
 	Project:          field.Struct[entity.Project]{}.WithName("Project"),
 }
