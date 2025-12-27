@@ -67,9 +67,9 @@ func respondError(next echo.HandlerFunc) echo.HandlerFunc {
 		entry := slog.With(
 			"statusCode", statusCode,
 			"error", err.Error(),
+			"errorCodeId", int64(appCode),
+			"errorCodeName", appCode.String(),
 			"clientMsg", msg,
-			"appCodeId", int64(appCode),
-			"appCodeName", appCode.String(),
 		)
 		if stackTrace != "" {
 			entry = entry.With("stackTrace", stackTrace)
