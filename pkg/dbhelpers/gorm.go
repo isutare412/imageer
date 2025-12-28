@@ -13,12 +13,6 @@ import (
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
-const (
-	summaryResourceNotFound    = "Resource not found"
-	summaryResourceConflict    = "Resource conflict"
-	summaryInternalServerError = "Internal server error"
-)
-
 func WrapError(err error, msg string, args ...any) error {
 	if err == nil {
 		return nil
@@ -27,17 +21,17 @@ func WrapError(err error, msg string, args ...any) error {
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		return apperr.NewError(apperr.CodeNotFound).
-			WithSummary(summaryResourceNotFound).
+			WithSummary("Resource not found").
 			WithDetail(msg, args...).
 			WithCause(err)
 	case errors.Is(err, gorm.ErrDuplicatedKey):
 		return apperr.NewError(apperr.CodeConflict).
-			WithSummary(summaryResourceConflict).
+			WithSummary("Resource state conflict").
 			WithDetail(msg, args...).
 			WithCause(err)
 	default:
 		return apperr.NewError(apperr.CodeInternalServerError).
-			WithSummary(summaryInternalServerError).
+			WithSummary("Unexpected database error").
 			WithDetail(msg, args...).
 			WithCause(err)
 	}
