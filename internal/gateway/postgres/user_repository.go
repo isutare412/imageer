@@ -22,19 +22,19 @@ func NewUserRepository(client *Client) *UserRepository {
 	}
 }
 
-func (r *UserRepository) FindByID(ctx context.Context, id string) (user domain.User, err error) {
-	u, err := gorm.G[entity.User](r.db).
+func (r *UserRepository) FindByID(ctx context.Context, id string) (domain.User, error) {
+	user, err := gorm.G[entity.User](r.db).
 		Where(gen.User.ID.Eq(id)).
 		First(ctx)
 	if err != nil {
-		return user, dbhelpers.WrapError(err, "Failed to find user %s", id)
+		return domain.User{}, dbhelpers.WrapError(err, "Failed to find user %s", id)
 	}
 
-	return u.ToDomain(), nil
+	return user.ToDomain(), nil
 }
 
-func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (userCreated domain.User, err error) {
-	u := entity.NewUser(user)
+func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (domain.User, error) {
+	usr := entity.NewUser(user)
 
 	if err := gorm.G[entity.User](r.db,
 		clause.OnConflict{
@@ -46,9 +46,9 @@ func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (userCrea
 				gen.User.PhotoURL.Column().Name,
 			}),
 		}).
-		Create(ctx, &u); err != nil {
-		return userCreated, dbhelpers.WrapError(err, "Failed to upsert user")
+		Create(ctx, &usr); err != nil {
+		return domain.User{}, dbhelpers.WrapError(err, "Failed to upsert user")
 	}
 
-	return u.ToDomain(), nil
+	return usr.ToDomain(), nil
 }

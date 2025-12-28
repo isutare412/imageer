@@ -70,3 +70,185 @@ func (mr *MockUserRepositoryMockRecorder) Upsert(ctx, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockUserRepository)(nil).Upsert), ctx, user)
 }
+
+// MockProjectRepository is a mock of ProjectRepository interface.
+type MockProjectRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockProjectRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockProjectRepositoryMockRecorder is the mock recorder for MockProjectRepository.
+type MockProjectRepositoryMockRecorder struct {
+	mock *MockProjectRepository
+}
+
+// NewMockProjectRepository creates a new mock instance.
+func NewMockProjectRepository(ctrl *gomock.Controller) *MockProjectRepository {
+	mock := &MockProjectRepository{ctrl: ctrl}
+	mock.recorder = &MockProjectRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockProjectRepository) EXPECT() *MockProjectRepositoryMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockProjectRepository) Create(ctx context.Context, proj domain.Project) (domain.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, proj)
+	ret0, _ := ret[0].(domain.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockProjectRepositoryMockRecorder) Create(ctx, proj any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockProjectRepository)(nil).Create), ctx, proj)
+}
+
+// FindByID mocks base method.
+func (m *MockProjectRepository) FindByID(ctx context.Context, id string) (domain.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByID", ctx, id)
+	ret0, _ := ret[0].(domain.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByID indicates an expected call of FindByID.
+func (mr *MockProjectRepositoryMockRecorder) FindByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockProjectRepository)(nil).FindByID), ctx, id)
+}
+
+// List mocks base method.
+func (m *MockProjectRepository) List(ctx context.Context, params domain.ListProjectsParams) ([]domain.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", ctx, params)
+	ret0, _ := ret[0].([]domain.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List.
+func (mr *MockProjectRepositoryMockRecorder) List(ctx, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockProjectRepository)(nil).List), ctx, params)
+}
+
+// Update mocks base method.
+func (m *MockProjectRepository) Update(ctx context.Context, req domain.UpdateProjectRequest) (domain.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, req)
+	ret0, _ := ret[0].(domain.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockProjectRepositoryMockRecorder) Update(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockProjectRepository)(nil).Update), ctx, req)
+}
+
+// MockServiceAccountRepository is a mock of ServiceAccountRepository interface.
+type MockServiceAccountRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockServiceAccountRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockServiceAccountRepositoryMockRecorder is the mock recorder for MockServiceAccountRepository.
+type MockServiceAccountRepositoryMockRecorder struct {
+	mock *MockServiceAccountRepository
+}
+
+// NewMockServiceAccountRepository creates a new mock instance.
+func NewMockServiceAccountRepository(ctrl *gomock.Controller) *MockServiceAccountRepository {
+	mock := &MockServiceAccountRepository{ctrl: ctrl}
+	mock.recorder = &MockServiceAccountRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockServiceAccountRepository) EXPECT() *MockServiceAccountRepositoryMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockServiceAccountRepository) Create(ctx context.Context, sa domain.ServiceAccount) (domain.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, sa)
+	ret0, _ := ret[0].(domain.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockServiceAccountRepositoryMockRecorder) Create(ctx, sa any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockServiceAccountRepository)(nil).Create), ctx, sa)
+}
+
+// Delete mocks base method.
+func (m *MockServiceAccountRepository) Delete(ctx context.Context, id string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockServiceAccountRepositoryMockRecorder) Delete(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockServiceAccountRepository)(nil).Delete), ctx, id)
+}
+
+// FindByID mocks base method.
+func (m *MockServiceAccountRepository) FindByID(ctx context.Context, id string) (domain.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByID", ctx, id)
+	ret0, _ := ret[0].(domain.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByID indicates an expected call of FindByID.
+func (mr *MockServiceAccountRepositoryMockRecorder) FindByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockServiceAccountRepository)(nil).FindByID), ctx, id)
+}
+
+// List mocks base method.
+func (m *MockServiceAccountRepository) List(ctx context.Context, params domain.ListServiceAccountsParams) ([]domain.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", ctx, params)
+	ret0, _ := ret[0].([]domain.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List.
+func (mr *MockServiceAccountRepositoryMockRecorder) List(ctx, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockServiceAccountRepository)(nil).List), ctx, params)
+}
+
+// Update mocks base method.
+func (m *MockServiceAccountRepository) Update(ctx context.Context, req domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, req)
+	ret0, _ := ret[0].(domain.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockServiceAccountRepositoryMockRecorder) Update(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockServiceAccountRepository)(nil).Update), ctx, req)
+}

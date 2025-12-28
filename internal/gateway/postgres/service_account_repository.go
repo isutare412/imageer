@@ -26,13 +26,13 @@ func NewServiceAccountRepository(client *Client) *ServiceAccountRepository {
 
 func (r *ServiceAccountRepository) FindByID(
 	ctx context.Context, id string,
-) (serviceAccount domain.ServiceAccount, err error) {
+) (domain.ServiceAccount, error) {
 	sa, err := gorm.G[entity.ServiceAccount](r.db).
 		Where(gen.ServiceAccount.ID.Eq(id)).
 		Preload(gen.ServiceAccount.Projects.Name(), nil).
 		First(ctx)
 	if err != nil {
-		return serviceAccount, dbhelpers.WrapError(err, "Failed to fetch service account %s", id)
+		return domain.ServiceAccount{}, dbhelpers.WrapError(err, "Failed to fetch service account %s", id)
 	}
 
 	return sa.ToDomain(), nil
@@ -84,7 +84,7 @@ func (r *ServiceAccountRepository) List(
 
 func (r *ServiceAccountRepository) Create(
 	ctx context.Context, req domain.ServiceAccount,
-) (serviceAccount domain.ServiceAccount, err error) {
+) (domain.ServiceAccount, error) {
 	sa := entity.NewServiceAccount(req)
 
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -118,7 +118,7 @@ func (r *ServiceAccountRepository) Create(
 		sa = saFetched
 		return nil
 	}); err != nil {
-		return serviceAccount, fmt.Errorf("during transaction: %w", err)
+		return domain.ServiceAccount{}, fmt.Errorf("during transaction: %w", err)
 	}
 
 	return sa.ToDomain(), nil
@@ -126,8 +126,8 @@ func (r *ServiceAccountRepository) Create(
 
 func (r *ServiceAccountRepository) Update(
 	ctx context.Context, req domain.UpdateServiceAccountRequest,
-) (serviceAccount domain.ServiceAccount, err error) {
-	var sa *entity.ServiceAccount
+) (domain.ServiceAccount, error) {
+	var sa entity.ServiceAccount
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
 		// Update service account fields
 		var assigners []clause.Assigner
@@ -151,7 +151,7 @@ func (r *ServiceAccountRepository) Update(
 		}
 
 		// Delete existing project associations
-		_, err = gorm.G[entity.ServiceAccountProject](tx).
+		_, err := gorm.G[entity.ServiceAccountProject](tx).
 			Where(gen.ServiceAccountProject.ServiceAccountID.Eq(req.ID)).
 			Delete(ctx)
 		if err != nil {
@@ -182,10 +182,10 @@ func (r *ServiceAccountRepository) Update(
 			return dbhelpers.WrapError(err, "Failed to fetch service account %s after update", req.ID)
 		}
 
-		sa = &saFetched
+		sa = saFetched
 		return nil
 	}); err != nil {
-		return serviceAccount, fmt.Errorf("during transaction: %w", err)
+		return domain.ServiceAccount{}, fmt.Errorf("during transaction: %w", err)
 	}
 
 	return sa.ToDomain(), nil

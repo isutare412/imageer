@@ -24,19 +24,21 @@ func NewProjectRepository(client *Client) *ProjectRepository {
 	}
 }
 
-func (r *ProjectRepository) FindByID(ctx context.Context, id string) (proj domain.Project, err error) {
-	p, err := gorm.G[entity.Project](r.db).
+func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Project, error) {
+	proj, err := gorm.G[entity.Project](r.db).
 		Where(gen.Project.ID.Eq(id)).
 		Preload(gen.Project.Transformations.Name(), nil).
 		First(ctx)
 	if err != nil {
-		return proj, dbhelpers.WrapError(err, "Failed to get project %s", id)
+		return domain.Project{}, dbhelpers.WrapError(err, "Failed to get project %s", id)
 	}
 
-	return p.ToDomain(), nil
+	return proj.ToDomain(), nil
 }
 
-func (r *ProjectRepository) List(ctx context.Context, params domain.ListProjectsParams) ([]domain.Project, error) {
+func (r *ProjectRepository) List(
+	ctx context.Context, params domain.ListProjectsParams,
+) ([]domain.Project, error) {
 	q := gorm.G[entity.Project](r.db).Scopes()
 
 	// Where clauses
@@ -79,17 +81,20 @@ func (r *ProjectRepository) List(ctx context.Context, params domain.ListProjects
 	}), nil
 }
 
-func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (proj domain.Project, err error) {
-	project := entity.NewProject(req)
+func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (domain.Project, error) {
+	proj := entity.NewProject(req)
 
-	if err := gorm.G[entity.Project](r.db).Create(ctx, &project); err != nil {
-		return proj, dbhelpers.WrapError(err, "Failed to create project")
+	if err := gorm.G[entity.Project](r.db).Create(ctx, &proj); err != nil {
+		return domain.Project{}, dbhelpers.WrapError(err, "Failed to create project")
 	}
 
-	return project.ToDomain(), nil
+	return proj.ToDomain(), nil
 }
 
-func (r *ProjectRepository) Update(ctx context.Context, req domain.UpdateProjectRequest) (proj domain.Project, err error) {
+func (r *ProjectRepository) Update(
+	ctx context.Context, req domain.UpdateProjectRequest,
+) (domain.Project, error) {
+	var proj domain.Project
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
 		if err := r.syncTransformations(ctx, tx, req.ID, req.Transformations); err != nil {
 			return fmt.Errorf("syncing transformations: %w", err)
@@ -122,7 +127,7 @@ func (r *ProjectRepository) Update(ctx context.Context, req domain.UpdateProject
 		proj = p.ToDomain()
 		return nil
 	}); err != nil {
-		return proj, fmt.Errorf("during transaction: %w", err)
+		return domain.Project{}, fmt.Errorf("during transaction: %w", err)
 	}
 
 	return proj, nil
