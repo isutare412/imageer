@@ -39,12 +39,21 @@ func (c *Client) MigrateSchemas(ctx context.Context) error {
 		&entity.Project{},
 		&entity.Transformation{},
 		&entity.ServiceAccount{},
+		&entity.ServiceAccountProject{},
 		&entity.Image{},
 	); err != nil {
 		return apperr.NewError(apperr.CodeInternalServerError).
-			WithSummary("failed to migrate database schemas").
+			WithSummary("Failed to migrate database schemas").
 			WithCause(err)
 	}
+
+	if err := c.db.SetupJoinTable(
+		&entity.ServiceAccount{}, "Projects", &entity.ServiceAccountProject{}); err != nil {
+		return apperr.NewError(apperr.CodeInternalServerError).
+			WithSummary("Failed to setup join table for service accounts and projects").
+			WithCause(err)
+	}
+
 	return nil
 }
 

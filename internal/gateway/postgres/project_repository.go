@@ -37,33 +37,37 @@ func (r *ProjectRepository) FindByID(ctx context.Context, id string) (proj domai
 }
 
 func (r *ProjectRepository) List(ctx context.Context, params domain.ListProjectsParams) ([]domain.Project, error) {
-	q := gorm.G[entity.Project](r.db)
+	q := gorm.G[entity.Project](r.db).Scopes()
 
 	// Where clauses
-	var q2 gorm.ChainInterface[entity.Project]
 	if params.SearchFilter.Name != nil {
-		q2 = q.Where(gen.Project.Name.Eq(*params.SearchFilter.Name))
+		q = q.Where(gen.Project.Name.Eq(*params.SearchFilter.Name))
 	}
 
 	// Order clauses
 	switch {
 	case params.SortFilter.CreatedAt:
-		order := lo.Ternary(params.SortFilter.Direction == dbhelpers.SortDirectionAsc,
-			gen.Project.CreatedAt.Asc(), gen.Project.CreatedAt.Desc())
-		q2 = q2.Order(order)
+		order := gen.Project.CreatedAt.Asc()
+		if params.SortFilter.Direction != dbhelpers.SortDirectionAsc {
+			order = gen.Project.CreatedAt.Desc()
+		}
+		q = q.Order(order)
 	case params.SortFilter.UpdatedAt:
 		fallthrough
 	default:
-		order := lo.Ternary(params.SortFilter.Direction == dbhelpers.SortDirectionAsc,
-			gen.Project.UpdatedAt.Asc(), gen.Project.UpdatedAt.Desc())
-		q2 = q2.Order(order)
+
+		order := gen.Project.UpdatedAt.Asc()
+		if params.SortFilter.Direction != dbhelpers.SortDirectionAsc {
+			order = gen.Project.UpdatedAt.Desc()
+		}
+		q = q.Order(order)
 	}
 
 	// Pagination clauses
-	q2 = q2.Offset(params.OffsetOrDefault())
-	q2 = q2.Limit(params.LimitOrDefault())
+	q = q.Offset(params.OffsetOrDefault())
+	q = q.Limit(params.LimitOrDefault())
 
-	projects, err := q2.
+	projects, err := q.
 		Preload(gen.Project.Transformations.Name(), nil).
 		Find(ctx)
 	if err != nil {
@@ -75,10 +79,10 @@ func (r *ProjectRepository) List(ctx context.Context, params domain.ListProjects
 	}), nil
 }
 
-func (r *ProjectRepository) Create(ctx context.Context, req domain.CreateProjectRequest) (proj domain.Project, err error) {
+func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (proj domain.Project, err error) {
 	project := entity.NewProject(req)
 
-	if err := gorm.G[entity.Project](r.db).Create(ctx, project); err != nil {
+	if err := gorm.G[entity.Project](r.db).Create(ctx, &project); err != nil {
 		return proj, dbhelpers.WrapError(err, "Failed to create project")
 	}
 
@@ -129,7 +133,7 @@ func (*ProjectRepository) syncTransformations(ctx context.Context, tx *gorm.DB,
 	upsertReqs []domain.UpsertTransformationRequest,
 ) error {
 	transToUpdate := make([]domain.UpsertTransformationRequest, 0, len(upsertReqs))
-	transToCreate := make([]*entity.Transformation, 0, len(upsertReqs))
+	transToCreate := make([]entity.Transformation, 0, len(upsertReqs))
 	for _, t := range upsertReqs {
 		if t.IsUpdateRequest() {
 			transToUpdate = append(transToUpdate, t)
@@ -167,7 +171,7 @@ func (*ProjectRepository) syncTransformations(ctx context.Context, tx *gorm.DB,
 	}
 
 	// Create transformations
-	err := gorm.G[*entity.Transformation](tx).
+	err := gorm.G[entity.Transformation](tx).
 		CreateInBatches(ctx, &transToCreate, 10)
 	if err != nil {
 		return dbhelpers.WrapError(err, "Failed to create transformations")

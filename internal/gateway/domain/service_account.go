@@ -3,6 +3,9 @@ package domain
 import (
 	"time"
 
+	"github.com/samber/lo"
+
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 	"github.com/isutare412/imageer/pkg/serviceaccounts"
 )
 
@@ -13,8 +16,8 @@ type ServiceAccount struct {
 	ExpireAt    *time.Time
 	Name        string
 	AccessScope serviceaccounts.AccessScope
-	Projects    []ProjectReference
 	APIKey      string
+	Projects    []ProjectReference
 }
 
 type CreateServiceAccountRequest struct {
@@ -35,4 +38,30 @@ type UpdateServiceAccountRequest struct {
 type ServiceAccounts struct {
 	Items []ServiceAccount
 	Total int64
+}
+
+type ListServiceAccountsParams struct {
+	Offset *int `validate:"omitempty,min=0"`
+	Limit  *int `validate:"omitempty,min=1,max=100"`
+
+	SearchFilter ServiceAccountSearchFilter
+	SortFilter   ServiceAccountSortFilter
+}
+
+func (p ListServiceAccountsParams) OffsetOrDefault() int {
+	return lo.FromPtrOr(p.Offset, 0)
+}
+
+func (p ListServiceAccountsParams) LimitOrDefault() int {
+	return lo.FromPtrOr(p.Limit, 20)
+}
+
+type ServiceAccountSearchFilter struct {
+	Name *string
+}
+
+type ServiceAccountSortFilter struct {
+	CreatedAt bool
+	UpdatedAt bool
+	Direction dbhelpers.SortDirection
 }

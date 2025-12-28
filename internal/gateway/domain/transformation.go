@@ -20,10 +20,10 @@ type UpsertTransformationRequest struct {
 	Height  *int64 `validate:"required_without=ID,omitempty,min=1"`
 }
 
-func (r *UpsertTransformationRequest) IsUpdateRequest() bool {
+func (r UpsertTransformationRequest) IsUpdateRequest() bool {
 	return r.ID != nil
 }
 
-func (r *UpsertTransformationRequest) IsCreateRequest() bool {
+func (r UpsertTransformationRequest) IsCreateRequest() bool {
 	return !r.IsUpdateRequest()
 }

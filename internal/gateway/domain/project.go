@@ -44,11 +44,11 @@ type ListProjectsParams struct {
 	SortFilter   ProjectSortFilter
 }
 
-func (p *ListProjectsParams) OffsetOrDefault() int {
+func (p ListProjectsParams) OffsetOrDefault() int {
 	return lo.FromPtrOr(p.Offset, 0)
 }
 
-func (p *ListProjectsParams) LimitOrDefault() int {
+func (p ListProjectsParams) LimitOrDefault() int {
 	return lo.FromPtrOr(p.Limit, 20)
 }
 

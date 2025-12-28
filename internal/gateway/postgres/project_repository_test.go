@@ -93,9 +93,10 @@ func TestProjectRepository_List(t *testing.T) {
 				tt.projectRepo = postgres.NewProjectRepository(postgresClient)
 				tt.mock = mock
 
-				mock.ExpectQuery(`SELECT * FROM "projects" WHERE "name" = $1 `+
-					`ORDER BY "updated_at" DESC `+
-					`LIMIT $2 OFFSET $3`).
+				mock.ExpectQuery(
+					`SELECT * FROM "projects" WHERE "name" = $1 `+
+						`ORDER BY "updated_at" DESC `+
+						`LIMIT $2 OFFSET $3`).
 					WithArgs("project-1", 20, 20).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
 						AddRow("project-1", time.Now(), time.Now(), "project-1"))
@@ -130,7 +131,7 @@ func TestProjectRepository_Create(t *testing.T) {
 		projectRepo *postgres.ProjectRepository
 		mock        sqlmock.Sqlmock
 
-		req     domain.CreateProjectRequest
+		req     domain.Project
 		setup   func(t *testing.T, tt *testSet)
 		wantErr bool
 	}
@@ -138,7 +139,7 @@ func TestProjectRepository_Create(t *testing.T) {
 	tests := []testSet{
 		{
 			name: "normal case",
-			req: domain.CreateProjectRequest{
+			req: domain.Project{
 				Name: "project-1",
 			},
 			setup: func(t *testing.T, tt *testSet) {

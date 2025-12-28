@@ -20,8 +20,8 @@ type User struct {
 	PhotoURL  string     `gorm:"size:2048"`
 }
 
-func NewUser(u domain.User) *User {
-	return &User{
+func NewUser(u domain.User) User {
+	return User{
 		ID:        u.ID,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,

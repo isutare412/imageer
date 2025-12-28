@@ -46,7 +46,7 @@ func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (userCrea
 				gen.User.PhotoURL.Column().Name,
 			}),
 		}).
-		Create(ctx, u); err != nil {
+		Create(ctx, &u); err != nil {
 		return userCreated, dbhelpers.WrapError(err, "Failed to upsert user")
 	}
 

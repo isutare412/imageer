@@ -27,3 +27,11 @@ var ServiceAccount = struct {
 	APIKey:      field.String{}.WithColumn("api_key"),
 	Projects:    field.Slice[entity.Project]{}.WithName("Projects"),
 }
+
+var ServiceAccountProject = struct {
+	ServiceAccountID field.String
+	ProjectID        field.String
+}{
+	ServiceAccountID: field.String{}.WithColumn("service_account_id"),
+	ProjectID:        field.String{}.WithColumn("project_id"),
+}

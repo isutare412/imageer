@@ -19,8 +19,8 @@ type Project struct {
 	Transformations []*Transformation `gorm:"constraint:OnDelete:CASCADE"`
 }
 
-func NewProject(req domain.CreateProjectRequest) *Project {
-	return &Project{
+func NewProject(req domain.Project) Project {
+	return Project{
 		Name: req.Name,
 	}
 }
@@ -32,7 +32,7 @@ func (p *Project) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-func (p *Project) ToDomain() domain.Project {
+func (p Project) ToDomain() domain.Project {
 	return domain.Project{
 		ID:        p.ID,
 		CreatedAt: p.CreatedAt,
@@ -41,5 +41,12 @@ func (p *Project) ToDomain() domain.Project {
 		Transformations: lo.Map(p.Transformations, func(t *Transformation, _ int) domain.Transformation {
 			return t.ToDomain()
 		}),
+	}
+}
+
+func (p Project) ToReference() domain.ProjectReference {
+	return domain.ProjectReference{
+		ID:   p.ID,
+		Name: p.Name,
 	}
 }
