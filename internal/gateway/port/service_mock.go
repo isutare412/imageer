@@ -70,3 +70,116 @@ func (mr *MockAuthServiceMockRecorder) StartGoogleSignIn(arg0, arg1 any) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartGoogleSignIn", reflect.TypeOf((*MockAuthService)(nil).StartGoogleSignIn), arg0, arg1)
 }
+
+// MockServiceAccountService is a mock of ServiceAccountService interface.
+type MockServiceAccountService struct {
+	ctrl     *gomock.Controller
+	recorder *MockServiceAccountServiceMockRecorder
+	isgomock struct{}
+}
+
+// MockServiceAccountServiceMockRecorder is the mock recorder for MockServiceAccountService.
+type MockServiceAccountServiceMockRecorder struct {
+	mock *MockServiceAccountService
+}
+
+// NewMockServiceAccountService creates a new mock instance.
+func NewMockServiceAccountService(ctrl *gomock.Controller) *MockServiceAccountService {
+	mock := &MockServiceAccountService{ctrl: ctrl}
+	mock.recorder = &MockServiceAccountServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockServiceAccountService) EXPECT() *MockServiceAccountServiceMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockServiceAccountService) Create(ctx context.Context, req domain.CreateServiceAccountRequest) (domain.ServiceAccountWithAPIKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, req)
+	ret0, _ := ret[0].(domain.ServiceAccountWithAPIKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockServiceAccountServiceMockRecorder) Create(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockServiceAccountService)(nil).Create), ctx, req)
+}
+
+// Delete mocks base method.
+func (m *MockServiceAccountService) Delete(ctx context.Context, id string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockServiceAccountServiceMockRecorder) Delete(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockServiceAccountService)(nil).Delete), ctx, id)
+}
+
+// GetByAPIKey mocks base method.
+func (m *MockServiceAccountService) GetByAPIKey(ctx context.Context, key string) (domain.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByAPIKey", ctx, key)
+	ret0, _ := ret[0].(domain.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByAPIKey indicates an expected call of GetByAPIKey.
+func (mr *MockServiceAccountServiceMockRecorder) GetByAPIKey(ctx, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByAPIKey", reflect.TypeOf((*MockServiceAccountService)(nil).GetByAPIKey), ctx, key)
+}
+
+// GetByID mocks base method.
+func (m *MockServiceAccountService) GetByID(ctx context.Context, id string) (domain.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByID", ctx, id)
+	ret0, _ := ret[0].(domain.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByID indicates an expected call of GetByID.
+func (mr *MockServiceAccountServiceMockRecorder) GetByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockServiceAccountService)(nil).GetByID), ctx, id)
+}
+
+// List mocks base method.
+func (m *MockServiceAccountService) List(ctx context.Context, params domain.ListServiceAccountsParams) ([]domain.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", ctx, params)
+	ret0, _ := ret[0].([]domain.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List.
+func (mr *MockServiceAccountServiceMockRecorder) List(ctx, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockServiceAccountService)(nil).List), ctx, params)
+}
+
+// Update mocks base method.
+func (m *MockServiceAccountService) Update(ctx context.Context, req domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, req)
+	ret0, _ := ret[0].(domain.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockServiceAccountServiceMockRecorder) Update(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockServiceAccountService)(nil).Update), ctx, req)
+}

@@ -12,3 +12,12 @@ type AuthService interface {
 	StartGoogleSignIn(context.Context, domain.StartGoogleSignInRequest) (domain.StartGoogleSignInResponse, error)
 	FinishGoogleSignIn(context.Context, domain.FinishGoogleSignInRequest) (domain.FinishGoogleSignInResponse, error)
 }
+
+type ServiceAccountService interface {
+	GetByID(ctx context.Context, id string) (domain.ServiceAccount, error)
+	GetByAPIKey(ctx context.Context, key string) (domain.ServiceAccount, error)
+	List(ctx context.Context, params domain.ListServiceAccountsParams) ([]domain.ServiceAccount, error)
+	Create(ctx context.Context, req domain.CreateServiceAccountRequest) (domain.ServiceAccountWithAPIKey, error)
+	Update(ctx context.Context, req domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error)
+	Delete(ctx context.Context, id string) error
+}
