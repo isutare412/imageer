@@ -22,6 +22,7 @@ type ProjectRepository interface {
 
 type ServiceAccountRepository interface {
 	FindByID(ctx context.Context, id string) (domain.ServiceAccount, error)
+	FindByAPIKeyHash(ctx context.Context, hash string) (domain.ServiceAccount, error)
 	List(ctx context.Context, params domain.ListServiceAccountsParams) ([]domain.ServiceAccount, error)
 	Create(ctx context.Context, sa domain.ServiceAccount) (domain.ServiceAccount, error)
 	Update(ctx context.Context, req domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error)

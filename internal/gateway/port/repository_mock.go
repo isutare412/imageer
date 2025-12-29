@@ -208,6 +208,21 @@ func (mr *MockServiceAccountRepositoryMockRecorder) Delete(ctx, id any) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockServiceAccountRepository)(nil).Delete), ctx, id)
 }
 
+// FindByAPIKeyHash mocks base method.
+func (m *MockServiceAccountRepository) FindByAPIKeyHash(ctx context.Context, hash string) (domain.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByAPIKeyHash", ctx, hash)
+	ret0, _ := ret[0].(domain.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByAPIKeyHash indicates an expected call of FindByAPIKeyHash.
+func (mr *MockServiceAccountRepositoryMockRecorder) FindByAPIKeyHash(ctx, hash any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByAPIKeyHash", reflect.TypeOf((*MockServiceAccountRepository)(nil).FindByAPIKeyHash), ctx, hash)
+}
+
 // FindByID mocks base method.
 func (m *MockServiceAccountRepository) FindByID(ctx context.Context, id string) (domain.ServiceAccount, error) {
 	m.ctrl.T.Helper()

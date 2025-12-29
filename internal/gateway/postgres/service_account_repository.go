@@ -32,7 +32,23 @@ func (r *ServiceAccountRepository) FindByID(
 		Preload(gen.ServiceAccount.Projects.Name(), nil).
 		First(ctx)
 	if err != nil {
-		return domain.ServiceAccount{}, dbhelpers.WrapError(err, "Failed to fetch service account %s", id)
+		return domain.ServiceAccount{},
+			dbhelpers.WrapError(err, "Failed to fetch service account %s", id)
+	}
+
+	return sa.ToDomain(), nil
+}
+
+func (r *ServiceAccountRepository) FindByAPIKeyHash(
+	ctx context.Context, hash string,
+) (domain.ServiceAccount, error) {
+	sa, err := gorm.G[entity.ServiceAccount](r.db).
+		Where(gen.ServiceAccount.APIKeyHash.Eq(hash)).
+		Preload(gen.ServiceAccount.Projects.Name(), nil).
+		First(ctx)
+	if err != nil {
+		return domain.ServiceAccount{},
+			dbhelpers.WrapError(err, "Failed to fetch service account with API key hash")
 	}
 
 	return sa.ToDomain(), nil
@@ -94,14 +110,16 @@ func (r *ServiceAccountRepository) Create(
 		}
 
 		// Associate service account to projects
-		saProjects := lo.Map(req.Projects, func(p domain.ProjectReference, _ int) entity.ServiceAccountProject {
-			return entity.ServiceAccountProject{
-				ServiceAccountID: sa.ID,
-				ProjectID:        p.ID,
-			}
-		})
+		saProjects := lo.Map(req.Projects,
+			func(p domain.ProjectReference, _ int) entity.ServiceAccountProject {
+				return entity.ServiceAccountProject{
+					ServiceAccountID: sa.ID,
+					ProjectID:        p.ID,
+				}
+			})
 		if len(saProjects) > 0 {
-			if err := gorm.G[entity.ServiceAccountProject](tx).CreateInBatches(ctx, &saProjects, 10); err != nil {
+			if err := gorm.G[entity.ServiceAccountProject](tx).
+				CreateInBatches(ctx, &saProjects, 10); err != nil {
 				return dbhelpers.WrapError(err, "Failed to associate service account to projects")
 			}
 		}
@@ -167,7 +185,8 @@ func (r *ServiceAccountRepository) Update(
 			}
 		})
 		if len(saProjects) > 0 {
-			if err := gorm.G[entity.ServiceAccountProject](tx).CreateInBatches(ctx, &saProjects, 10); err != nil {
+			if err := gorm.G[entity.ServiceAccountProject](tx).
+				CreateInBatches(ctx, &saProjects, 10); err != nil {
 				return dbhelpers.WrapError(err,
 					"Failed to associate service account to projects of service account %s", req.ID)
 			}

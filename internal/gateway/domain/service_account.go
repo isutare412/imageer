@@ -16,8 +16,20 @@ type ServiceAccount struct {
 	ExpireAt    *time.Time
 	Name        string
 	AccessScope serviceaccounts.AccessScope
-	APIKey      string
+	APIKeyHash  string
 	Projects    []ProjectReference
+}
+
+func (sa ServiceAccount) IsExpired() bool {
+	if sa.ExpireAt == nil {
+		return false
+	}
+	return sa.ExpireAt.Before(time.Now())
+}
+
+type ServiceAccountWithAPIKey struct {
+	ServiceAccount
+	APIKey string
 }
 
 type CreateServiceAccountRequest struct {
@@ -25,6 +37,18 @@ type CreateServiceAccountRequest struct {
 	AccessScope serviceaccounts.AccessScope `validate:"required,validateFn=IsAAccessScope"`
 	ProjectIDs  []string                    `validate:"dive,required"`
 	ExpireAt    *time.Time                  `validate:"omitempty,gt"`
+}
+
+func (r CreateServiceAccountRequest) ToServiceAccount(apiKeyHash string) ServiceAccount {
+	return ServiceAccount{
+		ExpireAt:    r.ExpireAt,
+		Name:        r.Name,
+		AccessScope: r.AccessScope,
+		APIKeyHash:  apiKeyHash,
+		Projects: lo.Map(r.ProjectIDs, func(pid string, _ int) ProjectReference {
+			return ProjectReference{ID: pid}
+		}),
+	}
 }
 
 type UpdateServiceAccountRequest struct {

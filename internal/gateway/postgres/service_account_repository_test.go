@@ -72,6 +72,63 @@ func TestServiceAccountRepository_FindByID(t *testing.T) {
 	}
 }
 
+func TestServiceAccountRepository_FindByAPIKeyHash(t *testing.T) {
+	type testSet struct {
+		name           string // description of this test case
+		svcAccountRepo *postgres.ServiceAccountRepository
+		mock           sqlmock.Sqlmock
+
+		hash    string
+		setup   func(t *testing.T, tt *testSet)
+		wantErr bool
+	}
+
+	tests := []testSet{
+		{
+			name: "normal case",
+			hash: "test-hash-1",
+			setup: func(t *testing.T, tt *testSet) {
+				postgresClient, mock := postgres.NewClientWithMock(t)
+				tt.svcAccountRepo = postgres.NewServiceAccountRepository(postgresClient)
+				tt.mock = mock
+
+				mock.ExpectQuery(
+					`SELECT * FROM "service_accounts" WHERE "api_key_hash" = $1 ORDER BY "service_accounts"."id" LIMIT $2`).
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.ServiceAccount]()).
+						AddRow("account-1", time.Now(), time.Now(), "account-name-1",
+							serviceaccounts.AccessScopeFull, time.Now(), "test-api-key"))
+				mock.ExpectQuery(
+					`SELECT * FROM "service_account_projects" WHERE ` +
+						`"service_account_projects"."service_account_id" = $1`).
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.ServiceAccountProject]()).
+						AddRow("account-1", "project-1").
+						AddRow("account-1", "project-2"))
+				mock.ExpectQuery(
+					`SELECT * FROM "projects" WHERE "projects"."id" IN ($1,$2)`).
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
+						AddRow("project-1", time.Now(), time.Now(), "project-name-1").
+						AddRow("project-2", time.Now(), time.Now(), "project-name-2"))
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup(t, &tt)
+
+			_, err := tt.svcAccountRepo.FindByAPIKeyHash(t.Context(), tt.hash)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			err = tt.mock.ExpectationsWereMet()
+			require.NoError(t, err)
+		})
+	}
+}
+
 func TestServiceAccountRepository_List(t *testing.T) {
 	type testSet struct {
 		name           string // description of this test case
@@ -159,7 +216,7 @@ func TestServiceAccountRepository_Create(t *testing.T) {
 				ExpireAt:    lo.ToPtr(time.Now().Add(24 * time.Hour)),
 				Name:        "account-name-1",
 				AccessScope: serviceaccounts.AccessScopeFull,
-				APIKey:      "test-api-key",
+				APIKeyHash:  "test-api-key",
 				Projects: []domain.ProjectReference{
 					{ID: "project-1"},
 					{ID: "project-2"},
@@ -173,7 +230,7 @@ func TestServiceAccountRepository_Create(t *testing.T) {
 				mock.ExpectBegin()
 				mock.ExpectExec(
 					`INSERT INTO "service_accounts" ` +
-						`("id","created_at","updated_at","name","access_scope","expire_at","api_key") VALUES ` +
+						`("id","created_at","updated_at","name","access_scope","expire_at","api_key_hash") VALUES ` +
 						`($1,$2,$3,$4,$5,$6,$7)`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(`INSERT INTO "service_account_projects" `+
@@ -185,7 +242,7 @@ func TestServiceAccountRepository_Create(t *testing.T) {
 					`SELECT * FROM "service_accounts" WHERE "id" = $1 ORDER BY "service_accounts"."id" LIMIT $2`).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.ServiceAccount]()).
 						AddRow("account-1", time.Now(), time.Now(),
-							tt.req.Name, tt.req.AccessScope, tt.req.ExpireAt, tt.req.APIKey))
+							tt.req.Name, tt.req.AccessScope, tt.req.ExpireAt, tt.req.APIKeyHash))
 				mock.ExpectQuery(
 					`SELECT * FROM "service_account_projects" WHERE ` +
 						`"service_account_projects"."service_account_id" = $1`).
