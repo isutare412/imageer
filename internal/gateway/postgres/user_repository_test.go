@@ -30,7 +30,7 @@ func TestUserRepository_Upsert(t *testing.T) {
 		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectQuery(
-		`SELECT * FROM "users" WHERE "id" = $1 ORDER BY "users"."id" LIMIT $2`).
+		`SELECT * FROM "users" WHERE "email" = $1 ORDER BY "users"."id" LIMIT $2`).
 		WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.User]()).
 			AddRow("user-1", time.Now(), time.Now(), users.RoleGuest, "nickname-1", "email-1", "photo-url-1"))
 	mock.ExpectCommit()

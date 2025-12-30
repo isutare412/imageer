@@ -49,18 +49,18 @@ func (r *ProjectRepository) List(
 	// Order clauses
 	switch {
 	case params.SortFilter.CreatedAt:
-		order := gen.Project.CreatedAt.Asc()
-		if params.SortFilter.Direction != dbhelpers.SortDirectionAsc {
-			order = gen.Project.CreatedAt.Desc()
+		order := gen.Project.CreatedAt.Desc()
+		if params.SortFilter.Direction == dbhelpers.SortDirectionAsc {
+			order = gen.Project.CreatedAt.Asc()
 		}
 		q = q.Order(order)
 	case params.SortFilter.UpdatedAt:
 		fallthrough
 	default:
 
-		order := gen.Project.UpdatedAt.Asc()
-		if params.SortFilter.Direction != dbhelpers.SortDirectionAsc {
-			order = gen.Project.UpdatedAt.Desc()
+		order := gen.Project.UpdatedAt.Desc()
+		if params.SortFilter.Direction == dbhelpers.SortDirectionAsc {
+			order = gen.Project.UpdatedAt.Asc()
 		}
 		q = q.Order(order)
 	}

@@ -93,7 +93,8 @@ func TestServiceAccountRepository_FindByAPIKeyHash(t *testing.T) {
 				tt.mock = mock
 
 				mock.ExpectQuery(
-					`SELECT * FROM "service_accounts" WHERE "api_key_hash" = $1 ORDER BY "service_accounts"."id" LIMIT $2`).
+					`SELECT * FROM "service_accounts" WHERE "api_key_hash" = $1 ` +
+						`ORDER BY "service_accounts"."id" LIMIT $2`).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.ServiceAccount]()).
 						AddRow("account-1", time.Now(), time.Now(), "account-name-1",
 							serviceaccounts.AccessScopeFull, time.Now(), "test-api-key"))

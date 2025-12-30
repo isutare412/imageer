@@ -67,17 +67,17 @@ func (r *ServiceAccountRepository) List(
 	// Order clauses
 	switch {
 	case params.SortFilter.CreatedAt:
-		order := gen.ServiceAccount.CreatedAt.Asc()
-		if params.SortFilter.Direction != dbhelpers.SortDirectionAsc {
-			order = gen.ServiceAccount.CreatedAt.Desc()
+		order := gen.ServiceAccount.CreatedAt.Desc()
+		if params.SortFilter.Direction == dbhelpers.SortDirectionAsc {
+			order = gen.ServiceAccount.CreatedAt.Asc()
 		}
 		q = q.Order(order)
 	case params.SortFilter.UpdatedAt:
 		fallthrough
 	default:
-		order := gen.ServiceAccount.UpdatedAt.Asc()
-		if params.SortFilter.Direction != dbhelpers.SortDirectionAsc {
-			order = gen.ServiceAccount.UpdatedAt.Desc()
+		order := gen.ServiceAccount.UpdatedAt.Desc()
+		if params.SortFilter.Direction == dbhelpers.SortDirectionAsc {
+			order = gen.ServiceAccount.UpdatedAt.Asc()
 		}
 		q = q.Order(order)
 	}
