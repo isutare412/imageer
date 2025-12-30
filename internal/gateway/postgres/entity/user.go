@@ -16,7 +16,7 @@ type User struct {
 	UpdatedAt time.Time
 	Role      users.Role `gorm:"size:32"`
 	Nickname  string     `gorm:"size:128"`
-	Email     string     `gorm:"size:1024"`
+	Email     string     `gorm:"size:1024; uniqueIndex"`
 	PhotoURL  string     `gorm:"size:2048"`
 }
 

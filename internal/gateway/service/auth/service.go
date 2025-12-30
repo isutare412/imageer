@@ -37,29 +37,28 @@ func NewService(cfg ServiceConfig, oidcProvider port.OIDCProvider, crypter port.
 }
 
 func (s *Service) StartGoogleSignIn(ctx context.Context, req domain.StartGoogleSignInRequest,
-) (resp domain.StartGoogleSignInResponse, err error) {
+) (domain.StartGoogleSignInResponse, error) {
 	state, err := s.createOIDCState(req.HTTPReq)
 	if err != nil {
-		return resp, fmt.Errorf("creating OIDC state: %w", err)
+		return domain.StartGoogleSignInResponse{}, fmt.Errorf("creating OIDC state: %w", err)
 	}
 
-	authURL := s.oidcProvider.BuildAuthenticationURL(httpBaseURL(req.HTTPReq), state)
-
-	resp.RedirectURL = authURL
-	resp.OIDCCookie = s.createOIDCStateCookie(state)
-	return resp, nil
+	return domain.StartGoogleSignInResponse{
+		RedirectURL: s.oidcProvider.BuildAuthenticationURL(httpBaseURL(req.HTTPReq), state),
+		OIDCCookie:  s.createOIDCStateCookie(state),
+	}, nil
 }
 
 func (s *Service) FinishGoogleSignIn(ctx context.Context, req domain.FinishGoogleSignInRequest,
-) (resp domain.FinishGoogleSignInResponse, err error) {
+) (domain.FinishGoogleSignInResponse, error) {
 	state, err := s.decryptOIDCState(req.State)
 	if err != nil {
-		return resp, fmt.Errorf("decrypting OIDC state: %w", err)
+		return domain.FinishGoogleSignInResponse{}, fmt.Errorf("decrypting OIDC state: %w", err)
 	}
 
 	idToken, err := s.oidcProvider.ExchangeCode(ctx, httpBaseURL(req.HTTPReq), req.AuthCode)
 	if err != nil {
-		return resp, fmt.Errorf("exchanging code: %w", err)
+		return domain.FinishGoogleSignInResponse{}, fmt.Errorf("exchanging code: %w", err)
 	}
 
 	user := domain.User{
@@ -71,7 +70,7 @@ func (s *Service) FinishGoogleSignIn(ctx context.Context, req domain.FinishGoogl
 
 	user, err = s.userRepo.Upsert(ctx, user)
 	if err != nil {
-		return resp, fmt.Errorf("upserting user: %w", err)
+		return domain.FinishGoogleSignInResponse{}, fmt.Errorf("upserting user: %w", err)
 	}
 
 	issuedAt := time.Now()
@@ -87,13 +86,14 @@ func (s *Service) FinishGoogleSignIn(ctx context.Context, req domain.FinishGoogl
 
 	token, err := s.jwtSigner.SignUserToken(userPayload)
 	if err != nil {
-		return resp, fmt.Errorf("signing user token: %w", err)
+		return domain.FinishGoogleSignInResponse{}, fmt.Errorf("signing user token: %w", err)
 	}
 
-	resp.RedirectURL = state.OriginURL
-	resp.OIDCCookie = s.deleteOIDCStateCookie()
-	resp.UserCookie = s.createUserCookie(token)
-	return resp, nil
+	return domain.FinishGoogleSignInResponse{
+		RedirectURL: state.OriginURL,
+		OIDCCookie:  s.deleteOIDCStateCookie(),
+		UserCookie:  s.createUserCookie(token),
+	}, nil
 }
 
 func (s *Service) VerifyUserToken(
