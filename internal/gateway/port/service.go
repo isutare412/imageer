@@ -11,6 +11,7 @@ import (
 type AuthService interface {
 	StartGoogleSignIn(context.Context, domain.StartGoogleSignInRequest) (domain.StartGoogleSignInResponse, error)
 	FinishGoogleSignIn(context.Context, domain.FinishGoogleSignInRequest) (domain.FinishGoogleSignInResponse, error)
+	VerifyUserToken(ctx context.Context, userToken string) (domain.UserTokenPayload, error)
 }
 
 type ServiceAccountService interface {

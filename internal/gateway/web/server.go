@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/isutare412/imageer/internal/gateway/port"
+	"github.com/isutare412/imageer/internal/gateway/web/immigration"
 )
 
 //go:embed openapi.yaml openapi.html
@@ -23,14 +24,19 @@ type Server struct {
 	handler *handler
 }
 
-func NewServer(cfg Config, authSvc port.AuthService) *Server {
+func NewServer(cfg Config, authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService) *Server {
 	handler := newHandler(authSvc)
+
+	passportIssuer := immigration.NewPassportIssuer(cfg.APIKeyHeader, cfg.UserCookieName,
+		authSvc, serviceAccountSvc)
+	immigration := immigration.New()
 
 	e := echo.New()
 	e.HidePort = true
 	e.HideBanner = !cfg.ShowBanner
 	e.IPExtractor = echo.ExtractIPFromXFFHeader()
 	e.Use(
+		withContextBag,
 		withLogAttrContext,
 		middleware.RequestIDWithConfig(middleware.RequestIDConfig{
 			RequestIDHandler: attachRequestID,
@@ -39,6 +45,8 @@ func NewServer(cfg Config, authSvc port.AuthService) *Server {
 		respondError,
 		recoverPanic,
 		openAPIValidator(),
+		passportIssuer.IssuePassport,
+		immigration.Immigrate,
 	)
 
 	RegisterHandlers(e, handler)

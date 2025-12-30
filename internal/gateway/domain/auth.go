@@ -36,6 +36,10 @@ type UserTokenPayload struct {
 	PictureURL string
 }
 
+func (p UserTokenPayload) IsAdmin() bool {
+	return p.Role == users.RoleAdmin
+}
+
 type OIDCState struct {
 	OriginURL string `json:"originUrl"`
 }

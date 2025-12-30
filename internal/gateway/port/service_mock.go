@@ -71,6 +71,21 @@ func (mr *MockAuthServiceMockRecorder) StartGoogleSignIn(arg0, arg1 any) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartGoogleSignIn", reflect.TypeOf((*MockAuthService)(nil).StartGoogleSignIn), arg0, arg1)
 }
 
+// VerifyUserToken mocks base method.
+func (m *MockAuthService) VerifyUserToken(ctx context.Context, userToken string) (domain.UserTokenPayload, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VerifyUserToken", ctx, userToken)
+	ret0, _ := ret[0].(domain.UserTokenPayload)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// VerifyUserToken indicates an expected call of VerifyUserToken.
+func (mr *MockAuthServiceMockRecorder) VerifyUserToken(ctx, userToken any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyUserToken", reflect.TypeOf((*MockAuthService)(nil).VerifyUserToken), ctx, userToken)
+}
+
 // MockServiceAccountService is a mock of ServiceAccountService interface.
 type MockServiceAccountService struct {
 	ctrl     *gomock.Controller

@@ -18,18 +18,20 @@ type Service struct {
 	oidcProvider port.OIDCProvider
 	crypter      port.Crypter
 	jwtSigner    port.JWTSigner
+	jwtVerifier  port.JWTVerifier
 	userRepo     port.UserRepository
 	cfg          ServiceConfig
 }
 
 func NewService(cfg ServiceConfig, oidcProvider port.OIDCProvider, crypter port.Crypter,
-	jwtSigner port.JWTSigner, userRepo port.UserRepository,
+	jwtSigner port.JWTSigner, jwtVerifier port.JWTVerifier, userRepo port.UserRepository,
 ) *Service {
 	return &Service{
 		oidcProvider: oidcProvider,
 		crypter:      crypter,
-		userRepo:     userRepo,
 		jwtSigner:    jwtSigner,
+		jwtVerifier:  jwtVerifier,
+		userRepo:     userRepo,
 		cfg:          cfg,
 	}
 }
@@ -92,6 +94,16 @@ func (s *Service) FinishGoogleSignIn(ctx context.Context, req domain.FinishGoogl
 	resp.OIDCCookie = s.deleteOIDCStateCookie()
 	resp.UserCookie = s.createUserCookie(token)
 	return resp, nil
+}
+
+func (s *Service) VerifyUserToken(
+	ctx context.Context, userToken string,
+) (domain.UserTokenPayload, error) {
+	payload, err := s.jwtVerifier.VerifyUserToken(userToken)
+	if err != nil {
+		return domain.UserTokenPayload{}, fmt.Errorf("verifying user token: %w", err)
+	}
+	return payload, nil
 }
 
 func httpBaseURL(r *http.Request) string {

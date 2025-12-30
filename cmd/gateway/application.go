@@ -15,6 +15,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/oidc"
 	"github.com/isutare412/imageer/internal/gateway/postgres"
 	"github.com/isutare412/imageer/internal/gateway/service/auth"
+	"github.com/isutare412/imageer/internal/gateway/service/serviceaccount"
 	"github.com/isutare412/imageer/internal/gateway/web"
 )
 
@@ -46,6 +47,12 @@ func newApplication(cfg config.Config) (*application, error) {
 		return nil, fmt.Errorf("creating jwt signer: %w", err)
 	}
 
+	slog.Info("Create JWT verifier")
+	jwtVerifier, err := jwt.NewVerifier(cfg.ToJWTVerifierConfig())
+	if err != nil {
+		return nil, fmt.Errorf("creating jwt verifier: %w", err)
+	}
+
 	slog.Info("Create repository client")
 	repoClient, err := postgres.NewClient(cfg.ToRepositoryClientConfig())
 	if err != nil {
@@ -55,11 +62,18 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create user repository")
 	userRepo := postgres.NewUserRepository(repoClient)
 
+	slog.Info("Create service account repository")
+	serviceAccountRepo := postgres.NewServiceAccountRepository(repoClient)
+
 	slog.Info("Create auth service")
-	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider, aesCrypter, jwtSigner, userRepo)
+	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider,
+		aesCrypter, jwtSigner, jwtVerifier, userRepo)
+
+	slog.Info("Create service account service")
+	serviceAccountSvc := serviceaccount.NewService(serviceAccountRepo)
 
 	slog.Info("Create web server")
-	webServer := web.NewServer(cfg.ToWebConfig(), authSvc)
+	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc)
 
 	return &application{
 		webServer:  webServer,

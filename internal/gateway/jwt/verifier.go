@@ -30,17 +30,17 @@ func (v *Verifier) VerifyUserToken(token string) (payload domain.UserTokenPayloa
 	switch {
 	case err != nil:
 		return payload, apperr.NewError(apperr.CodeBadRequest).
-			WithSummary("failed to parse and verify JWT token").
+			WithSummary("Failed to parse and verify JWT token").
 			WithCause(err)
 	case !jwtToken.Valid:
 		return payload, apperr.NewError(apperr.CodeBadRequest).
-			WithSummary("invalid token")
+			WithSummary("Invalid token")
 	}
 
 	claims, ok := jwtToken.Claims.(*appClaims)
 	if !ok {
 		return payload, apperr.NewError(apperr.CodeInternalServerError).
-			WithSummary("unexpected claims type")
+			WithSummary("Unexpected claims type")
 	}
 
 	return claims.toUserTokenPayload(), nil
@@ -50,7 +50,7 @@ func (v *Verifier) publicKeyPicker() func(jwtToken *jwt.Token) (any, error) {
 	return func(jwtToken *jwt.Token) (any, error) {
 		if _, ok := jwtToken.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, apperr.NewError(apperr.CodeBadRequest).
-				WithSummary("unexpected signing method: %v", jwtToken.Header["alg"])
+				WithSummary("Unexpected signing method: %v", jwtToken.Header["alg"])
 		}
 
 		kid, ok := jwtToken.Header["kid"].(string)

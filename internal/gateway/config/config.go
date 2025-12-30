@@ -53,6 +53,10 @@ type AuthConfig struct {
 		} `koanf:"user"`
 	} `koanf:"cookies"`
 
+	ServiceAccount struct {
+		APIKeyHeader string `koanf:"api-key-header" validate:"required"`
+	} `koanf:"service-account"`
+
 	JWT struct {
 		ActiveKeyPairName string                       `koanf:"active-key-pair-name" validate:"required"`
 		KeyPairs          map[string]AuthKeyPairConfig `koanf:"key-pairs" validate:"required,dive,keys,required,endkeys,required"`

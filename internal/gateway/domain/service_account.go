@@ -20,11 +20,15 @@ type ServiceAccount struct {
 	Projects    []ProjectReference
 }
 
-func (sa ServiceAccount) IsExpired() bool {
-	if sa.ExpireAt == nil {
+func (a ServiceAccount) IsExpired() bool {
+	if a.ExpireAt == nil {
 		return false
 	}
-	return sa.ExpireAt.Before(time.Now())
+	return a.ExpireAt.Before(time.Now())
+}
+
+func (a ServiceAccount) HasFullAccess() bool {
+	return a.AccessScope == serviceaccounts.AccessScopeFull
 }
 
 type ServiceAccountWithAPIKey struct {

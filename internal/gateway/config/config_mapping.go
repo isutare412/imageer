@@ -15,7 +15,13 @@ func (c *Config) ToLogConfig() log.Config {
 }
 
 func (c *Config) ToWebConfig() web.Config {
-	return web.Config(c.Web)
+	return web.Config{
+		Port:            c.Web.Port,
+		ShowBanner:      c.Web.ShowBanner,
+		ShowOpenAPIDocs: c.Web.ShowOpenAPIDocs,
+		APIKeyHeader:    c.Auth.ServiceAccount.APIKeyHeader,
+		UserCookieName:  c.Auth.Cookies.User.Name,
+	}
 }
 
 func (c *Config) ToRepositoryClientConfig() postgres.ClientConfig {

@@ -27,6 +27,9 @@ auth:
       name: USER
       ttl: 720h
 
+  service-account:
+    api-key-header: X-API-KEY
+
   jwt:
     active-key-pair-name: 'example-key-pair'
     key-pairs:
