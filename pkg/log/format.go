@@ -1,10 +1,22 @@
 package log
 
-//go:generate go tool enumer -type=Format -trimprefix Format -output format_enum.go -transform lower -text
-type Format int
+import "github.com/isutare412/imageer/pkg/apperr"
+
+type Format string
 
 const (
-	FormatJSON Format = iota
-	FormatText
-	FormatPretty
+	FormatJSON   Format = "json"
+	FormatText   Format = "text"
+	FormatPretty Format = "pretty"
 )
+
+func (f Format) Validate() error {
+	switch f {
+	case FormatJSON:
+	case FormatText:
+	case FormatPretty:
+	default:
+		return apperr.NewError(apperr.CodeBadRequest).WithSummary("Unexpected log format %q", f)
+	}
+	return nil
+}

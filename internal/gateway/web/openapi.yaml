@@ -439,11 +439,11 @@ components:
     ImageContentType:
       type: string
       enum:
-        - IMAGE_JPEG
-        - IMAGE_PNG
-        - IMAGE_WEBP
+        - image/jpeg
+        - image/png
+        - image/webp
       description: The content type of the image.
-      example: IMAGE_JPEG
+      example: image/jpeg
       x-go-type: images.ContentType
       x-go-import:
         path: github.com/redshore/imageer/pkg/images

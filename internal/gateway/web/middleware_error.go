@@ -59,16 +59,16 @@ func respondError(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		errorResp := ErrorResponse{
-			CodeID:   int64(appCode),
-			CodeName: appCode.String(),
+			CodeID:   int64(appCode.ID()),
+			CodeName: appCode.Name(),
 			Message:  msg,
 		}
 
 		entry := slog.With(
 			"statusCode", statusCode,
 			"error", err.Error(),
-			"errorCodeId", int64(appCode),
-			"errorCodeName", appCode.String(),
+			"errorCodeId", int64(appCode.ID()),
+			"errorCodeName", appCode.Name(),
 			"clientMsg", msg,
 		)
 		if stackTrace != "" {

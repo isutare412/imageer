@@ -28,7 +28,7 @@ func TestCreatePresignedURLRequest_Validation(t *testing.T) {
 			name: "invalid content type",
 			req: CreatePresignedURLRequest{
 				FileName:            "example.jpg",
-				ContentType:         images.ContentType(9999), // invalid content type
+				ContentType:         images.ContentType("invalid"), // invalid content type
 				TransformationNames: []string{"w100h100", "w200h200"},
 			},
 			wantErr: true,

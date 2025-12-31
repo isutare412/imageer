@@ -2,17 +2,30 @@ package log
 
 import (
 	"log/slog"
+
+	"github.com/isutare412/imageer/pkg/apperr"
 )
 
-//go:generate go tool enumer -type=Level -trimprefix Level -output level_enum.go -transform lower -text
-type Level int
+type Level string
 
 const (
-	LevelDebug Level = iota
-	LevelInfo
-	LevelWarn
-	LevelError
+	LevelDebug Level = "debug"
+	LevelInfo  Level = "info"
+	LevelWarn  Level = "warn"
+	LevelError Level = "error"
 )
+
+func (l Level) Validate() error {
+	switch l {
+	case LevelDebug:
+	case LevelInfo:
+	case LevelWarn:
+	case LevelError:
+	default:
+		return apperr.NewError(apperr.CodeBadRequest).WithSummary("Unexpected log level %q", l)
+	}
+	return nil
+}
 
 func (l Level) SlogLevel() slog.Level {
 	sl := slog.LevelInfo

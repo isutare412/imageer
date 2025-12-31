@@ -15,8 +15,8 @@ type Config struct {
 }
 
 type LogConfig struct {
-	Format    log.Format `koanf:"format" validate:"validateFn=IsAFormat"`
-	Level     log.Level  `koanf:"level" validate:"validateFn=IsALevel"`
+	Format    log.Format `koanf:"format" validate:"validateFn=Validate"`
+	Level     log.Level  `koanf:"level" validate:"validateFn=Validate"`
 	AddSource bool       `koanf:"add-source"`
 }
 
