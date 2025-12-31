@@ -23,14 +23,14 @@ func newResourceInspector(serviceAccountSvc port.ServiceAccountService) *resourc
 func (i *resourceInspector) inspect(ctx echo.Context) error {
 	rctx := ctx.Request().Context()
 
-	if _, _, err := i.fetchRequestedServiceAccount(rctx, ctx); err != nil {
+	if _, _, err := i.fetchServiceAccount(rctx, ctx); err != nil {
 		return fmt.Errorf("fetching requested service account: %w", err)
 	}
 
 	return nil
 }
 
-func (i *resourceInspector) fetchRequestedServiceAccount(
+func (i *resourceInspector) fetchServiceAccount(
 	ctx context.Context, ectx echo.Context,
 ) (domain.ServiceAccount, bool, error) {
 	id := ectx.Param("serviceAccountId")

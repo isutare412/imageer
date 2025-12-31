@@ -44,7 +44,7 @@ func (i *Immigration) Immigrate(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 
-		// Inspect resources existence, consistency.
+		// Inspect existence, consistency of requested resources.
 		if err := i.resourceInspectors.inspect(ctx); err != nil {
 			return fmt.Errorf("inspecting resources: %w", err)
 		}
