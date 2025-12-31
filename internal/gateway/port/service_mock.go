@@ -170,10 +170,10 @@ func (mr *MockServiceAccountServiceMockRecorder) GetByID(ctx, id any) *gomock.Ca
 }
 
 // List mocks base method.
-func (m *MockServiceAccountService) List(ctx context.Context, params domain.ListServiceAccountsParams) ([]domain.ServiceAccount, error) {
+func (m *MockServiceAccountService) List(ctx context.Context, params domain.ListServiceAccountsParams) (domain.ServiceAccounts, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, params)
-	ret0, _ := ret[0].([]domain.ServiceAccount)
+	ret0, _ := ret[0].(domain.ServiceAccounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -93,6 +93,7 @@ func TestProjectRepository_List(t *testing.T) {
 				tt.projectRepo = postgres.NewProjectRepository(postgresClient)
 				tt.mock = mock
 
+				mock.ExpectBegin()
 				mock.ExpectQuery(
 					`SELECT * FROM "projects" WHERE "name" = $1 `+
 						`ORDER BY "updated_at" DESC `+
@@ -104,6 +105,11 @@ func TestProjectRepository_List(t *testing.T) {
 					WithArgs("project-1").
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Transformation]()).
 						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false, 100, 100, "project-1"))
+				mock.ExpectQuery(
+					`SELECT COUNT(1) FROM "projects" WHERE "name" = $1`).
+					WithArgs(tt.req.SearchFilter.Name).
+					WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(5))
+				mock.ExpectCommit()
 			},
 			wantErr: false,
 		},

@@ -56,46 +56,45 @@ func (r *ServiceAccountRepository) FindByAPIKeyHash(
 
 func (r *ServiceAccountRepository) List(
 	ctx context.Context, params domain.ListServiceAccountsParams,
-) ([]domain.ServiceAccount, error) {
-	q := gorm.G[entity.ServiceAccount](r.db).Scopes()
-
-	// Where clauses
-	if params.SearchFilter.Name != nil {
-		q = q.Where(gen.ServiceAccount.Name.Eq(*params.SearchFilter.Name))
-	}
-
-	// Order clauses
-	switch {
-	case params.SortFilter.CreatedAt:
-		order := gen.ServiceAccount.CreatedAt.Desc()
-		if params.SortFilter.Direction == dbhelpers.SortDirectionAsc {
-			order = gen.ServiceAccount.CreatedAt.Asc()
+) (domain.ServiceAccounts, error) {
+	var (
+		accounts   []entity.ServiceAccount
+		totalCount int64
+	)
+	if err := r.db.Transaction(func(tx *gorm.DB) error {
+		// Fetch service accounts
+		q := gorm.G[entity.ServiceAccount](tx).Scopes()
+		q = applyServiceAccountSearchFilter(q, params.SearchFilter)
+		q = applyServiceAccountSortFilter(q, params.SortFilter)
+		q = applyPagination(q, params.LimitOrDefault(), params.OffsetOrDefault())
+		_accounts, err := q.
+			Preload(gen.ServiceAccount.Projects.Name(), nil).
+			Find(ctx)
+		if err != nil {
+			return dbhelpers.WrapError(err, "Failed to list service accounts")
 		}
-		q = q.Order(order)
-	case params.SortFilter.UpdatedAt:
-		fallthrough
-	default:
-		order := gen.ServiceAccount.UpdatedAt.Desc()
-		if params.SortFilter.Direction == dbhelpers.SortDirectionAsc {
-			order = gen.ServiceAccount.UpdatedAt.Asc()
+
+		// Fetch total count
+		q = gorm.G[entity.ServiceAccount](tx).Scopes()
+		q = applyServiceAccountSearchFilter(q, params.SearchFilter)
+		count, err := q.Count(ctx, "COUNT(1)")
+		if err != nil {
+			return dbhelpers.WrapError(err, "Failed to count service accounts")
 		}
-		q = q.Order(order)
+
+		accounts = _accounts
+		totalCount = count
+		return nil
+	}); err != nil {
+		return domain.ServiceAccounts{}, fmt.Errorf("during transaction: %w", err)
 	}
 
-	// Pagination clauses
-	q = q.Offset(params.OffsetOrDefault())
-	q = q.Limit(params.LimitOrDefault())
-
-	serviceAccounts, err := q.
-		Preload(gen.ServiceAccount.Projects.Name(), nil).
-		Find(ctx)
-	if err != nil {
-		return nil, dbhelpers.WrapError(err, "Failed to list service accounts")
-	}
-
-	return lo.Map(serviceAccounts, func(sa entity.ServiceAccount, _ int) domain.ServiceAccount {
-		return sa.ToDomain()
-	}), nil
+	return domain.ServiceAccounts{
+		Items: lo.Map(accounts, func(sa entity.ServiceAccount, _ int) domain.ServiceAccount {
+			return sa.ToDomain()
+		}),
+		Total: totalCount,
+	}, nil
 }
 
 func (r *ServiceAccountRepository) Create(

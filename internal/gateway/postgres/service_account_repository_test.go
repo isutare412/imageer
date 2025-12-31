@@ -160,6 +160,7 @@ func TestServiceAccountRepository_List(t *testing.T) {
 				tt.svcAccountRepo = postgres.NewServiceAccountRepository(postgresClient)
 				tt.mock = mock
 
+				mock.ExpectBegin()
 				mock.ExpectQuery(
 					`SELECT * FROM "service_accounts" WHERE "name" = $1 `+
 						`ORDER BY "updated_at" DESC LIMIT $2 OFFSET $3`).
@@ -178,6 +179,11 @@ func TestServiceAccountRepository_List(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
 						AddRow("project-1", time.Now(), time.Now(), "project-name-1").
 						AddRow("project-2", time.Now(), time.Now(), "project-name-2"))
+				mock.ExpectQuery(
+					`SELECT COUNT(1) FROM "service_accounts" WHERE "name" = $1`).
+					WithArgs(tt.req.SearchFilter.Name).
+					WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(5))
+				mock.ExpectCommit()
 			},
 			wantErr: false,
 		},

@@ -38,47 +38,45 @@ func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Pro
 
 func (r *ProjectRepository) List(
 	ctx context.Context, params domain.ListProjectsParams,
-) ([]domain.Project, error) {
-	q := gorm.G[entity.Project](r.db).Scopes()
-
-	// Where clauses
-	if params.SearchFilter.Name != nil {
-		q = q.Where(gen.Project.Name.Eq(*params.SearchFilter.Name))
-	}
-
-	// Order clauses
-	switch {
-	case params.SortFilter.CreatedAt:
-		order := gen.Project.CreatedAt.Desc()
-		if params.SortFilter.Direction == dbhelpers.SortDirectionAsc {
-			order = gen.Project.CreatedAt.Asc()
+) (domain.Projects, error) {
+	var (
+		projects   []entity.Project
+		totalCount int64
+	)
+	if err := r.db.Transaction(func(tx *gorm.DB) error {
+		// Fetch projects
+		q := gorm.G[entity.Project](r.db).Scopes()
+		q = applyProjectSearchFilter(q, params.SearchFilter)
+		q = applyProjectSortFilter(q, params.SortFilter)
+		q = applyPagination(q, params.LimitOrDefault(), params.OffsetOrDefault())
+		_projects, err := q.
+			Preload(gen.Project.Transformations.Name(), nil).
+			Find(ctx)
+		if err != nil {
+			return dbhelpers.WrapError(err, "Failed to list projects")
 		}
-		q = q.Order(order)
-	case params.SortFilter.UpdatedAt:
-		fallthrough
-	default:
 
-		order := gen.Project.UpdatedAt.Desc()
-		if params.SortFilter.Direction == dbhelpers.SortDirectionAsc {
-			order = gen.Project.UpdatedAt.Asc()
+		// Fetch total count
+		q = gorm.G[entity.Project](tx).Scopes()
+		q = applyProjectSearchFilter(q, params.SearchFilter)
+		count, err := q.Count(ctx, "COUNT(1)")
+		if err != nil {
+			return dbhelpers.WrapError(err, "Failed to count projects")
 		}
-		q = q.Order(order)
+
+		projects = _projects
+		totalCount = count
+		return nil
+	}); err != nil {
+		return domain.Projects{}, fmt.Errorf("during transaction: %w", err)
 	}
 
-	// Pagination clauses
-	q = q.Offset(params.OffsetOrDefault())
-	q = q.Limit(params.LimitOrDefault())
-
-	projects, err := q.
-		Preload(gen.Project.Transformations.Name(), nil).
-		Find(ctx)
-	if err != nil {
-		return nil, dbhelpers.WrapError(err, "Failed to list projects")
-	}
-
-	return lo.Map(projects, func(p entity.Project, _ int) domain.Project {
-		return p.ToDomain()
-	}), nil
+	return domain.Projects{
+		Items: lo.Map(projects, func(p entity.Project, _ int) domain.Project {
+			return p.ToDomain()
+		}),
+		Total: totalCount,
+	}, nil
 }
 
 func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (domain.Project, error) {

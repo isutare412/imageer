@@ -126,10 +126,10 @@ func (mr *MockProjectRepositoryMockRecorder) FindByID(ctx, id any) *gomock.Call 
 }
 
 // List mocks base method.
-func (m *MockProjectRepository) List(ctx context.Context, params domain.ListProjectsParams) ([]domain.Project, error) {
+func (m *MockProjectRepository) List(ctx context.Context, params domain.ListProjectsParams) (domain.Projects, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, params)
-	ret0, _ := ret[0].([]domain.Project)
+	ret0, _ := ret[0].(domain.Projects)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -239,10 +239,10 @@ func (mr *MockServiceAccountRepositoryMockRecorder) FindByID(ctx, id any) *gomoc
 }
 
 // List mocks base method.
-func (m *MockServiceAccountRepository) List(ctx context.Context, params domain.ListServiceAccountsParams) ([]domain.ServiceAccount, error) {
+func (m *MockServiceAccountRepository) List(ctx context.Context, params domain.ListServiceAccountsParams) (domain.ServiceAccounts, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, params)
-	ret0, _ := ret[0].([]domain.ServiceAccount)
+	ret0, _ := ret[0].(domain.ServiceAccounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

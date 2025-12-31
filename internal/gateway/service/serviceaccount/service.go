@@ -50,14 +50,14 @@ func (s *Service) GetByAPIKey(ctx context.Context, key string) (domain.ServiceAc
 
 func (s *Service) List(
 	ctx context.Context, params domain.ListServiceAccountsParams,
-) ([]domain.ServiceAccount, error) {
+) (domain.ServiceAccounts, error) {
 	if err := validation.Validate(params); err != nil {
-		return nil, fmt.Errorf("validating params: %w", err)
+		return domain.ServiceAccounts{}, fmt.Errorf("validating params: %w", err)
 	}
 
 	accounts, err := s.serviceAccountRepo.List(ctx, params)
 	if err != nil {
-		return nil, fmt.Errorf("listing service accounts: %w", err)
+		return domain.ServiceAccounts{}, fmt.Errorf("listing service accounts: %w", err)
 	}
 
 	return accounts, nil

@@ -33,7 +33,7 @@ type UpdateProjectRequest struct {
 
 type Projects struct {
 	Items []Project
-	Total int
+	Total int64
 }
 
 type ListProjectsParams struct {
