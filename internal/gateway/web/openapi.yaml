@@ -101,6 +101,19 @@ paths:
         default:
           $ref: '#/components/responses/ErrorResponse'
 
+    delete:
+      operationId: deleteProjectAdmin
+      summary: Delete a project
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+      responses:
+        '200':
+          description: Successfully deleted project
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
   /api/v1/admin/projects/{projectId}/images/reprocess:
     post:
       operationId: reprocessImagesAdmin
@@ -480,6 +493,11 @@ components:
           type: string
           description: The name of the project.
           example: My Project
+        transformations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateTransformationRequest'
+          x-go-type-skip-optional-pointer: true
       required:
         - name
 
@@ -586,6 +604,33 @@ components:
           default: false
           example: false
           x-go-type-skip-optional-pointer: true
+
+    CreateTransformationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the transformation.
+          example: w600h800
+        default:
+          type: boolean
+          description: Indicates if this transformation is the default one.
+          example: false
+        width:
+          type: integer
+          format: int64
+          description: The width of the image in pixels.
+          example: 600
+        height:
+          type: integer
+          format: int64
+          description: The height of the image in pixels.
+          example: 800
+      required:
+        - name
+        - default
+        - width
+        - height
 
     UpsertTransformationRequest:
       type: object

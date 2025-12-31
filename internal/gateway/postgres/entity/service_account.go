@@ -20,7 +20,7 @@ type ServiceAccount struct {
 	ExpireAt    *time.Time
 	APIKeyHash  string `gorm:"size:256; uniqueIndex"`
 
-	Projects []*Project `gorm:"many2many:service_account_projects"`
+	Projects []Project `gorm:"many2many:service_account_projects"`
 }
 
 func NewServiceAccount(acc domain.ServiceAccount) ServiceAccount {
@@ -48,7 +48,7 @@ func (sa ServiceAccount) ToDomain() domain.ServiceAccount {
 		AccessScope: sa.AccessScope,
 		ExpireAt:    sa.ExpireAt,
 		APIKeyHash:  sa.APIKeyHash,
-		Projects: lo.Map(sa.Projects, func(p *Project, _ int) domain.ProjectReference {
+		Projects: lo.Map(sa.Projects, func(p Project, _ int) domain.ProjectReference {
 			return p.ToReference()
 		}),
 	}

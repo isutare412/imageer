@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
@@ -40,4 +41,18 @@ func applyServiceAccountSortFilter(
 		q = q.Order(order)
 	}
 	return q
+}
+
+func buildServiceAccountUpdateAssigners(req domain.UpdateServiceAccountRequest) []clause.Assigner {
+	var assigners []clause.Assigner
+	if req.Name != nil {
+		assigners = append(assigners, gen.ServiceAccount.Name.Set(*req.Name))
+	}
+	if req.AccessScope != nil {
+		assigners = append(assigners, gen.ServiceAccount.AccessScope.Set(*req.AccessScope))
+	}
+	if req.ExpireAt != nil {
+		assigners = append(assigners, gen.ServiceAccount.ExpireAt.Set(*req.ExpireAt))
+	}
+	return assigners
 }

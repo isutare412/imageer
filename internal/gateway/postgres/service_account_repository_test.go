@@ -315,7 +315,7 @@ func TestServiceAccountRepository_Update(t *testing.T) {
 				mock.ExpectBegin()
 				mock.ExpectExec(
 					`UPDATE "service_accounts" SET ` +
-						`"name"=$1,"access_scope"=$2,"expire_at"=$3 WHERE "id" = $4`).
+						`"name"=$1,"access_scope"=$2,"expire_at"=$3,"updated_at"=$4 WHERE "id" = $5`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
 					`DELETE FROM "service_account_projects" WHERE "service_account_id" = $1`).

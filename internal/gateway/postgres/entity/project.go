@@ -16,12 +16,15 @@ type Project struct {
 	UpdatedAt time.Time
 	Name      string `gorm:"size:128"`
 
-	Transformations []*Transformation `gorm:"constraint:OnDelete:CASCADE"`
+	Transformations []Transformation `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 func NewProject(req domain.Project) Project {
 	return Project{
 		Name: req.Name,
+		Transformations: lo.Map(req.Transformations, func(t domain.Transformation, _ int) Transformation {
+			return NewTransformation(t)
+		}),
 	}
 }
 
@@ -38,7 +41,7 @@ func (p Project) ToDomain() domain.Project {
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
 		Name:      p.Name,
-		Transformations: lo.Map(p.Transformations, func(t *Transformation, _ int) domain.Transformation {
+		Transformations: lo.Map(p.Transformations, func(t Transformation, _ int) domain.Transformation {
 			return t.ToDomain()
 		}),
 	}

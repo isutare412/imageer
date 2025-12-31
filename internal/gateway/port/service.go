@@ -22,3 +22,11 @@ type ServiceAccountService interface {
 	Update(ctx context.Context, req domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error)
 	Delete(ctx context.Context, id string) error
 }
+
+type ProjectService interface {
+	GetByID(ctx context.Context, id string) (domain.Project, error)
+	List(ctx context.Context, params domain.ListProjectsParams) (domain.Projects, error)
+	Create(ctx context.Context, req domain.CreateProjectRequest) (domain.Project, error)
+	Update(ctx context.Context, req domain.UpdateProjectRequest) (domain.Project, error)
+	Delete(ctx context.Context, id string) error
+}

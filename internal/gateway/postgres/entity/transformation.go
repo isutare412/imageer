@@ -22,7 +22,16 @@ type Transformation struct {
 	ProjectID string `gorm:"size:36; uniqueIndex:idx_project_id_name,priority:1"`
 }
 
-func NewTransformation(projID string, req domain.UpsertTransformationRequest) Transformation {
+func NewTransformation(t domain.Transformation) Transformation {
+	return Transformation{
+		Name:    t.Name,
+		Default: t.Default,
+		Width:   t.Width,
+		Height:  t.Height,
+	}
+}
+
+func NewTransformationFromUpsert(projID string, req domain.UpsertTransformationRequest) Transformation {
 	return Transformation{
 		Name:      lo.FromPtr(req.Name),
 		Default:   lo.FromPtr(req.Default),

@@ -18,6 +18,7 @@ type ProjectRepository interface {
 	List(ctx context.Context, params domain.ListProjectsParams) (domain.Projects, error)
 	Create(ctx context.Context, proj domain.Project) (domain.Project, error)
 	Update(ctx context.Context, req domain.UpdateProjectRequest) (domain.Project, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type ServiceAccountRepository interface {

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
@@ -41,4 +42,12 @@ func applyProjectSortFilter(
 	}
 
 	return q
+}
+
+func buildProjectUpdateAssigners(req domain.UpdateProjectRequest) []clause.Assigner {
+	var assigners []clause.Assigner
+	if req.Name != nil {
+		assigners = append(assigners, gen.Project.Name.Set(*req.Name))
+	}
+	return assigners
 }

@@ -3,14 +3,15 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/samber/lo"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity/gen"
+	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
 )
 
@@ -99,14 +100,11 @@ func (r *ProjectRepository) Update(
 		}
 
 		// Update project fields
-		var assigners []clause.Assigner
-		if req.Name != nil {
-			assigners = append(assigners, gen.Project.Name.Set(*req.Name))
-		}
+		assigners := buildProjectUpdateAssigners(req)
 		if len(assigners) > 0 {
 			_, err := gorm.G[entity.Project](tx).
 				Where(gen.Project.ID.Eq(req.ID)).
-				Set(assigners...).
+				Set(append(assigners, gen.Project.UpdatedAt.Set(time.Now()))...).
 				Update(ctx)
 			if err != nil {
 				return dbhelpers.WrapError(err, "Failed to update project %s", req.ID)
@@ -131,6 +129,16 @@ func (r *ProjectRepository) Update(
 	return proj, nil
 }
 
+func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
+	_, err := gorm.G[entity.Project](r.db).
+		Where(gen.Project.ID.Eq(id)).
+		Delete(ctx)
+	if err != nil {
+		return dbhelpers.WrapError(err, "Failed to delete project %s", id)
+	}
+	return nil
+}
+
 func (*ProjectRepository) syncTransformations(ctx context.Context, tx *gorm.DB,
 	projectID string,
 	upsertReqs []domain.UpsertTransformationRequest,
@@ -141,35 +149,26 @@ func (*ProjectRepository) syncTransformations(ctx context.Context, tx *gorm.DB,
 		if t.IsUpdateRequest() {
 			transToUpdate = append(transToUpdate, t)
 		} else {
-			transToCreate = append(transToCreate, entity.NewTransformation(projectID, t))
+			transToCreate = append(transToCreate, entity.NewTransformationFromUpsert(projectID, t))
 		}
 	}
 
 	// Update transformations
 	for _, t := range transToUpdate {
-		var assigners []clause.Assigner
-		if t.Name != nil {
-			assigners = append(assigners, gen.Transformation.Name.Set(*t.Name))
-		}
-		if t.Default != nil {
-			assigners = append(assigners, gen.Transformation.Default.Set(*t.Default))
-		}
-		if t.Width != nil {
-			assigners = append(assigners, gen.Transformation.Width.Set(*t.Width))
-		}
-		if t.Height != nil {
-			assigners = append(assigners, gen.Transformation.Height.Set(*t.Height))
-		}
+		assigners := buildTransformationUpdateAssigners(t)
 		if len(assigners) == 0 || t.ID == nil {
 			continue
 		}
 
-		_, err := gorm.G[entity.Transformation](tx).
+		count, err := gorm.G[entity.Transformation](tx).
 			Where(gen.Transformation.ID.Eq(*t.ID)).
-			Set(assigners...).
+			Set(append(assigners, gen.Transformation.UpdatedAt.Set(time.Now()))...).
 			Update(ctx)
 		if err != nil {
 			return dbhelpers.WrapError(err, "Failed to update transformation %s", *t.ID)
+		} else if count == 0 {
+			return apperr.NewError(apperr.CodeNotFound).
+				WithSummary("Transformation %s not found", *t.ID)
 		}
 	}
 

@@ -3,10 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/samber/lo"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
@@ -147,20 +147,11 @@ func (r *ServiceAccountRepository) Update(
 	var sa entity.ServiceAccount
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
 		// Update service account fields
-		var assigners []clause.Assigner
-		if req.Name != nil {
-			assigners = append(assigners, gen.ServiceAccount.Name.Set(*req.Name))
-		}
-		if req.AccessScope != nil {
-			assigners = append(assigners, gen.ServiceAccount.AccessScope.Set(*req.AccessScope))
-		}
-		if req.ExpireAt != nil {
-			assigners = append(assigners, gen.ServiceAccount.ExpireAt.Set(*req.ExpireAt))
-		}
+		assigners := buildServiceAccountUpdateAssigners(req)
 		if len(assigners) > 0 {
 			_, err := gorm.G[entity.ServiceAccount](tx).
 				Where(gen.ServiceAccount.ID.Eq(req.ID)).
-				Set(assigners...).
+				Set(append(assigners, gen.ServiceAccount.UpdatedAt.Set(time.Now()))...).
 				Update(ctx)
 			if err != nil {
 				return dbhelpers.WrapError(err, "Failed to update service account %s", req.ID)

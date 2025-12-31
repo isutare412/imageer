@@ -15,6 +15,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/oidc"
 	"github.com/isutare412/imageer/internal/gateway/postgres"
 	"github.com/isutare412/imageer/internal/gateway/service/auth"
+	"github.com/isutare412/imageer/internal/gateway/service/project"
 	"github.com/isutare412/imageer/internal/gateway/service/serviceaccount"
 	"github.com/isutare412/imageer/internal/gateway/web"
 )
@@ -65,6 +66,9 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create service account repository")
 	serviceAccountRepo := postgres.NewServiceAccountRepository(repoClient)
 
+	slog.Info("Create project repository")
+	projectRepo := postgres.NewProjectRepository(repoClient)
+
 	slog.Info("Create auth service")
 	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider,
 		aesCrypter, jwtSigner, jwtVerifier, userRepo)
@@ -72,8 +76,11 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create service account service")
 	serviceAccountSvc := serviceaccount.NewService(serviceAccountRepo)
 
+	slog.Info("Create project service")
+	projectSvc := project.NewService(projectRepo)
+
 	slog.Info("Create web server")
-	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc)
+	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc)
 
 	return &application{
 		webServer:  webServer,

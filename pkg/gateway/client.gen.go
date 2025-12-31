@@ -41,7 +41,8 @@ type AppError struct {
 // CreateProjectAdminRequest defines model for CreateProjectAdminRequest.
 type CreateProjectAdminRequest struct {
 	// Name The name of the project.
-	Name string `json:"name"`
+	Name            string                        `json:"name"`
+	Transformations []CreateTransformationRequest `json:"transformations,omitempty"`
 }
 
 // CreateServiceAccountAdminRequest defines model for CreateServiceAccountAdminRequest.
@@ -57,6 +58,21 @@ type CreateServiceAccountAdminRequest struct {
 
 	// ProjectIDs List of project IDs to associate with the service account.
 	ProjectIDs []string `json:"projectIds,omitempty"`
+}
+
+// CreateTransformationRequest defines model for CreateTransformationRequest.
+type CreateTransformationRequest struct {
+	// Default Indicates if this transformation is the default one.
+	Default bool `json:"default"`
+
+	// Height The height of the image in pixels.
+	Height int64 `json:"height"`
+
+	// Name The name of the transformation.
+	Name string `json:"name"`
+
+	// Width The width of the image in pixels.
+	Width int64 `json:"width"`
 }
 
 // CreateUploadURLRequest defines model for CreateUploadUrlRequest.
@@ -477,6 +493,9 @@ type ClientInterface interface {
 
 	CreateProjectAdmin(ctx context.Context, body CreateProjectAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// DeleteProjectAdmin request
+	DeleteProjectAdmin(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetProjectAdmin request
 	GetProjectAdmin(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -556,6 +575,18 @@ func (c *Client) CreateProjectAdminWithBody(ctx context.Context, contentType str
 
 func (c *Client) CreateProjectAdmin(ctx context.Context, body CreateProjectAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateProjectAdminRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteProjectAdmin(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteProjectAdminRequest(c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -895,6 +926,40 @@ func NewCreateProjectAdminRequestWithBody(server string, contentType string, bod
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteProjectAdminRequest generates requests for DeleteProjectAdmin
+func NewDeleteProjectAdminRequest(server string, projectID ProjectIDPath) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/admin/projects/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -1531,6 +1596,9 @@ type ClientWithResponsesInterface interface {
 
 	CreateProjectAdminWithResponse(ctx context.Context, body CreateProjectAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateProjectAdminResponse, error)
 
+	// DeleteProjectAdminWithResponse request
+	DeleteProjectAdminWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*DeleteProjectAdminResponse, error)
+
 	// GetProjectAdminWithResponse request
 	GetProjectAdminWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*GetProjectAdminResponse, error)
 
@@ -1624,6 +1692,28 @@ func (r CreateProjectAdminResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r CreateProjectAdminResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteProjectAdminResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteProjectAdminResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteProjectAdminResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1975,6 +2065,15 @@ func (c *ClientWithResponses) CreateProjectAdminWithResponse(ctx context.Context
 	return ParseCreateProjectAdminResponse(rsp)
 }
 
+// DeleteProjectAdminWithResponse request returning *DeleteProjectAdminResponse
+func (c *ClientWithResponses) DeleteProjectAdminWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*DeleteProjectAdminResponse, error) {
+	rsp, err := c.DeleteProjectAdmin(ctx, projectID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteProjectAdminResponse(rsp)
+}
+
 // GetProjectAdminWithResponse request returning *GetProjectAdminResponse
 func (c *ClientWithResponses) GetProjectAdminWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*GetProjectAdminResponse, error) {
 	rsp, err := c.GetProjectAdmin(ctx, projectID, reqEditors...)
@@ -2195,6 +2294,32 @@ func ParseCreateProjectAdminResponse(rsp *http.Response) (*CreateProjectAdminRes
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteProjectAdminResponse parses an HTTP response from a DeleteProjectAdminWithResponse call
+func ParseDeleteProjectAdminResponse(rsp *http.Response) (*DeleteProjectAdminResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteProjectAdminResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {

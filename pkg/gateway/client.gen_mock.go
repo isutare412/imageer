@@ -201,6 +201,26 @@ func (mr *MockClientInterfaceMockRecorder) CreateUploadURLWithBody(ctx, projectI
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUploadURLWithBody", reflect.TypeOf((*MockClientInterface)(nil).CreateUploadURLWithBody), varargs...)
 }
 
+// DeleteProjectAdmin mocks base method.
+func (m *MockClientInterface) DeleteProjectAdmin(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, projectID}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteProjectAdmin", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteProjectAdmin indicates an expected call of DeleteProjectAdmin.
+func (mr *MockClientInterfaceMockRecorder) DeleteProjectAdmin(ctx, projectID any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, projectID}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProjectAdmin", reflect.TypeOf((*MockClientInterface)(nil).DeleteProjectAdmin), varargs...)
+}
+
 // DeleteServiceAccountAdmin mocks base method.
 func (m *MockClientInterface) DeleteServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -663,6 +683,26 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) CreateUploadURLWithRespo
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, projectID, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUploadURLWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).CreateUploadURLWithResponse), varargs...)
+}
+
+// DeleteProjectAdminWithResponse mocks base method.
+func (m *MockClientWithResponsesInterface) DeleteProjectAdminWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*DeleteProjectAdminResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, projectID}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteProjectAdminWithResponse", varargs...)
+	ret0, _ := ret[0].(*DeleteProjectAdminResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteProjectAdminWithResponse indicates an expected call of DeleteProjectAdminWithResponse.
+func (mr *MockClientWithResponsesInterfaceMockRecorder) DeleteProjectAdminWithResponse(ctx, projectID any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, projectID}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProjectAdminWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).DeleteProjectAdminWithResponse), varargs...)
 }
 
 // DeleteServiceAccountAdminWithResponse mocks base method.

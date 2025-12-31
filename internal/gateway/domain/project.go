@@ -22,7 +22,17 @@ type ProjectReference struct {
 }
 
 type CreateProjectRequest struct {
-	Name string `validate:"required,max=128"`
+	Name            string                        `validate:"required,max=128"`
+	Transformations []CreateTransformationRequest `validate:"dive,required"`
+}
+
+func (r CreateProjectRequest) ToProject() Project {
+	return Project{
+		Name: r.Name,
+		Transformations: lo.Map(r.Transformations, func(t CreateTransformationRequest, _ int) Transformation {
+			return t.ToTransformation()
+		}),
+	}
 }
 
 type UpdateProjectRequest struct {

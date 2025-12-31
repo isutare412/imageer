@@ -26,13 +26,14 @@ type Server struct {
 
 func NewServer(
 	cfg Config, authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService,
+	projectSvc port.ProjectService,
 ) *Server {
-	handler := newHandler(authSvc, serviceAccountSvc)
+	handler := newHandler(authSvc, serviceAccountSvc, projectSvc)
 
 	passportIssuer := immigration.NewPassportIssuer(cfg.APIKeyHeader, cfg.UserCookieName,
 		authSvc, serviceAccountSvc)
 
-	immigration := immigration.New(serviceAccountSvc)
+	immigration := immigration.New(serviceAccountSvc, projectSvc)
 
 	e := echo.New()
 	e.HidePort = true

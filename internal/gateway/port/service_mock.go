@@ -198,3 +198,101 @@ func (mr *MockServiceAccountServiceMockRecorder) Update(ctx, req any) *gomock.Ca
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockServiceAccountService)(nil).Update), ctx, req)
 }
+
+// MockProjectService is a mock of ProjectService interface.
+type MockProjectService struct {
+	ctrl     *gomock.Controller
+	recorder *MockProjectServiceMockRecorder
+	isgomock struct{}
+}
+
+// MockProjectServiceMockRecorder is the mock recorder for MockProjectService.
+type MockProjectServiceMockRecorder struct {
+	mock *MockProjectService
+}
+
+// NewMockProjectService creates a new mock instance.
+func NewMockProjectService(ctrl *gomock.Controller) *MockProjectService {
+	mock := &MockProjectService{ctrl: ctrl}
+	mock.recorder = &MockProjectServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockProjectService) EXPECT() *MockProjectServiceMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockProjectService) Create(ctx context.Context, req domain.CreateProjectRequest) (domain.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, req)
+	ret0, _ := ret[0].(domain.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockProjectServiceMockRecorder) Create(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockProjectService)(nil).Create), ctx, req)
+}
+
+// Delete mocks base method.
+func (m *MockProjectService) Delete(ctx context.Context, id string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockProjectServiceMockRecorder) Delete(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockProjectService)(nil).Delete), ctx, id)
+}
+
+// GetByID mocks base method.
+func (m *MockProjectService) GetByID(ctx context.Context, id string) (domain.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByID", ctx, id)
+	ret0, _ := ret[0].(domain.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByID indicates an expected call of GetByID.
+func (mr *MockProjectServiceMockRecorder) GetByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockProjectService)(nil).GetByID), ctx, id)
+}
+
+// List mocks base method.
+func (m *MockProjectService) List(ctx context.Context, params domain.ListProjectsParams) (domain.Projects, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", ctx, params)
+	ret0, _ := ret[0].(domain.Projects)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List.
+func (mr *MockProjectServiceMockRecorder) List(ctx, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockProjectService)(nil).List), ctx, params)
+}
+
+// Update mocks base method.
+func (m *MockProjectService) Update(ctx context.Context, req domain.UpdateProjectRequest) (domain.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, req)
+	ret0, _ := ret[0].(domain.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockProjectServiceMockRecorder) Update(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockProjectService)(nil).Update), ctx, req)
+}
