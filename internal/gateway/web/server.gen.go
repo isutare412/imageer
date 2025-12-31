@@ -179,7 +179,7 @@ type ServiceAccount struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	// ExpireAt The expiration time of the service account token.
-	ExpireAt time.Time `json:"expireAt"`
+	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
 	// ID The unique identifier of the service account.
 	ID string `json:"id"`
@@ -209,7 +209,7 @@ type ServiceAccountWithAPIKey struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	// ExpireAt The expiration time of the service account token.
-	ExpireAt time.Time `json:"expireAt"`
+	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
 	// ID The unique identifier of the service account.
 	ID string `json:"id"`
@@ -459,11 +459,11 @@ type ServerInterfaceWrapper struct {
 func (w *ServerInterfaceWrapper) ListProjectsAdmin(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListProjectsAdminParams
@@ -490,11 +490,11 @@ func (w *ServerInterfaceWrapper) ListProjectsAdmin(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) CreateProjectAdmin(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateProjectAdmin(ctx)
@@ -512,11 +512,11 @@ func (w *ServerInterfaceWrapper) GetProjectAdmin(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetProjectAdmin(ctx, projectID)
@@ -534,11 +534,11 @@ func (w *ServerInterfaceWrapper) UpdateProjectAdmin(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.UpdateProjectAdmin(ctx, projectID)
@@ -556,11 +556,11 @@ func (w *ServerInterfaceWrapper) ReprocessImagesAdmin(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ReprocessImagesAdmin(ctx, projectID)
@@ -571,11 +571,11 @@ func (w *ServerInterfaceWrapper) ReprocessImagesAdmin(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) ListServiceAccountsAdmin(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListServiceAccountsAdminParams
@@ -602,11 +602,11 @@ func (w *ServerInterfaceWrapper) ListServiceAccountsAdmin(ctx echo.Context) erro
 func (w *ServerInterfaceWrapper) CreateServiceAccountAdmin(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateServiceAccountAdmin(ctx)
@@ -624,11 +624,11 @@ func (w *ServerInterfaceWrapper) DeleteServiceAccountAdmin(ctx echo.Context) err
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter serviceAccountId: %s", err))
 	}
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.DeleteServiceAccountAdmin(ctx, serviceAccountID)
@@ -646,11 +646,11 @@ func (w *ServerInterfaceWrapper) GetServiceAccountAdmin(ctx echo.Context) error 
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter serviceAccountId: %s", err))
 	}
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetServiceAccountAdmin(ctx, serviceAccountID)
@@ -668,11 +668,11 @@ func (w *ServerInterfaceWrapper) UpdateServiceAccountAdmin(ctx echo.Context) err
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter serviceAccountId: %s", err))
 	}
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.UpdateServiceAccountAdmin(ctx, serviceAccountID)
@@ -724,11 +724,11 @@ func (w *ServerInterfaceWrapper) GetProject(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetProject(ctx, projectID)
@@ -746,11 +746,11 @@ func (w *ServerInterfaceWrapper) CreateUploadURL(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
 	}
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateUploadURL(ctx, projectID)
@@ -776,11 +776,11 @@ func (w *ServerInterfaceWrapper) GetImage(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter imageId: %s", err))
 	}
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetImage(ctx, projectID, imageID)
@@ -791,11 +791,11 @@ func (w *ServerInterfaceWrapper) GetImage(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetCurrentUser(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(CookieAuthScopes, []string{})
+	ctx.Set(BearerAuthScopes, []string{})
 
 	ctx.Set(ApiKeyAuthScopes, []string{})
 
-	ctx.Set(BearerAuthScopes, []string{})
+	ctx.Set(CookieAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetCurrentUser(ctx)
@@ -879,35 +879,35 @@ var swaggerSpec = []string{
 	"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",
-	"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",
-	"X1HIequ8f329/l8AAAD//2c9WFagUgAA",
+	"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",
+	"rfL+9fX6fwEAAP//pGs5epVSAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

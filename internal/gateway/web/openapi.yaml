@@ -10,9 +10,9 @@ servers:
     description: Current server
 
 security:
-  - cookieAuth: []
-  - apiKeyAuth: []
   - bearerAuth: []
+  - apiKeyAuth: []
+  - cookieAuth: []
 
 tags:
   - name: Authentication
@@ -873,7 +873,6 @@ components:
         - id
         - createdAt
         - updatedAt
-        - expireAt
         - name
         - accessScope
         - projects

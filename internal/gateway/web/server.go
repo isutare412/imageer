@@ -24,12 +24,15 @@ type Server struct {
 	handler *handler
 }
 
-func NewServer(cfg Config, authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService) *Server {
-	handler := newHandler(authSvc)
+func NewServer(
+	cfg Config, authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService,
+) *Server {
+	handler := newHandler(authSvc, serviceAccountSvc)
 
 	passportIssuer := immigration.NewPassportIssuer(cfg.APIKeyHeader, cfg.UserCookieName,
 		authSvc, serviceAccountSvc)
-	immigration := immigration.New()
+
+	immigration := immigration.New(serviceAccountSvc)
 
 	e := echo.New()
 	e.HidePort = true

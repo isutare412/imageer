@@ -11,26 +11,26 @@ import (
 	"github.com/isutare412/imageer/pkg/serviceaccounts"
 )
 
-type inspector interface {
+type permissionInspector interface {
 	isTarget(ctx echo.Context) bool
 	inspect(ctx echo.Context, passport domain.Passport) error
 }
 
-type adminInspector struct {
+type adminPermissionInspector struct {
 	pathPattern *regexp.Regexp
 }
 
-func newAdminInspector() *adminInspector {
-	return &adminInspector{
+func newAdminPermissionInspector() *adminPermissionInspector {
+	return &adminPermissionInspector{
 		pathPattern: regexp.MustCompile(`^/api/v1/admin.*`),
 	}
 }
 
-func (i *adminInspector) isTarget(ctx echo.Context) bool {
+func (i *adminPermissionInspector) isTarget(ctx echo.Context) bool {
 	return i.pathPattern.MatchString(ctx.Path())
 }
 
-func (i *adminInspector) inspect(ctx echo.Context, passport domain.Passport) error {
+func (i *adminPermissionInspector) inspect(ctx echo.Context, passport domain.Passport) error {
 	if passport == nil {
 		return apperr.NewError(apperr.CodeUnauthorized).WithSummary("Need authentication")
 	}

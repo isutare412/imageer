@@ -177,7 +177,7 @@ type ServiceAccount struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	// ExpireAt The expiration time of the service account token.
-	ExpireAt time.Time `json:"expireAt"`
+	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
 	// ID The unique identifier of the service account.
 	ID string `json:"id"`
@@ -207,7 +207,7 @@ type ServiceAccountWithAPIKey struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	// ExpireAt The expiration time of the service account token.
-	ExpireAt time.Time `json:"expireAt"`
+	ExpireAt *time.Time `json:"expireAt,omitempty"`
 
 	// ID The unique identifier of the service account.
 	ID string `json:"id"`

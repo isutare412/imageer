@@ -7,18 +7,21 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/contextbag"
 	"github.com/isutare412/imageer/internal/gateway/domain"
+	"github.com/isutare412/imageer/internal/gateway/port"
 )
 
 type Immigration struct {
-	inspectors []inspector
+	permissionInspectors []permissionInspector
+	resourceInspectors   *resourceInspector
 }
 
-func New() *Immigration {
+func New(serviceAccountSvc port.ServiceAccountService) *Immigration {
 	return &Immigration{
-		inspectors: []inspector{
-			newAdminInspector(),
+		permissionInspectors: []permissionInspector{
+			newAdminPermissionInspector(),
 			newProjectPermissionInspector(),
 		},
+		resourceInspectors: newResourceInspector(serviceAccountSvc),
 	}
 }
 
@@ -31,14 +34,19 @@ func (i *Immigration) Immigrate(next echo.HandlerFunc) echo.HandlerFunc {
 			passport = bag.Passport
 		}
 
-		for _, inspector := range i.inspectors {
+		// Inspect permissions
+		for _, inspector := range i.permissionInspectors {
 			if !inspector.isTarget(ctx) {
 				continue
 			}
-
 			if err := inspector.inspect(ctx, passport); err != nil {
 				return fmt.Errorf("inspecting passport: %w", err)
 			}
+		}
+
+		// Inspect resources existence, consistency.
+		if err := i.resourceInspectors.inspect(ctx); err != nil {
+			return fmt.Errorf("inspecting resources: %w", err)
 		}
 
 		return next(ctx)
