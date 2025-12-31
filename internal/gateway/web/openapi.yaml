@@ -160,7 +160,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ServiceAccount'
+                $ref: '#/components/schemas/ServiceAccountWithApiKey'
         default:
           $ref: '#/components/responses/ErrorResponse'
 
@@ -869,10 +869,6 @@ components:
           description: List of projects associated with the service account.
           items:
             $ref: '#/components/schemas/ProjectReference'
-        apiKey:
-          type: string
-          description: The API key for the service account.
-          example: abc123
       required:
         - id
         - createdAt
@@ -881,7 +877,18 @@ components:
         - name
         - accessScope
         - projects
-        - apiKey
+
+    ServiceAccountWithApiKey:
+      allOf:
+        - $ref: '#/components/schemas/ServiceAccount'
+        - type: object
+          properties:
+            apiKey:
+              type: string
+              description: The API key for the service account.
+              example: ak_SOEXTZL3Ww7BXyqMWdD5QpPfyPF5nXTy14PkpV9X6vySOzmQdpjHYXK26vbhDgDj
+          required:
+            - apiKey
 
     ServiceAccounts:
       type: object

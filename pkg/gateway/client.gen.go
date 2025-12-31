@@ -173,9 +173,6 @@ type ServiceAccount struct {
 	// AccessScope The access scope of the service account.
 	AccessScope ServiceAccountAccessScope `json:"accessScope"`
 
-	// APIKey The API key for the service account.
-	APIKey string `json:"apiKey"`
-
 	// CreatedAt The creation time of the service account.
 	CreatedAt time.Time `json:"createdAt"`
 
@@ -197,6 +194,33 @@ type ServiceAccount struct {
 
 // ServiceAccountAccessScope The access scope of the service account.
 type ServiceAccountAccessScope = serviceaccounts.AccessScope
+
+// ServiceAccountWithAPIKey defines model for ServiceAccountWithApiKey.
+type ServiceAccountWithAPIKey struct {
+	// AccessScope The access scope of the service account.
+	AccessScope ServiceAccountAccessScope `json:"accessScope"`
+
+	// APIKey The API key for the service account.
+	APIKey string `json:"apiKey"`
+
+	// CreatedAt The creation time of the service account.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// ExpireAt The expiration time of the service account token.
+	ExpireAt time.Time `json:"expireAt"`
+
+	// ID The unique identifier of the service account.
+	ID string `json:"id"`
+
+	// Name The name of the service account.
+	Name string `json:"name"`
+
+	// Projects List of projects associated with the service account.
+	Projects []ProjectReference `json:"projects"`
+
+	// UpdatedAt The last update time of the service account.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
 
 // ServiceAccounts defines model for ServiceAccounts.
 type ServiceAccounts struct {
@@ -1701,7 +1725,7 @@ func (r ListServiceAccountsAdminResponse) StatusCode() int {
 type CreateServiceAccountAdminResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ServiceAccount
+	JSON200      *ServiceAccountWithAPIKey
 	JSONDefault  *ErrorResponse
 }
 
@@ -2330,7 +2354,7 @@ func ParseCreateServiceAccountAdminResponse(rsp *http.Response) (*CreateServiceA
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ServiceAccount
+		var dest ServiceAccountWithAPIKey
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
