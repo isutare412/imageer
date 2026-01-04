@@ -64,26 +64,41 @@ type CreateServiceAccountAdminRequest struct {
 
 // CreateTransformationRequest defines model for CreateTransformationRequest.
 type CreateTransformationRequest struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
+
+	// Crop Indicates if cropping should be applied.
+	Crop *bool `json:"crop,omitempty"`
+
 	// Default Indicates if this transformation is the default one.
 	Default bool `json:"default"`
 
+	// Fit The fit mode for image transformation.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format *ImageFormat `json:"format,omitempty"`
+
 	// Height The height of the image in pixels.
-	Height int64 `json:"height"`
+	Height *int64 `json:"height,omitempty"`
 
 	// Name The name of the transformation.
 	Name string `json:"name"`
 
+	// Quality The quality of the image (1-100).
+	Quality *int64 `json:"quality,omitempty"`
+
 	// Width The width of the image in pixels.
-	Width int64 `json:"width"`
+	Width *int64 `json:"width,omitempty"`
 }
 
 // CreateUploadURLRequest defines model for CreateUploadUrlRequest.
 type CreateUploadURLRequest struct {
-	// ContentType The content type of the image.
-	ContentType ImageContentType `json:"contentType"`
-
 	// FileName The name of the file to be uploaded.
 	FileName string `json:"fileName"`
+
+	// Format The content type of the image.
+	Format ImageFormat `json:"format"`
 
 	// TransformationNames List of transformation names to apply to the image. If not provided, default transformations will be applied.
 	TransformationNames []string `json:"transformationNames,omitempty"`
@@ -107,8 +122,14 @@ type Image struct {
 	URLSet ImageURLSet `json:"urlSet"`
 }
 
-// ImageContentType The content type of the image.
-type ImageContentType = images.ContentType
+// ImageAnchor The anchor position for image cropping.
+type ImageAnchor = images.Anchor
+
+// ImageFit The fit mode for image transformation.
+type ImageFit = images.Fit
+
+// ImageFormat The content type of the image.
+type ImageFormat = images.Format
 
 // ImageState The current state of the image.
 type ImageState = images.State
@@ -250,14 +271,26 @@ type ServiceAccounts struct {
 
 // Transformation defines model for Transformation.
 type Transformation struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
+
 	// CreatedAt The creation time of the transformation.
 	CreatedAt time.Time `json:"createdAt"`
+
+	// Crop Indicates if cropping should be applied.
+	Crop bool `json:"crop"`
 
 	// Default Indicates if this transformation is the default one.
 	Default bool `json:"default"`
 
+	// Fit The fit mode for image transformation.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format ImageFormat `json:"format"`
+
 	// Height The height of the image in pixels.
-	Height int64 `json:"height"`
+	Height *int64 `json:"height,omitempty"`
 
 	// ID The unique identifier of the transformation.
 	ID string `json:"id"`
@@ -265,11 +298,14 @@ type Transformation struct {
 	// Name The name of the transformation.
 	Name string `json:"name"`
 
+	// Quality The quality of the image (1-100).
+	Quality int64 `json:"quality"`
+
 	// UpdatedAt The last update time of the transformation.
 	UpdatedAt time.Time `json:"updatedAt"`
 
 	// Width The width of the image in pixels.
-	Width int64 `json:"width"`
+	Width *int64 `json:"width,omitempty"`
 }
 
 // UpdateProjectAdminRequest defines model for UpdateProjectAdminRequest.
@@ -294,10 +330,24 @@ type UpdateServiceAccountAdminRequest struct {
 	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
-// UpsertTransformationRequest If id is provided, the transformation will be updated; otherwise, a new transformation will be created.
+// UpsertTransformationRequest If id is provided, the transformation will be updated; otherwise, a new
+// transformation will be created. All existing transformations not
+// included in the upsert list will be deleted.
 type UpsertTransformationRequest struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
+
+	// Crop Indicates if cropping should be applied.
+	Crop *bool `json:"crop,omitempty"`
+
 	// Default Indicates if this transformation is the default one.
 	Default *bool `json:"default,omitempty"`
+
+	// Fit The fit mode for image transformation.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format *ImageFormat `json:"format,omitempty"`
 
 	// Height The height of the image in pixels.
 	Height *int64 `json:"height,omitempty"`
@@ -307,6 +357,9 @@ type UpsertTransformationRequest struct {
 
 	// Name The name of the transformation.
 	Name *string `json:"name,omitempty"`
+
+	// Quality The quality of the image (1-100).
+	Quality *int64 `json:"quality,omitempty"`
 
 	// Width The width of the image in pixels.
 	Width *int64 `json:"width,omitempty"`
@@ -894,63 +947,67 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"KDOk8lRWAAA=",
+	"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",
+	"6QdYlrNV3r+4Xvw/AAD///xhP82eXAAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

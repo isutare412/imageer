@@ -11,7 +11,7 @@ type Image struct {
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 	OriginalFileName string
-	ContentType      images.ContentType
+	Format           images.Format
 	State            images.State
 	URLSet           ImageURLSet
 }
@@ -44,7 +44,7 @@ type PresignedURL struct {
 }
 
 type CreatePresignedURLRequest struct {
-	FileName            string             `validate:"required,max=1024"`
-	ContentType         images.ContentType `validate:"validateFn=Validate"`
-	TransformationNames []string           `validate:"dive,required,max=64"`
+	FileName            string        `validate:"required,max=1024"`
+	Format              images.Format `validate:"validateFn=Validate"`
+	TransformationNames []string      `validate:"dive,required,max=64"`
 }

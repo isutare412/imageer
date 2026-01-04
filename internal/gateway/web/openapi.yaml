@@ -442,6 +442,7 @@ components:
       enum:
         - WAITING_UPLOAD
         - PROCESSING
+        - FAILED
         - READY
       description: The current state of the image.
       example: READY
@@ -449,15 +450,44 @@ components:
       x-go-import:
         path: github.com/redshore/imageer/pkg/images
 
-    ImageContentType:
+    ImageFormat:
       type: string
       enum:
-        - image/jpeg
-        - image/png
-        - image/webp
+        - JPEG
+        - PNG
+        - WEBP
+        - AVIF
+        - HEIC
       description: The content type of the image.
-      example: image/jpeg
-      x-go-type: images.ContentType
+      example: JPEG
+      x-go-type: images.Format
+      x-go-import:
+        path: github.com/redshore/imageer/pkg/images
+
+    ImageFit:
+      type: string
+      enum:
+        - COVER
+        - CONTAIN
+        - FILL
+      description: The fit mode for image transformation.
+      example: COVER
+      x-go-type: images.Fit
+      x-go-import:
+        path: github.com/redshore/imageer/pkg/images
+
+    ImageAnchor:
+      type: string
+      enum:
+        - SMART
+        - CENTER
+        - NORTH
+        - EAST
+        - SOUTH
+        - WEST
+      description: The anchor position for image cropping.
+      example: SMART
+      x-go-type: images.Anchor
       x-go-import:
         path: github.com/redshore/imageer/pkg/images
 
@@ -569,9 +599,9 @@ components:
         fileName:
           type: string
           description: The name of the file to be uploaded.
-          example: image.png
-        contentType:
-          $ref: '#/components/schemas/ImageContentType'
+          example: image.jpg
+        format:
+          $ref: '#/components/schemas/ImageFormat'
         transformationNames:
           type: array
           description: >-
@@ -583,7 +613,7 @@ components:
           x-go-type-skip-optional-pointer: true
       required:
         - fileName
-        - contentType
+        - format
 
     ReprocessImagesAdminRequest:
       type: object
@@ -616,6 +646,15 @@ components:
           type: boolean
           description: Indicates if this transformation is the default one.
           example: false
+        format:
+          $ref: '#/components/schemas/ImageFormat'
+        quality:
+          type: integer
+          format: int64
+          description: The quality of the image (1-100).
+          example: 90
+        fit:
+          $ref: '#/components/schemas/ImageFit'
         width:
           type: integer
           format: int64
@@ -626,15 +665,22 @@ components:
           format: int64
           description: The height of the image in pixels.
           example: 800
+        crop:
+          type: boolean
+          description: Indicates if cropping should be applied.
+          example: true
+        anchor:
+          $ref: '#/components/schemas/ImageAnchor'
       required:
         - name
         - default
-        - width
-        - height
 
     UpsertTransformationRequest:
       type: object
-      description: If id is provided, the transformation will be updated; otherwise, a new transformation will be created.
+      description: |
+        If id is provided, the transformation will be updated; otherwise, a new
+        transformation will be created. All existing transformations not
+        included in the upsert list will be deleted.
       properties:
         id:
           type: string
@@ -648,6 +694,15 @@ components:
           type: boolean
           description: Indicates if this transformation is the default one.
           example: false
+        format:
+          $ref: '#/components/schemas/ImageFormat'
+        quality:
+          type: integer
+          format: int64
+          description: The quality of the image (1-100).
+          example: 90
+        fit:
+          $ref: '#/components/schemas/ImageFit'
         width:
           type: integer
           format: int64
@@ -658,6 +713,12 @@ components:
           format: int64
           description: The height of the image in pixels.
           example: 800
+        crop:
+          type: boolean
+          description: Indicates if cropping should be applied.
+          example: true
+        anchor:
+          $ref: '#/components/schemas/ImageAnchor'
 
     ###
     # Response Schemas
@@ -757,6 +818,15 @@ components:
           type: boolean
           description: Indicates if this transformation is the default one.
           example: false
+        format:
+          $ref: '#/components/schemas/ImageFormat'
+        quality:
+          type: integer
+          format: int64
+          description: The quality of the image (1-100).
+          example: 90
+        fit:
+          $ref: '#/components/schemas/ImageFit'
         width:
           type: integer
           format: int64
@@ -767,14 +837,21 @@ components:
           format: int64
           description: The height of the image in pixels.
           example: 800
+        crop:
+          type: boolean
+          description: Indicates if cropping should be applied.
+          example: true
+        anchor:
+          $ref: '#/components/schemas/ImageAnchor'
       required:
         - id
         - createdAt
         - updatedAt
         - name
         - default
-        - width
-        - height
+        - format
+        - quality
+        - crop
 
     PresignedUrl:
       type: object
@@ -851,7 +928,7 @@ components:
         originalUrl:
           type: string
           description: The original URL of the image.
-          example: https://example.com/original/image.png
+          example: https://example.com/original/image.webp
         variants:
           type: array
           description: List of URLs for the image with applied transformations.
@@ -875,7 +952,7 @@ components:
         url:
           type: string
           description: The URL of the image with the applied transformation.
-          example: https://example.com/presets/w600h800/image.png
+          example: https://example.com/presets/w600h800/image.webp
       required:
         - transformationId
         - transformationName
@@ -986,7 +1063,7 @@ components:
           type: string
           format: uri
           description: The photo URL of the user.
-          example: https://example.com/photos/user.png
+          example: https://example.com/photos/user.webp
         createdAt:
           type: string
           format: date-time

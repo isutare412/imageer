@@ -9,7 +9,7 @@ import (
 	"github.com/isutare412/imageer/pkg/validation"
 )
 
-func TestUpdateTransformationRequest_Validation(t *testing.T) {
+func TestUpsertTransformationRequest_Validation(t *testing.T) {
 	tests := []struct {
 		name    string // description of this test case
 		req     UpsertTransformationRequest
@@ -24,16 +24,6 @@ func TestUpdateTransformationRequest_Validation(t *testing.T) {
 				Height:  lo.ToPtr[int64](100),
 			},
 			wantErr: false,
-		},
-		{
-			name: "create request without required field",
-			req: UpsertTransformationRequest{
-				Name:    lo.ToPtr("w100h100"),
-				Default: lo.ToPtr(true),
-				// Width:   lo.ToPtr[int64](100),
-				// Height: lo.ToPtr[int64](100),
-			},
-			wantErr: true,
 		},
 		{
 			name: "invalid transformation dimensions",

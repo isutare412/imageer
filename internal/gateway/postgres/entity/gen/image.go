@@ -9,21 +9,21 @@ import (
 )
 
 var Image = struct {
-	ID               field.String
-	CreatedAt        field.Time
-	UpdatedAt        field.Time
-	OriginalFileName field.String
-	ContentType      field.Field[images.ContentType]
-	State            field.Field[images.State]
-	ProjectID        field.String
-	Project          field.Struct[entity.Project]
+	ID        field.String
+	CreatedAt field.Time
+	UpdatedAt field.Time
+	FileName  field.String
+	Format    field.Field[images.Format]
+	State     field.Field[images.State]
+	ProjectID field.String
+	Project   field.Struct[entity.Project]
 }{
-	ID:               field.String{}.WithColumn("id"),
-	CreatedAt:        field.Time{}.WithColumn("created_at"),
-	UpdatedAt:        field.Time{}.WithColumn("updated_at"),
-	OriginalFileName: field.String{}.WithColumn("original_file_name"),
-	ContentType:      field.Field[images.ContentType]{}.WithColumn("content_type"),
-	State:            field.Field[images.State]{}.WithColumn("state"),
-	ProjectID:        field.String{}.WithColumn("project_id"),
-	Project:          field.Struct[entity.Project]{}.WithName("Project"),
+	ID:        field.String{}.WithColumn("id"),
+	CreatedAt: field.Time{}.WithColumn("created_at"),
+	UpdatedAt: field.Time{}.WithColumn("updated_at"),
+	FileName:  field.String{}.WithColumn("file_name"),
+	Format:    field.Field[images.Format]{}.WithColumn("format"),
+	State:     field.Field[images.State]{}.WithColumn("state"),
+	ProjectID: field.String{}.WithColumn("project_id"),
+	Project:   field.Struct[entity.Project]{}.WithName("Project"),
 }

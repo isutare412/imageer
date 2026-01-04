@@ -62,26 +62,41 @@ type CreateServiceAccountAdminRequest struct {
 
 // CreateTransformationRequest defines model for CreateTransformationRequest.
 type CreateTransformationRequest struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
+
+	// Crop Indicates if cropping should be applied.
+	Crop *bool `json:"crop,omitempty"`
+
 	// Default Indicates if this transformation is the default one.
 	Default bool `json:"default"`
 
+	// Fit The fit mode for image transformation.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format *ImageFormat `json:"format,omitempty"`
+
 	// Height The height of the image in pixels.
-	Height int64 `json:"height"`
+	Height *int64 `json:"height,omitempty"`
 
 	// Name The name of the transformation.
 	Name string `json:"name"`
 
+	// Quality The quality of the image (1-100).
+	Quality *int64 `json:"quality,omitempty"`
+
 	// Width The width of the image in pixels.
-	Width int64 `json:"width"`
+	Width *int64 `json:"width,omitempty"`
 }
 
 // CreateUploadURLRequest defines model for CreateUploadUrlRequest.
 type CreateUploadURLRequest struct {
-	// ContentType The content type of the image.
-	ContentType ImageContentType `json:"contentType"`
-
 	// FileName The name of the file to be uploaded.
 	FileName string `json:"fileName"`
+
+	// Format The content type of the image.
+	Format ImageFormat `json:"format"`
 
 	// TransformationNames List of transformation names to apply to the image. If not provided, default transformations will be applied.
 	TransformationNames []string `json:"transformationNames,omitempty"`
@@ -105,8 +120,14 @@ type Image struct {
 	URLSet ImageURLSet `json:"urlSet"`
 }
 
-// ImageContentType The content type of the image.
-type ImageContentType = images.ContentType
+// ImageAnchor The anchor position for image cropping.
+type ImageAnchor = images.Anchor
+
+// ImageFit The fit mode for image transformation.
+type ImageFit = images.Fit
+
+// ImageFormat The content type of the image.
+type ImageFormat = images.Format
 
 // ImageState The current state of the image.
 type ImageState = images.State
@@ -248,14 +269,26 @@ type ServiceAccounts struct {
 
 // Transformation defines model for Transformation.
 type Transformation struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
+
 	// CreatedAt The creation time of the transformation.
 	CreatedAt time.Time `json:"createdAt"`
+
+	// Crop Indicates if cropping should be applied.
+	Crop bool `json:"crop"`
 
 	// Default Indicates if this transformation is the default one.
 	Default bool `json:"default"`
 
+	// Fit The fit mode for image transformation.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format ImageFormat `json:"format"`
+
 	// Height The height of the image in pixels.
-	Height int64 `json:"height"`
+	Height *int64 `json:"height,omitempty"`
 
 	// ID The unique identifier of the transformation.
 	ID string `json:"id"`
@@ -263,11 +296,14 @@ type Transformation struct {
 	// Name The name of the transformation.
 	Name string `json:"name"`
 
+	// Quality The quality of the image (1-100).
+	Quality int64 `json:"quality"`
+
 	// UpdatedAt The last update time of the transformation.
 	UpdatedAt time.Time `json:"updatedAt"`
 
 	// Width The width of the image in pixels.
-	Width int64 `json:"width"`
+	Width *int64 `json:"width,omitempty"`
 }
 
 // UpdateProjectAdminRequest defines model for UpdateProjectAdminRequest.
@@ -292,10 +328,24 @@ type UpdateServiceAccountAdminRequest struct {
 	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
-// UpsertTransformationRequest If id is provided, the transformation will be updated; otherwise, a new transformation will be created.
+// UpsertTransformationRequest If id is provided, the transformation will be updated; otherwise, a new
+// transformation will be created. All existing transformations not
+// included in the upsert list will be deleted.
 type UpsertTransformationRequest struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
+
+	// Crop Indicates if cropping should be applied.
+	Crop *bool `json:"crop,omitempty"`
+
 	// Default Indicates if this transformation is the default one.
 	Default *bool `json:"default,omitempty"`
+
+	// Fit The fit mode for image transformation.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format *ImageFormat `json:"format,omitempty"`
 
 	// Height The height of the image in pixels.
 	Height *int64 `json:"height,omitempty"`
@@ -305,6 +355,9 @@ type UpsertTransformationRequest struct {
 
 	// Name The name of the transformation.
 	Name *string `json:"name,omitempty"`
+
+	// Quality The quality of the image (1-100).
+	Quality *int64 `json:"quality,omitempty"`
 
 	// Width The width of the image in pixels.
 	Width *int64 `json:"width,omitempty"`

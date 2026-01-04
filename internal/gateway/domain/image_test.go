@@ -19,7 +19,7 @@ func TestCreatePresignedURLRequest_Validation(t *testing.T) {
 			name: "normal case",
 			req: CreatePresignedURLRequest{
 				FileName:            "example.jpg",
-				ContentType:         images.ContentTypeImageJPEG,
+				Format:              images.FormatWebp,
 				TransformationNames: []string{"w100h100", "w200h200"},
 			},
 			wantErr: false,
@@ -28,7 +28,7 @@ func TestCreatePresignedURLRequest_Validation(t *testing.T) {
 			name: "invalid content type",
 			req: CreatePresignedURLRequest{
 				FileName:            "example.jpg",
-				ContentType:         images.ContentType("invalid"), // invalid content type
+				Format:              images.Format("invalid"), // invalid content type
 				TransformationNames: []string{"w100h100", "w200h200"},
 			},
 			wantErr: true,
@@ -37,7 +37,7 @@ func TestCreatePresignedURLRequest_Validation(t *testing.T) {
 			name: "empty transformation name",
 			req: CreatePresignedURLRequest{
 				FileName:            "example.jpg",
-				ContentType:         images.ContentTypeImageJPEG,
+				Format:              images.FormatWebp,
 				TransformationNames: []string{"", "w200h200"}, // invalid transformation name
 			},
 			wantErr: true,

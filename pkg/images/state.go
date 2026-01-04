@@ -13,6 +13,7 @@ type State string
 const (
 	StateWaitingUpload State = "WAITING_UPLOAD"
 	StateProcessing    State = "PROCESSING"
+	StateFailed        State = "FAILED"
 	StateReady         State = "READY"
 )
 
@@ -26,6 +27,7 @@ func (s State) Validate() error {
 	switch s {
 	case StateWaitingUpload:
 	case StateProcessing:
+	case StateFailed:
 	case StateReady:
 	default:
 		return apperr.NewError(apperr.CodeBadRequest).WithSummary("Unexpected image state %q", s)

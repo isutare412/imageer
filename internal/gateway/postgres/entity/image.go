@@ -10,12 +10,12 @@ import (
 )
 
 type Image struct {
-	ID               string `gorm:"size:36"`
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
-	OriginalFileName string             `gorm:"size:256"`
-	ContentType      images.ContentType `gorm:"size:64"`
-	State            images.State       `gorm:"size:32"`
+	ID        string `gorm:"size:36"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	FileName  string        `gorm:"size:1024"`
+	Format    images.Format `gorm:"size:32"`
+	State     images.State  `gorm:"size:32"`
 
 	ProjectID string   `gorm:"size:36"`
 	Project   *Project `gorm:"constraint:OnDelete:CASCADE"`

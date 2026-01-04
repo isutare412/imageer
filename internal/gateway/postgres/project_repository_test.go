@@ -12,6 +12,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/postgres"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
+	"github.com/isutare412/imageer/pkg/images"
 )
 
 func TestProjectRepository_FindByID(t *testing.T) {
@@ -41,7 +42,8 @@ func TestProjectRepository_FindByID(t *testing.T) {
 				mock.ExpectQuery(`SELECT * FROM "transformations" WHERE "transformations"."project_id" = $1`).
 					WithArgs("project-1").
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Transformation]()).
-						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false, 100, 100, "project-1"))
+						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false, images.FormatWebp,
+							images.Quality(90), images.FitCover, 100, 100, true, nil, "project-1"))
 			},
 			wantErr: false,
 		},
@@ -104,7 +106,8 @@ func TestProjectRepository_List(t *testing.T) {
 				mock.ExpectQuery(`SELECT * FROM "transformations" WHERE "transformations"."project_id" = $1`).
 					WithArgs("project-1").
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Transformation]()).
-						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false, 100, 100, "project-1"))
+						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false, images.FormatWebp,
+							images.Quality(90), images.FitCover, 100, 100, true, nil, "project-1"))
 				mock.ExpectQuery(
 					`SELECT COUNT(1) FROM "projects" WHERE "name" = $1`).
 					WithArgs(tt.req.SearchFilter.Name).
@@ -151,14 +154,24 @@ func TestProjectRepository_Create(t *testing.T) {
 					{
 						Name:    "trans-name-1",
 						Default: false,
-						Width:   100,
-						Height:  100,
+						Quality: images.Quality(90),
+						Format:  images.FormatWebp,
+						Width:   lo.ToPtr[int64](100),
+						Height:  lo.ToPtr[int64](100),
+						Crop:    true,
+						Fit:     lo.ToPtr(images.FitCover),
+						Anchor:  lo.ToPtr(images.AnchorSmart),
 					},
 					{
 						Name:    "trans-name-2",
 						Default: false,
-						Width:   200,
-						Height:  200,
+						Quality: images.Quality(90),
+						Format:  images.FormatWebp,
+						Width:   lo.ToPtr[int64](200),
+						Height:  lo.ToPtr[int64](200),
+						Crop:    true,
+						Fit:     lo.ToPtr(images.FitCover),
+						Anchor:  lo.ToPtr(images.AnchorSmart),
 					},
 				},
 			},
@@ -173,10 +186,9 @@ func TestProjectRepository_Create(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
 					`INSERT INTO "transformations" ` +
-						`("id","created_at","updated_at","name","default","width","height","project_id") VALUES ` +
-						`($1,$2,$3,$4,$5,$6,$7,$8),($9,$10,$11,$12,$13,$14,$15,$16) ` +
-						`ON CONFLICT ("id") ` +
-						`DO UPDATE SET "project_id"="excluded"."project_id"`).
+						`("id","created_at","updated_at","name","default","format","quality","fit","width","height","crop","anchor","project_id") VALUES ` +
+						`($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13),($14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26) ` +
+						`ON CONFLICT ("id") DO UPDATE SET "project_id"="excluded"."project_id"`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 			},
@@ -245,8 +257,8 @@ func TestProjectRepository_Update(t *testing.T) {
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
 					`INSERT INTO "transformations" ` +
-						`("id","created_at","updated_at","name","default","width","height","project_id") VALUES ` +
-						`($1,$2,$3,$4,$5,$6,$7,$8)`).
+						`("id","created_at","updated_at","name","default","format","quality","fit","width","height","crop","anchor","project_id") VALUES ` +
+						`($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
 					`DELETE FROM "transformations" WHERE "id" NOT IN ($1,$2)`).
@@ -261,10 +273,10 @@ func TestProjectRepository_Update(t *testing.T) {
 				mock.ExpectQuery(
 					`SELECT * FROM "transformations" WHERE "transformations"."project_id" = $1`).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Transformation]()).
-						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false,
-							int64(100), int64(100), "project-1").
-						AddRow("trans-2", time.Now(), time.Now(), "trans-2", true,
-							int64(100), int64(100), "project-1"))
+						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false, images.FormatWebp,
+							images.Quality(90), images.FitCover, 100, 100, true, nil, "project-1").
+						AddRow("trans-2", time.Now(), time.Now(), "trans-2", false, images.FormatWebp,
+							images.Quality(90), images.FitCover, 100, 100, true, nil, "project-1"))
 				mock.ExpectCommit()
 			},
 			wantErr: false,

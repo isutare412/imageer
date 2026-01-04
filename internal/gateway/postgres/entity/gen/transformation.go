@@ -3,6 +3,7 @@
 package gen
 
 import (
+	"github.com/isutare412/imageer/pkg/images"
 	"gorm.io/cli/gorm/field"
 )
 
@@ -12,8 +13,13 @@ var Transformation = struct {
 	UpdatedAt field.Time
 	Name      field.String
 	Default   field.Bool
+	Format    field.Field[images.Format]
+	Quality   field.Field[images.Quality]
+	Fit       field.Field[images.Fit]
 	Width     field.Number[int64]
 	Height    field.Number[int64]
+	Crop      field.Bool
+	Anchor    field.Field[images.Anchor]
 	ProjectID field.String
 }{
 	ID:        field.String{}.WithColumn("id"),
@@ -21,7 +27,12 @@ var Transformation = struct {
 	UpdatedAt: field.Time{}.WithColumn("updated_at"),
 	Name:      field.String{}.WithColumn("name"),
 	Default:   field.Bool{}.WithColumn("default"),
+	Format:    field.Field[images.Format]{}.WithColumn("format"),
+	Quality:   field.Field[images.Quality]{}.WithColumn("quality"),
+	Fit:       field.Field[images.Fit]{}.WithColumn("fit"),
 	Width:     field.Number[int64]{}.WithColumn("width"),
 	Height:    field.Number[int64]{}.WithColumn("height"),
+	Crop:      field.Bool{}.WithColumn("crop"),
+	Anchor:    field.Field[images.Anchor]{}.WithColumn("anchor"),
 	ProjectID: field.String{}.WithColumn("project_id"),
 }
