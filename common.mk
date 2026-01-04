@@ -59,3 +59,13 @@ golangci-lint: ## Check and install golangci-lint if needed
 	else \
 		echo "✅ golangci-lint is already installed."; \
 	fi
+
+.PHONY: vips
+vips: ## Check and install vips if needed
+	@if ! command -v vips >/dev/null 2>&1; then \
+		echo "⚠️ vips not found. Please install vips before proceeding."; \
+		brew install vips && \
+		echo "✅ vips installed successfully."; \
+	else \
+		echo "✅ vips is already installed."; \
+	fi
