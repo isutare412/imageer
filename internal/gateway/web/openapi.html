@@ -1,23 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
+    <title>API Reference</title>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <title>API Specification</title>
-    <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/@stoplight/elements/styles.min.css"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <elements-api
-      apiDescriptionUrl="/docs/openapi.yaml"
-      router="hash"
-      layout="responsive"
-    />
+    <div id="app"></div>
+    <!-- Load the Script -->
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    <!-- Initialize the Scalar API Reference -->
+    <script>
+      Scalar.createApiReference("#app", {
+        // https://guides.scalar.com/scalar/scalar-api-references/configuration
+        url: "/docs/openapi.yaml",
+        metaData: {
+          title: "API Reference",
+        },
+        theme: "kepler",
+        telemetry: false,
+        hideClientButton: true,
+      });
+    </script>
   </body>
 </html>
