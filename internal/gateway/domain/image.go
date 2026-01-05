@@ -32,19 +32,19 @@ type ImageURLSet struct {
 }
 
 type VariantURL struct {
-	TransformationID   string
-	TransformationName string
-	URL                string
+	PresetID   string
+	PresetName string
+	URL        string
 }
 
-type PresignedURL struct {
+type UploadURL struct {
 	ImageID   string
 	ExpiresAt time.Time
-	UploadURL string
+	URL       string
 }
 
-type CreatePresignedURLRequest struct {
-	FileName            string        `validate:"required,max=1024"`
-	Format              images.Format `validate:"validateFn=Validate"`
-	TransformationNames []string      `validate:"dive,required,max=64"`
+type CreateUploadURLRequest struct {
+	FileName    string        `validate:"required,max=1024"`
+	Format      images.Format `validate:"validateFn=Validate"`
+	PresetNames []string      `validate:"dive,required,max=64"`
 }

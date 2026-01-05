@@ -26,7 +26,7 @@ func TestProcessor_Process(t *testing.T) {
 		name         string // description of this test case
 		fileName     string
 		prepareInput func(t *testing.T, tt testSet) domain.RawImage
-		trans        domain.Transformation
+		preset       domain.Preset
 	}
 
 	tests := []testSet{
@@ -41,14 +41,13 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatJPEG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitCover),
+				Anchor:  lo.ToPtr(images.AnchorSmart),
 				Width:   lo.ToPtr[int64](400),
 				Height:  lo.ToPtr[int64](400),
-				Crop:    true,
-				Anchor:  lo.ToPtr(images.AnchorSmart),
 			},
 		},
 		{
@@ -62,7 +61,7 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatJPEG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Width:   lo.ToPtr[int64](400),
@@ -79,7 +78,7 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatJPEG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(30),
 			},
@@ -95,7 +94,7 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatJPEG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitFill),
@@ -114,7 +113,7 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatJPEG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitContain),
@@ -133,14 +132,13 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatJPEG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitCover),
+				Anchor:  lo.ToPtr(images.AnchorSmart),
 				Width:   lo.ToPtr[int64](400),
 				Height:  lo.ToPtr[int64](400),
-				Crop:    true,
-				Anchor:  lo.ToPtr(images.AnchorSmart),
 			},
 		},
 		{
@@ -154,7 +152,7 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatJPEG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitFill),
@@ -173,7 +171,7 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatJPEG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitContain),
@@ -192,14 +190,13 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatJPEG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitCover),
+				Anchor:  lo.ToPtr(images.AnchorSmart),
 				Width:   lo.ToPtr[int64](800),
 				Height:  lo.ToPtr[int64](800),
-				Crop:    true,
-				Anchor:  lo.ToPtr(images.AnchorSmart),
 			},
 		},
 		{
@@ -213,14 +210,13 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatPNG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitCover),
+				Anchor:  lo.ToPtr(images.AnchorSmart),
 				Width:   lo.ToPtr[int64](400),
 				Height:  lo.ToPtr[int64](300),
-				Crop:    true,
-				Anchor:  lo.ToPtr(images.AnchorSmart),
 			},
 		},
 		{
@@ -234,7 +230,7 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatPNG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitContain),
@@ -253,7 +249,7 @@ func TestProcessor_Process(t *testing.T) {
 					Format: images.FormatPNG,
 				}
 			},
-			trans: domain.Transformation{
+			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitFill),
@@ -271,7 +267,7 @@ func TestProcessor_Process(t *testing.T) {
 
 			c := image.NewProcessor()
 			input := tt.prepareInput(t, tt)
-			out, err := c.Process(t.Context(), input, tt.trans)
+			out, err := c.Process(t.Context(), input, tt.preset)
 			require.NoError(t, err)
 
 			outFileName := testImageOutputName(tt.name, tt.fileName, out.Format)

@@ -9,15 +9,15 @@ import (
 	"github.com/isutare412/imageer/pkg/validation"
 )
 
-func TestUpsertTransformationRequest_Validation(t *testing.T) {
+func TestUpsertPresetRequest_Validation(t *testing.T) {
 	tests := []struct {
 		name    string // description of this test case
-		req     UpsertTransformationRequest
+		req     UpsertPresetRequest
 		wantErr bool
 	}{
 		{
 			name: "create request with all fields set",
-			req: UpsertTransformationRequest{
+			req: UpsertPresetRequest{
 				Name:    lo.ToPtr("w100h100"),
 				Default: lo.ToPtr(true),
 				Width:   lo.ToPtr[int64](100),
@@ -26,8 +26,8 @@ func TestUpsertTransformationRequest_Validation(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "invalid transformation dimensions",
-			req: UpsertTransformationRequest{
+			name: "invalid preset dimensions",
+			req: UpsertPresetRequest{
 				Name:    lo.ToPtr("w100h100"),
 				Default: lo.ToPtr(true),
 				Width:   lo.ToPtr[int64](0), // invalid width
@@ -37,7 +37,7 @@ func TestUpsertTransformationRequest_Validation(t *testing.T) {
 		},
 		{
 			name: "update request",
-			req: UpsertTransformationRequest{
+			req: UpsertPresetRequest{
 				ID:      lo.ToPtr("w100h100"),
 				Default: lo.ToPtr(true),
 			},

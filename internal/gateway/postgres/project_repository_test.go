@@ -39,11 +39,11 @@ func TestProjectRepository_FindByID(t *testing.T) {
 					WithArgs("project-1", 1).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
 						AddRow("project-1", time.Now(), time.Now(), "project-1"))
-				mock.ExpectQuery(`SELECT * FROM "transformations" WHERE "transformations"."project_id" = $1`).
+				mock.ExpectQuery(`SELECT * FROM "presets" WHERE "presets"."project_id" = $1`).
 					WithArgs("project-1").
-					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Transformation]()).
-						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false, images.FormatWebp,
-							images.Quality(90), images.FitCover, 100, 100, true, nil, "project-1"))
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Preset]()).
+						AddRow("preset-1", time.Now(), time.Now(), "preset-1", false, images.FormatWebp,
+							images.Quality(90), images.FitCover, nil, 100, 100, "project-1"))
 			},
 			wantErr: false,
 		},
@@ -103,11 +103,11 @@ func TestProjectRepository_List(t *testing.T) {
 					WithArgs("project-1", 20, 20).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
 						AddRow("project-1", time.Now(), time.Now(), "project-1"))
-				mock.ExpectQuery(`SELECT * FROM "transformations" WHERE "transformations"."project_id" = $1`).
+				mock.ExpectQuery(`SELECT * FROM "presets" WHERE "presets"."project_id" = $1`).
 					WithArgs("project-1").
-					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Transformation]()).
-						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false, images.FormatWebp,
-							images.Quality(90), images.FitCover, 100, 100, true, nil, "project-1"))
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Preset]()).
+						AddRow("preset-1", time.Now(), time.Now(), "preset-1", false, images.FormatWebp,
+							images.Quality(90), images.FitCover, nil, 100, 100, "project-1"))
 				mock.ExpectQuery(
 					`SELECT COUNT(1) FROM "projects" WHERE "name" = $1`).
 					WithArgs(tt.req.SearchFilter.Name).
@@ -150,28 +150,26 @@ func TestProjectRepository_Create(t *testing.T) {
 			name: "normal case",
 			req: domain.Project{
 				Name: "project-1",
-				Transformations: []domain.Transformation{
+				Presets: []domain.Preset{
 					{
-						Name:    "trans-name-1",
+						Name:    "preset-name-1",
 						Default: false,
 						Quality: images.Quality(90),
 						Format:  images.FormatWebp,
+						Fit:     lo.ToPtr(images.FitCover),
+						Anchor:  lo.ToPtr(images.AnchorSmart),
 						Width:   lo.ToPtr[int64](100),
 						Height:  lo.ToPtr[int64](100),
-						Crop:    true,
-						Fit:     lo.ToPtr(images.FitCover),
-						Anchor:  lo.ToPtr(images.AnchorSmart),
 					},
 					{
-						Name:    "trans-name-2",
+						Name:    "preset-name-2",
 						Default: false,
-						Quality: images.Quality(90),
 						Format:  images.FormatWebp,
-						Width:   lo.ToPtr[int64](200),
-						Height:  lo.ToPtr[int64](200),
-						Crop:    true,
+						Quality: images.Quality(90),
 						Fit:     lo.ToPtr(images.FitCover),
 						Anchor:  lo.ToPtr(images.AnchorSmart),
+						Width:   lo.ToPtr[int64](200),
+						Height:  lo.ToPtr[int64](200),
 					},
 				},
 			},
@@ -185,9 +183,9 @@ func TestProjectRepository_Create(t *testing.T) {
 					`INSERT INTO "projects" ("id","created_at","updated_at","name") VALUES ($1,$2,$3,$4)`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
-					`INSERT INTO "transformations" ` +
-						`("id","created_at","updated_at","name","default","format","quality","fit","width","height","crop","anchor","project_id") VALUES ` +
-						`($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13),($14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26) ` +
+					`INSERT INTO "presets" ` +
+						`("id","created_at","updated_at","name","default","format","quality","fit","anchor","width","height","project_id") VALUES ` +
+						`($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12),($13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24) ` +
 						`ON CONFLICT ("id") DO UPDATE SET "project_id"="excluded"."project_id"`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -229,17 +227,17 @@ func TestProjectRepository_Update(t *testing.T) {
 			req: domain.UpdateProjectRequest{
 				ID:   "project-1",
 				Name: lo.ToPtr("project-1"),
-				Transformations: []domain.UpsertTransformationRequest{
+				Presets: []domain.UpsertPresetRequest{
 					{
 						// Update request
-						ID:     lo.ToPtr("trans-1"),
-						Name:   lo.ToPtr("trans-1"),
+						ID:     lo.ToPtr("preset-1"),
+						Name:   lo.ToPtr("preset-1"),
 						Width:  lo.ToPtr[int64](100),
 						Height: lo.ToPtr[int64](100),
 					},
 					{
 						// Create request
-						Name:    lo.ToPtr("trans-2"),
+						Name:    lo.ToPtr("preset-2"),
 						Default: lo.ToPtr(true),
 						Width:   lo.ToPtr[int64](100),
 						Height:  lo.ToPtr[int64](100),
@@ -253,15 +251,15 @@ func TestProjectRepository_Update(t *testing.T) {
 
 				mock.ExpectBegin()
 				mock.ExpectExec(
-					`UPDATE "transformations" SET "name"=$1,"width"=$2,"height"=$3,"updated_at"=$4 WHERE "id" = $5`).
+					`UPDATE "presets" SET "name"=$1,"width"=$2,"height"=$3,"updated_at"=$4 WHERE "id" = $5`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
-					`INSERT INTO "transformations" ` +
-						`("id","created_at","updated_at","name","default","format","quality","fit","width","height","crop","anchor","project_id") VALUES ` +
-						`($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`).
+					`INSERT INTO "presets" ` +
+						`("id","created_at","updated_at","name","default","format","quality","fit","anchor","width","height","project_id") VALUES ` +
+						`($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
-					`DELETE FROM "transformations" WHERE "id" NOT IN ($1,$2)`).
+					`DELETE FROM "presets" WHERE "id" NOT IN ($1,$2)`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
 					`UPDATE "projects" SET "name"=$1,"updated_at"=$2 WHERE "id" = $3`).
@@ -271,12 +269,12 @@ func TestProjectRepository_Update(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
 						AddRow("project-1", time.Now(), time.Now(), "project-1"))
 				mock.ExpectQuery(
-					`SELECT * FROM "transformations" WHERE "transformations"."project_id" = $1`).
-					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Transformation]()).
-						AddRow("trans-1", time.Now(), time.Now(), "trans-1", false, images.FormatWebp,
-							images.Quality(90), images.FitCover, 100, 100, true, nil, "project-1").
-						AddRow("trans-2", time.Now(), time.Now(), "trans-2", false, images.FormatWebp,
-							images.Quality(90), images.FitCover, 100, 100, true, nil, "project-1"))
+					`SELECT * FROM "presets" WHERE "presets"."project_id" = $1`).
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Preset]()).
+						AddRow("preset-1", time.Now(), time.Now(), "preset-1", false, images.FormatWebp,
+							images.Quality(90), images.FitCover, nil, 100, 100, "project-1").
+						AddRow("preset-2", time.Now(), time.Now(), "preset-2", false, images.FormatWebp,
+							images.Quality(90), images.FitCover, nil, 100, 100, "project-1"))
 				mock.ExpectCommit()
 			},
 			wantErr: false,

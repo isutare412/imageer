@@ -37,7 +37,7 @@ func (c *Client) MigrateSchemas(ctx context.Context) error {
 	if err := c.db.AutoMigrate(
 		&entity.User{},
 		&entity.Project{},
-		&entity.Transformation{},
+		&entity.Preset{},
 		&entity.ServiceAccount{},
 		&entity.ServiceAccountProject{},
 		&entity.Image{},

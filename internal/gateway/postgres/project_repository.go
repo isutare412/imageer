@@ -28,7 +28,7 @@ func NewProjectRepository(client *Client) *ProjectRepository {
 func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Project, error) {
 	proj, err := gorm.G[entity.Project](r.db).
 		Where(gen.Project.ID.Eq(id)).
-		Preload(gen.Project.Transformations.Name(), nil).
+		Preload(gen.Project.Presets.Name(), nil).
 		First(ctx)
 	if err != nil {
 		return domain.Project{}, dbhelpers.WrapError(err, "Failed to get project %s", id)
@@ -51,7 +51,7 @@ func (r *ProjectRepository) List(
 		q = applyProjectSortFilter(q, params.SortFilter)
 		q = applyPagination(q, params.LimitOrDefault(), params.OffsetOrDefault())
 		_projects, err := q.
-			Preload(gen.Project.Transformations.Name(), nil).
+			Preload(gen.Project.Presets.Name(), nil).
 			Find(ctx)
 		if err != nil {
 			return dbhelpers.WrapError(err, "Failed to list projects")
@@ -95,8 +95,8 @@ func (r *ProjectRepository) Update(
 ) (domain.Project, error) {
 	var proj domain.Project
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := r.syncTransformations(ctx, tx, req.ID, req.Transformations); err != nil {
-			return fmt.Errorf("syncing transformations: %w", err)
+		if err := r.syncPresets(ctx, tx, req.ID, req.Presets); err != nil {
+			return fmt.Errorf("syncing presets: %w", err)
 		}
 
 		// Update project fields
@@ -114,7 +114,7 @@ func (r *ProjectRepository) Update(
 		// Fetch updated project
 		p, err := gorm.G[entity.Project](tx).
 			Where(gen.Project.ID.Eq(req.ID)).
-			Preload(gen.Project.Transformations.Name(), nil).
+			Preload(gen.Project.Presets.Name(), nil).
 			First(ctx)
 		if err != nil {
 			return dbhelpers.WrapError(err, "Failed to fetch updated project %s", req.ID)
@@ -139,60 +139,60 @@ func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (*ProjectRepository) syncTransformations(ctx context.Context, tx *gorm.DB,
+func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 	projectID string,
-	upsertReqs []domain.UpsertTransformationRequest,
+	upsertReqs []domain.UpsertPresetRequest,
 ) error {
-	transToUpdate := make([]domain.UpsertTransformationRequest, 0, len(upsertReqs))
-	transToCreate := make([]entity.Transformation, 0, len(upsertReqs))
+	presetsToUpdate := make([]domain.UpsertPresetRequest, 0, len(upsertReqs))
+	presetsToCreate := make([]entity.Preset, 0, len(upsertReqs))
 	for _, t := range upsertReqs {
 		if t.IsUpdateRequest() {
-			transToUpdate = append(transToUpdate, t)
+			presetsToUpdate = append(presetsToUpdate, t)
 		} else {
-			transToCreate = append(transToCreate, entity.NewTransformationFromUpsert(projectID, t))
+			presetsToCreate = append(presetsToCreate, entity.NewPresetFromUpsert(projectID, t))
 		}
 	}
 
-	// Update transformations
-	for _, t := range transToUpdate {
-		assigners := buildTransformationUpdateAssigners(t)
+	// Update presets
+	for _, t := range presetsToUpdate {
+		assigners := buildPresetUpdateAssigners(t)
 		if len(assigners) == 0 || t.ID == nil {
 			continue
 		}
 
-		count, err := gorm.G[entity.Transformation](tx).
-			Where(gen.Transformation.ID.Eq(*t.ID)).
-			Set(append(assigners, gen.Transformation.UpdatedAt.Set(time.Now()))...).
+		count, err := gorm.G[entity.Preset](tx).
+			Where(gen.Preset.ID.Eq(*t.ID)).
+			Set(append(assigners, gen.Preset.UpdatedAt.Set(time.Now()))...).
 			Update(ctx)
 		if err != nil {
-			return dbhelpers.WrapError(err, "Failed to update transformation %s", *t.ID)
+			return dbhelpers.WrapError(err, "Failed to update preset %s", *t.ID)
 		} else if count == 0 {
 			return apperr.NewError(apperr.CodeNotFound).
-				WithSummary("Transformation %s not found", *t.ID)
+				WithSummary("Preset %s not found", *t.ID)
 		}
 	}
 
-	// Create transformations
-	err := gorm.G[entity.Transformation](tx).
-		CreateInBatches(ctx, &transToCreate, 10)
+	// Create presets
+	err := gorm.G[entity.Preset](tx).
+		CreateInBatches(ctx, &presetsToCreate, 10)
 	if err != nil {
-		return dbhelpers.WrapError(err, "Failed to create transformations")
+		return dbhelpers.WrapError(err, "Failed to create presets")
 	}
 
-	transIDs := make([]string, 0, len(transToUpdate)+len(transToCreate))
-	for _, t := range transToUpdate {
-		transIDs = append(transIDs, *t.ID)
+	presetIDs := make([]string, 0, len(presetsToUpdate)+len(presetsToCreate))
+	for _, t := range presetsToUpdate {
+		presetIDs = append(presetIDs, *t.ID)
 	}
-	for _, t := range transToCreate {
-		transIDs = append(transIDs, t.ID)
+	for _, t := range presetsToCreate {
+		presetIDs = append(presetIDs, t.ID)
 	}
 
-	// Delete removed transformations
-	_, err = gorm.G[entity.Transformation](tx).
-		Where(gen.Transformation.ID.NotIn(transIDs...)).
+	// Delete removed presets
+	_, err = gorm.G[entity.Preset](tx).
+		Where(gen.Preset.ID.NotIn(presetIDs...)).
 		Delete(ctx)
 	if err != nil {
-		return dbhelpers.WrapError(err, "Failed to drop transformations")
+		return dbhelpers.WrapError(err, "Failed to drop presets not in the upsert list")
 	}
 
 	return nil

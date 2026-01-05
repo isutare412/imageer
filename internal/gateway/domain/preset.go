@@ -6,7 +6,7 @@ import (
 	"github.com/isutare412/imageer/pkg/images"
 )
 
-type Transformation struct {
+type Preset struct {
 	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -16,59 +16,53 @@ type Transformation struct {
 	Format  images.Format
 	Quality images.Quality
 	Fit     *images.Fit
+	Anchor  *images.Anchor
 	Width   *int64
 	Height  *int64
-
-	Crop   bool
-	Anchor *images.Anchor
 }
 
-type CreateTransformationRequest struct {
+type CreatePresetRequest struct {
 	Name    string `validate:"required,max=64"`
 	Default bool
 
-	Format  *images.Format  `validate:"omitempty,validateFn=ValidateForTransformation"`
+	Format  *images.Format  `validate:"omitempty,validateFn=ValidateForPreset"`
 	Quality *images.Quality `validate:"omitempty,validateFn=Validate"`
 	Fit     *images.Fit     `validate:"omitempty,validateFn=Validate"`
+	Anchor  *images.Anchor  `validate:"omitempty,validateFn=Validate"`
 	Width   *int64          `validate:"omitempty,min=1,max=4000"`
 	Height  *int64          `validate:"omitempty,min=1,max=4000"`
-
-	Crop   bool
-	Anchor *images.Anchor `validate:"omitempty,validateFn=Validate"`
 }
 
-func (r CreateTransformationRequest) ToTransformation() Transformation {
-	return Transformation{
+func (r CreatePresetRequest) ToPreset() Preset {
+	return Preset{
 		Name:    r.Name,
 		Default: r.Default,
 		Format:  r.Format.GetOrDefault(),
 		Quality: r.Quality.GetOrDefault(),
 		Fit:     r.Fit,
+		Anchor:  r.Anchor,
 		Width:   r.Width,
 		Height:  r.Height,
-		Anchor:  r.Anchor,
 	}
 }
 
-type UpsertTransformationRequest struct {
+type UpsertPresetRequest struct {
 	ID      *string `validate:"omitempty,max=36"`
 	Name    *string `validate:"omitempty,max=64"`
 	Default *bool
 
-	Format  *images.Format  `validate:"omitempty,validateFn=ValidateForTransformation"`
+	Format  *images.Format  `validate:"omitempty,validateFn=ValidateForPreset"`
 	Quality *images.Quality `validate:"omitempty,validateFn=Validate"`
 	Fit     *images.Fit     `validate:"omitempty,validateFn=Validate"`
+	Anchor  *images.Anchor  `validate:"omitempty,validateFn=Validate"`
 	Width   *int64          `validate:"omitempty,min=1,max=4000"`
 	Height  *int64          `validate:"omitempty,min=1,max=4000"`
-
-	Crop   *bool
-	Anchor *images.Anchor `validate:"omitempty,validateFn=Validate"`
 }
 
-func (r UpsertTransformationRequest) IsUpdateRequest() bool {
+func (r UpsertPresetRequest) IsUpdateRequest() bool {
 	return r.ID != nil
 }
 
-func (r UpsertTransformationRequest) IsCreateRequest() bool {
+func (r UpsertPresetRequest) IsCreateRequest() bool {
 	return !r.IsUpdateRequest()
 }

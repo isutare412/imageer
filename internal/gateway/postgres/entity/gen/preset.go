@@ -7,7 +7,7 @@ import (
 	"gorm.io/cli/gorm/field"
 )
 
-var Transformation = struct {
+var Preset = struct {
 	ID        field.String
 	CreatedAt field.Time
 	UpdatedAt field.Time
@@ -16,10 +16,9 @@ var Transformation = struct {
 	Format    field.Field[images.Format]
 	Quality   field.Field[images.Quality]
 	Fit       field.Field[images.Fit]
+	Anchor    field.Field[images.Anchor]
 	Width     field.Number[int64]
 	Height    field.Number[int64]
-	Crop      field.Bool
-	Anchor    field.Field[images.Anchor]
 	ProjectID field.String
 }{
 	ID:        field.String{}.WithColumn("id"),
@@ -30,9 +29,8 @@ var Transformation = struct {
 	Format:    field.Field[images.Format]{}.WithColumn("format"),
 	Quality:   field.Field[images.Quality]{}.WithColumn("quality"),
 	Fit:       field.Field[images.Fit]{}.WithColumn("fit"),
+	Anchor:    field.Field[images.Anchor]{}.WithColumn("anchor"),
 	Width:     field.Number[int64]{}.WithColumn("width"),
 	Height:    field.Number[int64]{}.WithColumn("height"),
-	Crop:      field.Bool{}.WithColumn("crop"),
-	Anchor:    field.Field[images.Anchor]{}.WithColumn("anchor"),
 	ProjectID: field.String{}.WithColumn("project_id"),
 }

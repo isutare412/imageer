@@ -9,11 +9,11 @@ import (
 )
 
 type Project struct {
-	ID              string
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	Name            string
-	Transformations []Transformation
+	ID        string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
+	Presets   []Preset
 }
 
 type ProjectReference struct {
@@ -22,23 +22,23 @@ type ProjectReference struct {
 }
 
 type CreateProjectRequest struct {
-	Name            string                        `validate:"required,max=128"`
-	Transformations []CreateTransformationRequest `validate:"dive,required"`
+	Name    string                `validate:"required,max=128"`
+	Presets []CreatePresetRequest `validate:"dive,required"`
 }
 
 func (r CreateProjectRequest) ToProject() Project {
 	return Project{
 		Name: r.Name,
-		Transformations: lo.Map(r.Transformations, func(t CreateTransformationRequest, _ int) Transformation {
-			return t.ToTransformation()
+		Presets: lo.Map(r.Presets, func(t CreatePresetRequest, _ int) Preset {
+			return t.ToPreset()
 		}),
 	}
 }
 
 type UpdateProjectRequest struct {
-	ID              string                        `validate:"max=36"`
-	Name            *string                       `validate:"omitempty,max=128"`
-	Transformations []UpsertTransformationRequest `validate:"dive,required"`
+	ID      string                `validate:"max=36"`
+	Name    *string               `validate:"omitempty,max=128"`
+	Presets []UpsertPresetRequest `validate:"dive,required"`
 }
 
 type Projects struct {

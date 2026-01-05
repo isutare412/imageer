@@ -43,14 +43,14 @@ func (f Format) Validate() error {
 	return nil
 }
 
-func (f Format) ValidateForTransformation() error {
+func (f Format) ValidateForPreset() error {
 	switch f {
 	case FormatJPEG:
 	case FormatPNG:
 	case FormatWebp:
 	default:
 		return apperr.NewError(apperr.CodeBadRequest).
-			WithSummary("Unexpected image format %q for transformation", f)
+			WithSummary("Unexpected image format %q for preset", f)
 	}
 	return nil
 }

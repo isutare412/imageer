@@ -18,7 +18,7 @@ var (
 )
 
 func (q *Quality) GetOrDefault() Quality {
-	return lo.FromPtrOr(q, 75)
+	return lo.FromPtrOr(q, 80)
 }
 
 func (q Quality) Validate() error {

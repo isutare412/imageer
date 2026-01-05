@@ -332,7 +332,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PresignedUrl'
+                $ref: '#/components/schemas/UploadUrl'
         default:
           $ref: '#/components/responses/ErrorResponse'
 
@@ -459,7 +459,7 @@ components:
         - AVIF
         - HEIC
       description: The content type of the image.
-      example: JPEG
+      example: WEBP
       x-go-type: images.Format
       x-go-import:
         path: github.com/redshore/imageer/pkg/images
@@ -470,7 +470,11 @@ components:
         - COVER
         - CONTAIN
         - FILL
-      description: The fit mode for image transformation.
+      description: |
+        The fit mode for image conversion:
+          - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
+          - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
+          - FILL: Scale the image to fill the target dimensions. The image may be distorted.
       example: COVER
       x-go-type: images.Fit
       x-go-import:
@@ -523,10 +527,10 @@ components:
           type: string
           description: The name of the project.
           example: My Project
-        transformations:
+        presets:
           type: array
           items:
-            $ref: '#/components/schemas/CreateTransformationRequest'
+            $ref: '#/components/schemas/CreatePresetRequest'
           x-go-type-skip-optional-pointer: true
       required:
         - name
@@ -538,10 +542,10 @@ components:
           type: string
           description: The name of the project.
           example: My Project
-        transformations:
+        presets:
           type: array
           items:
-            $ref: '#/components/schemas/UpsertTransformationRequest'
+            $ref: '#/components/schemas/UpsertPresetRequest'
           x-go-type-skip-optional-pointer: true
 
     CreateServiceAccountAdminRequest:
@@ -602,11 +606,11 @@ components:
           example: image.jpg
         format:
           $ref: '#/components/schemas/ImageFormat'
-        transformationNames:
+        presetNames:
           type: array
           description: >-
-            List of transformation names to apply to the image. If not provided,
-            default transformations will be applied.
+            List of preset names to apply to the image. If not provided,
+            default presets will be applied.
           items:
             type: string
             example: w600h800
@@ -635,26 +639,28 @@ components:
           example: false
           x-go-type-skip-optional-pointer: true
 
-    CreateTransformationRequest:
+    CreatePresetRequest:
       type: object
       properties:
         name:
           type: string
-          description: The name of the transformation.
+          description: The name of the preset.
           example: w600h800
         default:
           type: boolean
-          description: Indicates if this transformation is the default one.
+          description: Indicates if this preset is the default one.
           example: false
         format:
           $ref: '#/components/schemas/ImageFormat'
         quality:
           type: integer
           format: int64
-          description: The quality of the image (1-100).
+          description: The quality of the image (1-100). Default is 80.
           example: 90
         fit:
           $ref: '#/components/schemas/ImageFit'
+        anchor:
+          $ref: '#/components/schemas/ImageAnchor'
         width:
           type: integer
           format: int64
@@ -665,44 +671,40 @@ components:
           format: int64
           description: The height of the image in pixels.
           example: 800
-        crop:
-          type: boolean
-          description: Indicates if cropping should be applied.
-          example: true
-        anchor:
-          $ref: '#/components/schemas/ImageAnchor'
       required:
         - name
         - default
 
-    UpsertTransformationRequest:
+    UpsertPresetRequest:
       type: object
       description: |
-        If id is provided, the transformation will be updated; otherwise, a new
-        transformation will be created. All existing transformations not
-        included in the upsert list will be deleted.
+        If id is provided, the preset will be updated; otherwise, a new preset
+        will be created. All existing presets not included in the upsert list
+        will be deleted.
       properties:
         id:
           type: string
-          description: The unique identifier of the transformation.
+          description: The unique identifier of the preset.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
         name:
           type: string
-          description: The name of the transformation.
+          description: The name of the preset.
           example: w600h800
         default:
           type: boolean
-          description: Indicates if this transformation is the default one.
+          description: Indicates if this preset is the default one.
           example: false
         format:
           $ref: '#/components/schemas/ImageFormat'
         quality:
           type: integer
           format: int64
-          description: The quality of the image (1-100).
+          description: The quality of the image (1-100). Default is 80.
           example: 90
         fit:
           $ref: '#/components/schemas/ImageFit'
+        anchor:
+          $ref: '#/components/schemas/ImageAnchor'
         width:
           type: integer
           format: int64
@@ -713,12 +715,6 @@ components:
           format: int64
           description: The height of the image in pixels.
           example: 800
-        crop:
-          type: boolean
-          description: Indicates if cropping should be applied.
-          example: true
-        anchor:
-          $ref: '#/components/schemas/ImageAnchor'
 
     ###
     # Response Schemas
@@ -765,17 +761,17 @@ components:
           type: string
           description: The name of the project.
           example: My Project
-        transformations:
+        presets:
           type: array
-          description: List of transformations to apply to the project.
+          description: List of presets to apply to images of the project.
           items:
-            $ref: '#/components/schemas/Transformation'
+            $ref: '#/components/schemas/Preset'
       required:
         - id
         - createdAt
         - updatedAt
         - name
-        - transformations
+        - presets
 
     Projects:
       type: object
@@ -793,30 +789,30 @@ components:
         - items
         - total
 
-    Transformation:
+    Preset:
       type: object
       properties:
         id:
           type: string
-          description: The unique identifier of the transformation.
+          description: The unique identifier of the preset.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
         createdAt:
           type: string
           format: date-time
-          description: The creation time of the transformation.
+          description: The creation time of the preset.
           example: '2023-10-01T12:00:00Z'
         updatedAt:
           type: string
           format: date-time
-          description: The last update time of the transformation.
+          description: The last update time of the preset.
           example: '2023-10-01T12:00:00Z'
         name:
           type: string
-          description: The name of the transformation.
+          description: The name of the preset.
           example: w600h800
         default:
           type: boolean
-          description: Indicates if this transformation is the default one.
+          description: Indicates if this preset is the default one.
           example: false
         format:
           $ref: '#/components/schemas/ImageFormat'
@@ -827,6 +823,8 @@ components:
           example: 90
         fit:
           $ref: '#/components/schemas/ImageFit'
+        anchor:
+          $ref: '#/components/schemas/ImageAnchor'
         width:
           type: integer
           format: int64
@@ -837,12 +835,6 @@ components:
           format: int64
           description: The height of the image in pixels.
           example: 800
-        crop:
-          type: boolean
-          description: Indicates if cropping should be applied.
-          example: true
-        anchor:
-          $ref: '#/components/schemas/ImageAnchor'
       required:
         - id
         - createdAt
@@ -851,16 +843,15 @@ components:
         - default
         - format
         - quality
-        - crop
 
-    PresignedUrl:
+    UploadUrl:
       type: object
       properties:
         imageId:
           type: string
           description: The unique identifier of the image.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-        uploadUrl:
+        url:
           type: string
           description: >-
             The presigned URL for uploading the image. Check
@@ -874,7 +865,7 @@ components:
           example: '2023-10-01T12:00:00Z'
       required:
         - imageId
-        - uploadUrl
+        - url
         - expiresAt
 
     Image:
@@ -931,7 +922,7 @@ components:
           example: https://example.com/original/image.webp
         variants:
           type: array
-          description: List of URLs for the image with applied transformations.
+          description: List of URLs for the image with applied presets.
           items:
             $ref: '#/components/schemas/VariantUrl'
       required:
@@ -941,21 +932,21 @@ components:
     VariantUrl:
       type: object
       properties:
-        transformationId:
+        presetId:
           type: string
-          description: The unique identifier of the transformation.
+          description: The unique identifier of the preset.
           example: 426e634f-50dd-41a0-881b-c991441b3cd5
-        transformationName:
+        presetName:
           type: string
-          description: The name of the transformation.
+          description: The name of the preset.
           example: w600h800
         url:
           type: string
-          description: The URL of the image with the applied transformation.
+          description: The URL of the image with the applied preset.
           example: https://example.com/presets/w600h800/image.webp
       required:
-        - transformationId
-        - transformationName
+        - presetId
+        - presetName
         - url
 
     ServiceAccount:

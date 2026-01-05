@@ -12,9 +12,9 @@ func ProjectToWeb(p domain.Project) Project {
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
 		Name:      p.Name,
-		Transformations: lo.Map(p.Transformations,
-			func(t domain.Transformation, _ int) Transformation {
-				return TransformationToWeb(t)
+		Presets: lo.Map(p.Presets,
+			func(t domain.Preset, _ int) Preset {
+				return PresetToWeb(t)
 			}),
 	}
 }
@@ -57,9 +57,9 @@ func ListProjectsAdminParamsToDomain(params ListProjectsAdminParams) domain.List
 func CreateProjectAdminRequestToDomain(req CreateProjectAdminRequest) domain.CreateProjectRequest {
 	return domain.CreateProjectRequest{
 		Name: req.Name,
-		Transformations: lo.Map(req.Transformations,
-			func(t CreateTransformationRequest, _ int) domain.CreateTransformationRequest {
-				return CreateTransformationRequestToDomain(t)
+		Presets: lo.Map(req.Presets,
+			func(t CreatePresetRequest, _ int) domain.CreatePresetRequest {
+				return CreatePresetRequestToDomain(t)
 			}),
 	}
 }
@@ -69,9 +69,9 @@ func UpdateProjectAdminRequestToDomain(projectID string, req UpdateProjectAdminR
 	return domain.UpdateProjectRequest{
 		ID:   projectID,
 		Name: req.Name,
-		Transformations: lo.Map(req.Transformations,
-			func(t UpsertTransformationRequest, _ int) domain.UpsertTransformationRequest {
-				return UpsertTransformationRequestToDomain(t)
+		Presets: lo.Map(req.Presets,
+			func(t UpsertPresetRequest, _ int) domain.UpsertPresetRequest {
+				return UpsertPresetRequestToDomain(t)
 			}),
 	}
 }

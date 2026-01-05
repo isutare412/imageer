@@ -38,11 +38,41 @@ type AppError struct {
 	Message string `json:"message"`
 }
 
+// CreatePresetRequest defines model for CreatePresetRequest.
+type CreatePresetRequest struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
+
+	// Default Indicates if this preset is the default one.
+	Default bool `json:"default"`
+
+	// Fit The fit mode for image conversion:
+	//   - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
+	//   - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
+	//   - FILL: Scale the image to fill the target dimensions. The image may be distorted.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format *ImageFormat `json:"format,omitempty"`
+
+	// Height The height of the image in pixels.
+	Height *int64 `json:"height,omitempty"`
+
+	// Name The name of the preset.
+	Name string `json:"name"`
+
+	// Quality The quality of the image (1-100). Default is 80.
+	Quality *int64 `json:"quality,omitempty"`
+
+	// Width The width of the image in pixels.
+	Width *int64 `json:"width,omitempty"`
+}
+
 // CreateProjectAdminRequest defines model for CreateProjectAdminRequest.
 type CreateProjectAdminRequest struct {
 	// Name The name of the project.
-	Name            string                        `json:"name"`
-	Transformations []CreateTransformationRequest `json:"transformations,omitempty"`
+	Name    string                `json:"name"`
+	Presets []CreatePresetRequest `json:"presets,omitempty"`
 }
 
 // CreateServiceAccountAdminRequest defines model for CreateServiceAccountAdminRequest.
@@ -60,36 +90,6 @@ type CreateServiceAccountAdminRequest struct {
 	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
-// CreateTransformationRequest defines model for CreateTransformationRequest.
-type CreateTransformationRequest struct {
-	// Anchor The anchor position for image cropping.
-	Anchor *ImageAnchor `json:"anchor,omitempty"`
-
-	// Crop Indicates if cropping should be applied.
-	Crop *bool `json:"crop,omitempty"`
-
-	// Default Indicates if this transformation is the default one.
-	Default bool `json:"default"`
-
-	// Fit The fit mode for image transformation.
-	Fit *ImageFit `json:"fit,omitempty"`
-
-	// Format The content type of the image.
-	Format *ImageFormat `json:"format,omitempty"`
-
-	// Height The height of the image in pixels.
-	Height *int64 `json:"height,omitempty"`
-
-	// Name The name of the transformation.
-	Name string `json:"name"`
-
-	// Quality The quality of the image (1-100).
-	Quality *int64 `json:"quality,omitempty"`
-
-	// Width The width of the image in pixels.
-	Width *int64 `json:"width,omitempty"`
-}
-
 // CreateUploadURLRequest defines model for CreateUploadUrlRequest.
 type CreateUploadURLRequest struct {
 	// FileName The name of the file to be uploaded.
@@ -98,8 +98,8 @@ type CreateUploadURLRequest struct {
 	// Format The content type of the image.
 	Format ImageFormat `json:"format"`
 
-	// TransformationNames List of transformation names to apply to the image. If not provided, default transformations will be applied.
-	TransformationNames []string `json:"transformationNames,omitempty"`
+	// PresetNames List of preset names to apply to the image. If not provided, default presets will be applied.
+	PresetNames []string `json:"presetNames,omitempty"`
 }
 
 // Image defines model for Image.
@@ -123,7 +123,10 @@ type Image struct {
 // ImageAnchor The anchor position for image cropping.
 type ImageAnchor = images.Anchor
 
-// ImageFit The fit mode for image transformation.
+// ImageFit The fit mode for image conversion:
+//   - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
+//   - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
+//   - FILL: Scale the image to fill the target dimensions. The image may be distorted.
 type ImageFit = images.Fit
 
 // ImageFormat The content type of the image.
@@ -137,7 +140,7 @@ type ImageURLSet struct {
 	// OriginalURL The original URL of the image.
 	OriginalURL string `json:"originalUrl"`
 
-	// Variants List of URLs for the image with applied transformations.
+	// Variants List of URLs for the image with applied presets.
 	Variants []VariantURL `json:"variants"`
 }
 
@@ -149,16 +152,43 @@ type Images struct {
 	Total int64 `json:"total"`
 }
 
-// PresignedURL defines model for PresignedUrl.
-type PresignedURL struct {
-	// ExpiresAt The expiration time of the presigned URL.
-	ExpiresAt time.Time `json:"expiresAt"`
+// Preset defines model for Preset.
+type Preset struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
 
-	// ImageID The unique identifier of the image.
-	ImageID string `json:"imageId"`
+	// CreatedAt The creation time of the preset.
+	CreatedAt time.Time `json:"createdAt"`
 
-	// UploadURL The presigned URL for uploading the image. Check https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html for more details.
-	UploadURL string `json:"uploadUrl"`
+	// Default Indicates if this preset is the default one.
+	Default bool `json:"default"`
+
+	// Fit The fit mode for image conversion:
+	//   - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
+	//   - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
+	//   - FILL: Scale the image to fill the target dimensions. The image may be distorted.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format ImageFormat `json:"format"`
+
+	// Height The height of the image in pixels.
+	Height *int64 `json:"height,omitempty"`
+
+	// ID The unique identifier of the preset.
+	ID string `json:"id"`
+
+	// Name The name of the preset.
+	Name string `json:"name"`
+
+	// Quality The quality of the image (1-100).
+	Quality int64 `json:"quality"`
+
+	// UpdatedAt The last update time of the preset.
+	UpdatedAt time.Time `json:"updatedAt"`
+
+	// Width The width of the image in pixels.
+	Width *int64 `json:"width,omitempty"`
 }
 
 // Project defines model for Project.
@@ -172,8 +202,8 @@ type Project struct {
 	// Name The name of the project.
 	Name string `json:"name"`
 
-	// Transformations List of transformations to apply to the project.
-	Transformations []Transformation `json:"transformations"`
+	// Presets List of presets to apply to images of the project.
+	Presets []Preset `json:"presets"`
 
 	// UpdatedAt The last update time of the project.
 	UpdatedAt time.Time `json:"updatedAt"`
@@ -267,50 +297,11 @@ type ServiceAccounts struct {
 	Total int64 `json:"total"`
 }
 
-// Transformation defines model for Transformation.
-type Transformation struct {
-	// Anchor The anchor position for image cropping.
-	Anchor *ImageAnchor `json:"anchor,omitempty"`
-
-	// CreatedAt The creation time of the transformation.
-	CreatedAt time.Time `json:"createdAt"`
-
-	// Crop Indicates if cropping should be applied.
-	Crop bool `json:"crop"`
-
-	// Default Indicates if this transformation is the default one.
-	Default bool `json:"default"`
-
-	// Fit The fit mode for image transformation.
-	Fit *ImageFit `json:"fit,omitempty"`
-
-	// Format The content type of the image.
-	Format ImageFormat `json:"format"`
-
-	// Height The height of the image in pixels.
-	Height *int64 `json:"height,omitempty"`
-
-	// ID The unique identifier of the transformation.
-	ID string `json:"id"`
-
-	// Name The name of the transformation.
-	Name string `json:"name"`
-
-	// Quality The quality of the image (1-100).
-	Quality int64 `json:"quality"`
-
-	// UpdatedAt The last update time of the transformation.
-	UpdatedAt time.Time `json:"updatedAt"`
-
-	// Width The width of the image in pixels.
-	Width *int64 `json:"width,omitempty"`
-}
-
 // UpdateProjectAdminRequest defines model for UpdateProjectAdminRequest.
 type UpdateProjectAdminRequest struct {
 	// Name The name of the project.
-	Name            *string                       `json:"name,omitempty"`
-	Transformations []UpsertTransformationRequest `json:"transformations,omitempty"`
+	Name    *string               `json:"name,omitempty"`
+	Presets []UpsertPresetRequest `json:"presets,omitempty"`
 }
 
 // UpdateServiceAccountAdminRequest defines model for UpdateServiceAccountAdminRequest.
@@ -328,20 +319,32 @@ type UpdateServiceAccountAdminRequest struct {
 	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
-// UpsertTransformationRequest If id is provided, the transformation will be updated; otherwise, a new
-// transformation will be created. All existing transformations not
-// included in the upsert list will be deleted.
-type UpsertTransformationRequest struct {
+// UploadURL defines model for UploadUrl.
+type UploadURL struct {
+	// ExpiresAt The expiration time of the presigned URL.
+	ExpiresAt time.Time `json:"expiresAt"`
+
+	// ImageID The unique identifier of the image.
+	ImageID string `json:"imageId"`
+
+	// URL The presigned URL for uploading the image. Check https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html for more details.
+	URL string `json:"url"`
+}
+
+// UpsertPresetRequest If id is provided, the preset will be updated; otherwise, a new preset
+// will be created. All existing presets not included in the upsert list
+// will be deleted.
+type UpsertPresetRequest struct {
 	// Anchor The anchor position for image cropping.
 	Anchor *ImageAnchor `json:"anchor,omitempty"`
 
-	// Crop Indicates if cropping should be applied.
-	Crop *bool `json:"crop,omitempty"`
-
-	// Default Indicates if this transformation is the default one.
+	// Default Indicates if this preset is the default one.
 	Default *bool `json:"default,omitempty"`
 
-	// Fit The fit mode for image transformation.
+	// Fit The fit mode for image conversion:
+	//   - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
+	//   - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
+	//   - FILL: Scale the image to fill the target dimensions. The image may be distorted.
 	Fit *ImageFit `json:"fit,omitempty"`
 
 	// Format The content type of the image.
@@ -350,13 +353,13 @@ type UpsertTransformationRequest struct {
 	// Height The height of the image in pixels.
 	Height *int64 `json:"height,omitempty"`
 
-	// ID The unique identifier of the transformation.
+	// ID The unique identifier of the preset.
 	ID *string `json:"id,omitempty"`
 
-	// Name The name of the transformation.
+	// Name The name of the preset.
 	Name *string `json:"name,omitempty"`
 
-	// Quality The quality of the image (1-100).
+	// Quality The quality of the image (1-100). Default is 80.
 	Quality *int64 `json:"quality,omitempty"`
 
 	// Width The width of the image in pixels.
@@ -392,13 +395,13 @@ type UserRole = users.Role
 
 // VariantURL defines model for VariantUrl.
 type VariantURL struct {
-	// TransformationID The unique identifier of the transformation.
-	TransformationID string `json:"transformationId"`
+	// PresetID The unique identifier of the preset.
+	PresetID string `json:"presetId"`
 
-	// TransformationName The name of the transformation.
-	TransformationName string `json:"transformationName"`
+	// PresetName The name of the preset.
+	PresetName string `json:"presetName"`
 
-	// URL The URL of the image with the applied transformation.
+	// URL The URL of the image with the applied preset.
 	URL string `json:"url"`
 }
 
@@ -2026,7 +2029,7 @@ func (r GetProjectResponse) StatusCode() int {
 type CreateUploadURLResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *PresignedURL
+	JSON200      *UploadURL
 	JSONDefault  *ErrorResponse
 }
 
@@ -2742,7 +2745,7 @@ func ParseCreateUploadURLResponse(rsp *http.Response) (*CreateUploadURLResponse,
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PresignedURL
+		var dest UploadURL
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

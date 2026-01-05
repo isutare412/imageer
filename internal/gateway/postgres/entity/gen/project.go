@@ -8,15 +8,15 @@ import (
 )
 
 var Project = struct {
-	ID              field.String
-	CreatedAt       field.Time
-	UpdatedAt       field.Time
-	Name            field.String
-	Transformations field.Slice[entity.Transformation]
+	ID        field.String
+	CreatedAt field.Time
+	UpdatedAt field.Time
+	Name      field.String
+	Presets   field.Slice[entity.Preset]
 }{
-	ID:              field.String{}.WithColumn("id"),
-	CreatedAt:       field.Time{}.WithColumn("created_at"),
-	UpdatedAt:       field.Time{}.WithColumn("updated_at"),
-	Name:            field.String{}.WithColumn("name"),
-	Transformations: field.Slice[entity.Transformation]{}.WithName("Transformations"),
+	ID:        field.String{}.WithColumn("id"),
+	CreatedAt: field.Time{}.WithColumn("created_at"),
+	UpdatedAt: field.Time{}.WithColumn("updated_at"),
+	Name:      field.String{}.WithColumn("name"),
+	Presets:   field.Slice[entity.Preset]{}.WithName("Presets"),
 }

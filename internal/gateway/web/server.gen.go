@@ -40,11 +40,41 @@ type AppError struct {
 	Message string `json:"message"`
 }
 
+// CreatePresetRequest defines model for CreatePresetRequest.
+type CreatePresetRequest struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
+
+	// Default Indicates if this preset is the default one.
+	Default bool `json:"default"`
+
+	// Fit The fit mode for image conversion:
+	//   - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
+	//   - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
+	//   - FILL: Scale the image to fill the target dimensions. The image may be distorted.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format *ImageFormat `json:"format,omitempty"`
+
+	// Height The height of the image in pixels.
+	Height *int64 `json:"height,omitempty"`
+
+	// Name The name of the preset.
+	Name string `json:"name"`
+
+	// Quality The quality of the image (1-100). Default is 80.
+	Quality *int64 `json:"quality,omitempty"`
+
+	// Width The width of the image in pixels.
+	Width *int64 `json:"width,omitempty"`
+}
+
 // CreateProjectAdminRequest defines model for CreateProjectAdminRequest.
 type CreateProjectAdminRequest struct {
 	// Name The name of the project.
-	Name            string                        `json:"name"`
-	Transformations []CreateTransformationRequest `json:"transformations,omitempty"`
+	Name    string                `json:"name"`
+	Presets []CreatePresetRequest `json:"presets,omitempty"`
 }
 
 // CreateServiceAccountAdminRequest defines model for CreateServiceAccountAdminRequest.
@@ -62,36 +92,6 @@ type CreateServiceAccountAdminRequest struct {
 	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
-// CreateTransformationRequest defines model for CreateTransformationRequest.
-type CreateTransformationRequest struct {
-	// Anchor The anchor position for image cropping.
-	Anchor *ImageAnchor `json:"anchor,omitempty"`
-
-	// Crop Indicates if cropping should be applied.
-	Crop *bool `json:"crop,omitempty"`
-
-	// Default Indicates if this transformation is the default one.
-	Default bool `json:"default"`
-
-	// Fit The fit mode for image transformation.
-	Fit *ImageFit `json:"fit,omitempty"`
-
-	// Format The content type of the image.
-	Format *ImageFormat `json:"format,omitempty"`
-
-	// Height The height of the image in pixels.
-	Height *int64 `json:"height,omitempty"`
-
-	// Name The name of the transformation.
-	Name string `json:"name"`
-
-	// Quality The quality of the image (1-100).
-	Quality *int64 `json:"quality,omitempty"`
-
-	// Width The width of the image in pixels.
-	Width *int64 `json:"width,omitempty"`
-}
-
 // CreateUploadURLRequest defines model for CreateUploadUrlRequest.
 type CreateUploadURLRequest struct {
 	// FileName The name of the file to be uploaded.
@@ -100,8 +100,8 @@ type CreateUploadURLRequest struct {
 	// Format The content type of the image.
 	Format ImageFormat `json:"format"`
 
-	// TransformationNames List of transformation names to apply to the image. If not provided, default transformations will be applied.
-	TransformationNames []string `json:"transformationNames,omitempty"`
+	// PresetNames List of preset names to apply to the image. If not provided, default presets will be applied.
+	PresetNames []string `json:"presetNames,omitempty"`
 }
 
 // Image defines model for Image.
@@ -125,7 +125,10 @@ type Image struct {
 // ImageAnchor The anchor position for image cropping.
 type ImageAnchor = images.Anchor
 
-// ImageFit The fit mode for image transformation.
+// ImageFit The fit mode for image conversion:
+//   - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
+//   - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
+//   - FILL: Scale the image to fill the target dimensions. The image may be distorted.
 type ImageFit = images.Fit
 
 // ImageFormat The content type of the image.
@@ -139,7 +142,7 @@ type ImageURLSet struct {
 	// OriginalURL The original URL of the image.
 	OriginalURL string `json:"originalUrl"`
 
-	// Variants List of URLs for the image with applied transformations.
+	// Variants List of URLs for the image with applied presets.
 	Variants []VariantURL `json:"variants"`
 }
 
@@ -151,16 +154,43 @@ type Images struct {
 	Total int64 `json:"total"`
 }
 
-// PresignedURL defines model for PresignedUrl.
-type PresignedURL struct {
-	// ExpiresAt The expiration time of the presigned URL.
-	ExpiresAt time.Time `json:"expiresAt"`
+// Preset defines model for Preset.
+type Preset struct {
+	// Anchor The anchor position for image cropping.
+	Anchor *ImageAnchor `json:"anchor,omitempty"`
 
-	// ImageID The unique identifier of the image.
-	ImageID string `json:"imageId"`
+	// CreatedAt The creation time of the preset.
+	CreatedAt time.Time `json:"createdAt"`
 
-	// UploadURL The presigned URL for uploading the image. Check https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html for more details.
-	UploadURL string `json:"uploadUrl"`
+	// Default Indicates if this preset is the default one.
+	Default bool `json:"default"`
+
+	// Fit The fit mode for image conversion:
+	//   - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
+	//   - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
+	//   - FILL: Scale the image to fill the target dimensions. The image may be distorted.
+	Fit *ImageFit `json:"fit,omitempty"`
+
+	// Format The content type of the image.
+	Format ImageFormat `json:"format"`
+
+	// Height The height of the image in pixels.
+	Height *int64 `json:"height,omitempty"`
+
+	// ID The unique identifier of the preset.
+	ID string `json:"id"`
+
+	// Name The name of the preset.
+	Name string `json:"name"`
+
+	// Quality The quality of the image (1-100).
+	Quality int64 `json:"quality"`
+
+	// UpdatedAt The last update time of the preset.
+	UpdatedAt time.Time `json:"updatedAt"`
+
+	// Width The width of the image in pixels.
+	Width *int64 `json:"width,omitempty"`
 }
 
 // Project defines model for Project.
@@ -174,8 +204,8 @@ type Project struct {
 	// Name The name of the project.
 	Name string `json:"name"`
 
-	// Transformations List of transformations to apply to the project.
-	Transformations []Transformation `json:"transformations"`
+	// Presets List of presets to apply to images of the project.
+	Presets []Preset `json:"presets"`
 
 	// UpdatedAt The last update time of the project.
 	UpdatedAt time.Time `json:"updatedAt"`
@@ -269,50 +299,11 @@ type ServiceAccounts struct {
 	Total int64 `json:"total"`
 }
 
-// Transformation defines model for Transformation.
-type Transformation struct {
-	// Anchor The anchor position for image cropping.
-	Anchor *ImageAnchor `json:"anchor,omitempty"`
-
-	// CreatedAt The creation time of the transformation.
-	CreatedAt time.Time `json:"createdAt"`
-
-	// Crop Indicates if cropping should be applied.
-	Crop bool `json:"crop"`
-
-	// Default Indicates if this transformation is the default one.
-	Default bool `json:"default"`
-
-	// Fit The fit mode for image transformation.
-	Fit *ImageFit `json:"fit,omitempty"`
-
-	// Format The content type of the image.
-	Format ImageFormat `json:"format"`
-
-	// Height The height of the image in pixels.
-	Height *int64 `json:"height,omitempty"`
-
-	// ID The unique identifier of the transformation.
-	ID string `json:"id"`
-
-	// Name The name of the transformation.
-	Name string `json:"name"`
-
-	// Quality The quality of the image (1-100).
-	Quality int64 `json:"quality"`
-
-	// UpdatedAt The last update time of the transformation.
-	UpdatedAt time.Time `json:"updatedAt"`
-
-	// Width The width of the image in pixels.
-	Width *int64 `json:"width,omitempty"`
-}
-
 // UpdateProjectAdminRequest defines model for UpdateProjectAdminRequest.
 type UpdateProjectAdminRequest struct {
 	// Name The name of the project.
-	Name            *string                       `json:"name,omitempty"`
-	Transformations []UpsertTransformationRequest `json:"transformations,omitempty"`
+	Name    *string               `json:"name,omitempty"`
+	Presets []UpsertPresetRequest `json:"presets,omitempty"`
 }
 
 // UpdateServiceAccountAdminRequest defines model for UpdateServiceAccountAdminRequest.
@@ -330,20 +321,32 @@ type UpdateServiceAccountAdminRequest struct {
 	ProjectIDs []string `json:"projectIds,omitempty"`
 }
 
-// UpsertTransformationRequest If id is provided, the transformation will be updated; otherwise, a new
-// transformation will be created. All existing transformations not
-// included in the upsert list will be deleted.
-type UpsertTransformationRequest struct {
+// UploadURL defines model for UploadUrl.
+type UploadURL struct {
+	// ExpiresAt The expiration time of the presigned URL.
+	ExpiresAt time.Time `json:"expiresAt"`
+
+	// ImageID The unique identifier of the image.
+	ImageID string `json:"imageId"`
+
+	// URL The presigned URL for uploading the image. Check https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html for more details.
+	URL string `json:"url"`
+}
+
+// UpsertPresetRequest If id is provided, the preset will be updated; otherwise, a new preset
+// will be created. All existing presets not included in the upsert list
+// will be deleted.
+type UpsertPresetRequest struct {
 	// Anchor The anchor position for image cropping.
 	Anchor *ImageAnchor `json:"anchor,omitempty"`
 
-	// Crop Indicates if cropping should be applied.
-	Crop *bool `json:"crop,omitempty"`
-
-	// Default Indicates if this transformation is the default one.
+	// Default Indicates if this preset is the default one.
 	Default *bool `json:"default,omitempty"`
 
-	// Fit The fit mode for image transformation.
+	// Fit The fit mode for image conversion:
+	//   - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
+	//   - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
+	//   - FILL: Scale the image to fill the target dimensions. The image may be distorted.
 	Fit *ImageFit `json:"fit,omitempty"`
 
 	// Format The content type of the image.
@@ -352,13 +355,13 @@ type UpsertTransformationRequest struct {
 	// Height The height of the image in pixels.
 	Height *int64 `json:"height,omitempty"`
 
-	// ID The unique identifier of the transformation.
+	// ID The unique identifier of the preset.
 	ID *string `json:"id,omitempty"`
 
-	// Name The name of the transformation.
+	// Name The name of the preset.
 	Name *string `json:"name,omitempty"`
 
-	// Quality The quality of the image (1-100).
+	// Quality The quality of the image (1-100). Default is 80.
 	Quality *int64 `json:"quality,omitempty"`
 
 	// Width The width of the image in pixels.
@@ -394,13 +397,13 @@ type UserRole = users.Role
 
 // VariantURL defines model for VariantUrl.
 type VariantURL struct {
-	// TransformationID The unique identifier of the transformation.
-	TransformationID string `json:"transformationId"`
+	// PresetID The unique identifier of the preset.
+	PresetID string `json:"presetId"`
 
-	// TransformationName The name of the transformation.
-	TransformationName string `json:"transformationName"`
+	// PresetName The name of the preset.
+	PresetName string `json:"presetName"`
 
-	// URL The URL of the image with the applied transformation.
+	// URL The URL of the image with the applied preset.
 	URL string `json:"url"`
 }
 
@@ -947,67 +950,69 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+wcaXPbNvavYLj7YXeGOnwkm3hnZ1fxVbVO7Eh2kjb1dGDySURMEQwA2lEz+u87OEjx",
-	"ACnKlty0k28SCeDdBx4e+NXx6CymEUSCOwdfnRgzPAMBTP0bzvAUhv4FFoH86wP3GIkFoZFz4FwGgIZH",
-	"iE6QCAARObTruA6R72I5w3UiPAPnwCF6Gcd1GHxOCAPfORAsAdfhXgAzLNeGL3gWh3L0/u5zeL63P+k8",
-	"6/t+Z38H9zsvXuzcdLyXL3f293du9jz/meM6Yh7L0VwwEk2dxcJ1zsiMiLcJsHkVWfUOTShDMZ6SCKvH",
-	"BtnPakqGbSiHOlbcdvquM6FshoWkKhLP95eIkEjAFJjC5Hwy4VCHin7ZDheqxtqRaYnLBaOfwBPtpBjr",
-	"wUhQdB8QL1iKFt1ASKMprxFxnELZtpDHwO6IBwPPo0nUkiqu5yCsJ9WQwEsrb5eShVydxzTioEztmDHK",
-	"RuaJfODRSEAk5E8cxyHxlJ70PnFJ4NccKn9nMHEOnL/1lpbc0295bxDHamENsMgj9QJRz0sYAx/5icRM",
-	"8UuSDVwofpuVJKBsMeknGI2BCaKR96gv7bsiBg1CvpXSUBrP6JTh2QwL4qEAR34o2eHmTazfRrFdBfON",
-	"klwDVCnadnCdV4Oj30bHb6+Ox5dVcbnODDjH01po6ev8imM6AySFEsIXBKVhVc1eKttHZznOsDZH73U2",
-	"md5Im5PYHTLAAoypD/wZiUZGhhVZRVaeSYNRzCo6gm6BoNdzZEDYOCQYjrgWHKGRgkUEzPgqHdW4XxZm",
-	"p9gvMjiYMSwd45fOlHbksw6/JXGHKgJw2Imp1A2mLbXMzqiZb0Wf0sw+7HnA+dijMawirLRsbuJCcjUm",
-	"DAbCLgr1VnECCbKUSsmRIUFvISrKaLe/u9fZ6Xf6O5c7uwf9/kG//4uTMygfC+jINW0ibKcbFne6hD+b",
-	"d8z7jnlvA5SFC24L1VxIUGksGh5xGY8w59QjWAC6JyKo9eupxj3WQdsVz4SKNKYe8UdppFvQpnr9tNtG",
-	"VTUjL9DeuUkrVU430EOlG2U0rspgGPky4ABHZILkkFjGBh7QJPTRDSAVkcAviF6HSEPCDaUh4MhRUWeC",
-	"k1CsACICwlHRhSD5JABkFkA0ggLACQ65FeKEiFZcOCGKyalttJmhhy5cJwAyDWqsV78rZMaIRCgmXyDk",
-	"BRJetAx27QyzyL6iXd4/7/eDF/2+TdM/JzgkYm4HYF4WqfnHTmen3/9nAcTLdqTcE78uY1Ov2rDteb9l",
-	"8msxuVQd683tKg4p9q9YWGtpExLW5B5lkciR0nvdAErUsiWj0Xuj7qd4ahPMgzSzqAUSzQYnW7I4ibr2",
-	"tnEczuWP5d4ODScookL65Tvig+9mhlmK/OiehGHJS1j8cpNGbiLoZ0LK+GgTuWKeJaNVmuDXxWf1uhyd",
-	"sy3whqIx8e3Ak4h8TgARHyJBJgRYAwIPDX5cYAGtFG+sRi5cJ4n9JpaFmAukx2yVawkLx9DOZq700LLi",
-	"EJVuZwqQpyxlTAamVqUGWTCuskIHahRTTpQSyQ2KdndpqFX8iJKZRGf8ejCSW5LD4zeXxyPHdd6cjy5/",
-	"cFzneKC2KuPzK/X3vdy5XBc2IGZmkUfGnMgspkz7NrWFdqZEBMlN16OzHgOfB5RBT2EFrBffTvVvLgnM",
-	"zDH1X7y7TCiyyGolfUIEmsmd2ZJmS9QylB+ev1MEH56/uRwM3ziuczI8OyvSmI55AhpNupB3t3bnoHfu",
-	"SM6uarmh7ceL41PHdS7enCrRvbpwXGfwbnjiuM4Px8PDIpFm8FPQmIWRnHHbqUwYk1Qqg6gl8/1geDl8",
-	"c/rb1cXZ+eBIEjw6Pzwej4eK7pPB8OxYPh0dD45+LtKsHz0J0ZkLy3uFCtFXozOu1FYn7WmxRCsxjnxE",
-	"BEd3mBEcCZWuFCMKZWRKIhxesdDO0HQAuhqdNTjHQIiYH/R65okiOZ2qyezew01sc40pcvXpQEbjkjK1",
-	"2zKRvBzpC5G9yd2+05Al7eXoXva+eT7lUK51tLwavDOUWuGmM4AKWq4jqMA1slKvUJTMbnT0NYpUKmSt",
-	"n6NqhFPQNpovGHAyjcA3elSkXFcV+JplhThdU8p/kwmMqfv/YVlMkmbydhQKdCu11xMKpt1FhwF4tyi1",
-	"O596vIvveRfP8O80UvY3UD/He71QbmdFL+HApgnxoZcXl95XnCtRdgMxCxXIGWVyiyswKW1yMkuXwCQU",
-	"jdx/b2H+H3zj7ezurSwjLg9elpxwc0piVzBd4dtISmwtIz5tUmxF4aEK9ZTF0zYbtupeLQe7lfcr1pZs",
-	"bvCBef2mRb9Okm62+mWmNqj7CCbAIPIsW8G/pMbZuFlbJTerPDrSptg8LtYaWp8k2o4gZlRmezrVaD4a",
-	"MN62wXh1RmUK2ixdu1JZUdlk9noQhqoSyhJwEZZ/FC6IRIUj27Toks2rLbxsoSCuGwXWKIdLQSzp0xwz",
-	"ZWJT1i3ViieGAdm0elZ00SW+BS7Duwe+NGpE78BsN4c+b1FEXqPkVNGZ4rHP9k6QHhKPG49uHhWXv8nz",
-	"rLVddyN/tuvCN3eqtvpMjS9P0/x2x2kt3PoyhG4uidiWvj4gmcibbY7V1ys9wKBo75ZyoBqAuBzRRLgp",
-	"qZxcnZ3pQsqPx4elil/6sKZskj7Ui5u1eXdQIG3p+ZqqLIQnAjPY39kt1FlKS1tadt4TEQxi8hOo8yYc",
-	"hucT5+DjOn7QWbgVn5otWGXv4GKIbmGelTUadQrf/jY+P/5w+cvZ3vv7f736MP/8+r1/9OxtfDGZX5w8",
-	"iz5cznf2L27jdy8/PL+bj89/n731408//Pzhp93ndzfB0fTo00ptM8hWNee6wqxHp1wVzj0m8ypx7kky",
-	"sNL+ZFOH3uuHzqbD1UcFqe8n8H+GE/i1U4kmfdluJvGnaAN4YEKwNSv8w9oS2uQeqQFnqy+FZfyHzXVe",
-	"qYX+nE2BVzEHJjbeFFjDo+8NgN8bAJ+gAdCiffVaXg3WE0R8GZGXDThVj5iVgYwX+TeiIgB2Tzi4CKMI",
-	"7n+NamYYH9RFgzBE8IVwoc5BSvXmiIpfIxJ5YeKDnxZeEkUHCqXg0uV8CEEu92tUOQr93qj4PU36niZ9",
-	"e92SVf/EgW3mIDDhwDZZbZxhUrNpVa8Q9n0GnNeDl0/+l+uh2Ej5sArmwSpMvNsGNTZv6+F+okHkUyvv",
-	"4oAKWn8mLt/mW1Cqa9s6UNQ0rg6+0/aTTJIJIzY8GA1XZlBSAUdy3MN3DBvVPOuxWSoqQ1KqnTlO1yX4",
-	"1zU2NzKsqVIpIVQoM4XBwdFr1SR3elXpBDy1XmsqVgXlcrw70iQ8qgioVlLMyvX9VNxI0f8Ov4XAUW2d",
-	"3l4YSeossNz+tUx37V1YLYyTAQfBeyk6jW1iJRWvSMnKJU1OVZ0XrsPBSxgR87E06Xy1dpDoyKauYgaA",
-	"fWDLy5gfOoOLYeen41wHoCmbLlznBjADls7X/9KGTOfH95fpfVmVbam3y1Ukf/T1QXpLoICDfrTE4Wqc",
-	"7yxNwUuaSDShljRRmwA6xQLu8VwVnlWHD47wVKalWpwMOE2Yp9vFBBEhVOc6rnMHjOt1+90diTGNIcIx",
-	"cQ6cvW6/K0O4NEjF0B6OSe9up4flzrWXPwaa6k5GaXeZmakNVnqmrza7aq3lxe+aavxySC9/wXnhrhye",
-	"u5m9uC5dfN3t9zd23TVrVLBcdx0nav89ScJwjhgIRuAO/OxErLQBsEHJ0O4VL+sqLU9mM8zm6e4Vh+Fy",
-	"ZdcReMqVh1bMvpZBmHKLYKrXOM0lZODiFfXnG2NU/X3RRfVq8hYktFJAJl6mTNyYdDTheiecLV4V0MKt",
-	"sane16xysdAeQO5yq5I8Us9LklzPxooX9+vspoGHZge+cR5q2hBu4J9rdzynIJ6AJU+qqBVPkvZybozd",
-	"pyAqa1tdSmLheLUGvBGmb94j1RervxGPZLL2rYlZM6CFpFv5JnPhoZe1S6n82xp0bD1u36iSNLXjbVlN",
-	"zF2DVVoiGJlOgYGPbrDwgizlM3ib3H8jCpMxA82SUJA4hFw7HF4nuJXq9c2JY6lB4S+VP5abL9o7/3Jr",
-	"xGbTycrq66aUlgOurWaWDQdqW7bT2majthlnidfbyTzLQB5gpL2v5Q8WtUhI7Xqwnu1av8D0iPR0WwzP",
-	"0tTVzK5PV5+cYVswgoe7sa3ksnUw1sxptyyZbWW434pnbJ3vbss8Tb6L1/SFiQh6U0qnIfQ4mUYdEtVm",
-	"K2OBmThVY8dkGg11yMtxd6+/W/VRI/AJA08fflOk5yO5QEetoCuVav4Z9bKuRHsdV13z0OtlJXv5cEJZ",
-	"deWlGCsfi3sk000J1jn4eJ0XgWJQFY+M/YkIIBJG21bKoefhMLzB3m2tQE5IRHhQkkjJYi3t0YkIKCO/",
-	"60NF9Vk3BiJhkUyy5yn6eCKAIYNKt+ZzinJy42f9KrVwG0L6xnuGt5RnzOAOIoEOx6MThIXA3i2vQyL9",
-	"gkR7LK7b6G3BeM21VhLpwwPNo00p75LVqqj9h6iuVqWH6W5dLW9Fyep7terx1aoUz5XySOsX+t5yxxyW",
-	"NW1xzFebRmffaO2i5ttSW69u5T4XsEo7COcJ+NVPAmxMOYYSgKpN1F+8x5EuY+S0Rn+hobXOfDUX/RqN",
-	"emhgPEpVVlcu8l9Q3qoHMF+xaG3/ujC1DesvrtwoRdUo0NOn7HWCOtTfmVGtSFvkn1q/PfvSr9+omLgN",
-	"LloBNMW3YrD8Wjgk/3gtVTV/7K6f5A/BP15L/ZTJuD0VO0y/96NGmBP/A6en1NqglTaSl9GTsIqds/lH",
-	"6QdYlrNV3r+4Xvw/AAD///xhP82eXAAA",
+	"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",
+	"/2uVzW6iWwAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

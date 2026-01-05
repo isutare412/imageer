@@ -26,10 +26,9 @@ func imageTypeToFormat(t string) (images.Format, error) {
 	}
 }
 
-func applyTransformation(o *bimg.Options, t domain.Transformation) {
+func applyPreset(o *bimg.Options, t domain.Preset) {
 	o.StripMetadata = true
 	o.Quality = int(t.Quality)
-	o.Crop = t.Crop
 
 	var typ bimg.ImageType
 	switch t.Format {
@@ -56,6 +55,7 @@ func applyTransformation(o *bimg.Options, t domain.Transformation) {
 	if t.Fit != nil {
 		switch *t.Fit {
 		case images.FitCover:
+			o.Crop = true
 		case images.FitContain:
 			o.Embed = true
 		case images.FitFill:

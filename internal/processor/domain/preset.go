@@ -4,7 +4,7 @@ import (
 	"github.com/isutare412/imageer/pkg/images"
 )
 
-type Transformation struct {
+type Preset struct {
 	ID      string
 	Name    string
 	Default bool
@@ -12,9 +12,7 @@ type Transformation struct {
 	Format  images.Format
 	Quality images.Quality
 	Fit     *images.Fit
+	Anchor  *images.Anchor
 	Width   *int64
 	Height  *int64
-
-	Crop   bool
-	Anchor *images.Anchor
 }

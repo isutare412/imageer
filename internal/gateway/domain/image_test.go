@@ -9,36 +9,36 @@ import (
 	"github.com/isutare412/imageer/pkg/validation"
 )
 
-func TestCreatePresignedURLRequest_Validation(t *testing.T) {
+func TestCreateUploadURLRequest_Validation(t *testing.T) {
 	tests := []struct {
 		name    string // description of this test case
-		req     CreatePresignedURLRequest
+		req     CreateUploadURLRequest
 		wantErr bool
 	}{
 		{
 			name: "normal case",
-			req: CreatePresignedURLRequest{
-				FileName:            "example.jpg",
-				Format:              images.FormatWebp,
-				TransformationNames: []string{"w100h100", "w200h200"},
+			req: CreateUploadURLRequest{
+				FileName:    "example.jpg",
+				Format:      images.FormatWebp,
+				PresetNames: []string{"w100h100", "w200h200"},
 			},
 			wantErr: false,
 		},
 		{
 			name: "invalid content type",
-			req: CreatePresignedURLRequest{
-				FileName:            "example.jpg",
-				Format:              images.Format("invalid"), // invalid content type
-				TransformationNames: []string{"w100h100", "w200h200"},
+			req: CreateUploadURLRequest{
+				FileName:    "example.jpg",
+				Format:      images.Format("invalid"), // invalid content type
+				PresetNames: []string{"w100h100", "w200h200"},
 			},
 			wantErr: true,
 		},
 		{
-			name: "empty transformation name",
-			req: CreatePresignedURLRequest{
-				FileName:            "example.jpg",
-				Format:              images.FormatWebp,
-				TransformationNames: []string{"", "w200h200"}, // invalid transformation name
+			name: "empty preset name",
+			req: CreateUploadURLRequest{
+				FileName:    "example.jpg",
+				Format:      images.FormatWebp,
+				PresetNames: []string{"", "w200h200"}, // invalid preset name
 			},
 			wantErr: true,
 		},
