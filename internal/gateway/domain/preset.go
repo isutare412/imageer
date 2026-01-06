@@ -22,7 +22,7 @@ type Preset struct {
 }
 
 type CreatePresetRequest struct {
-	Name    string `validate:"required,max=64"`
+	Name    string `validate:"required,max=64,kebabcase"`
 	Default bool
 
 	Format  *images.Format  `validate:"omitempty,validateFn=ValidateForPreset"`
@@ -48,7 +48,7 @@ func (r CreatePresetRequest) ToPreset() Preset {
 
 type UpsertPresetRequest struct {
 	ID      *string `validate:"omitempty,max=36"`
-	Name    *string `validate:"omitempty,max=64"`
+	Name    *string `validate:"omitempty,max=64,kebabcase"`
 	Default *bool
 
 	Format  *images.Format  `validate:"omitempty,validateFn=ValidateForPreset"`

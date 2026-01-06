@@ -11,6 +11,7 @@ import (
 	trans_en "github.com/go-playground/validator/v10/translations/en"
 
 	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/validation/custom"
 )
 
 var globalValidator = NewValidator()
@@ -56,6 +57,11 @@ func NewValidator() Validator {
 		}
 		return ""
 	})
+
+	// Register custom tags
+	if err := custom.RegisterKebabCaseTag(validate, translator); err != nil {
+		panic(fmt.Errorf("registering kebabcase tag: %w", err))
+	}
 
 	return Validator{
 		validate:   validate,

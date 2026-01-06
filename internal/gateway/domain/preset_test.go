@@ -38,10 +38,18 @@ func TestUpsertPresetRequest_Validation(t *testing.T) {
 		{
 			name: "update request",
 			req: UpsertPresetRequest{
-				ID:      lo.ToPtr("w100h100"),
+				Name:    lo.ToPtr("w100h100"),
 				Default: lo.ToPtr(true),
 			},
 			wantErr: false,
+		},
+		{
+			name: "invalid name format",
+			req: UpsertPresetRequest{
+				ID:   lo.ToPtr("preset-1"),
+				Name: lo.ToPtr("W100H100"),
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

@@ -526,7 +526,7 @@ components:
         name:
           type: string
           description: The name of the project.
-          example: My Project
+          example: test-project
         presets:
           type: array
           items:
@@ -541,7 +541,7 @@ components:
         name:
           type: string
           description: The name of the project.
-          example: My Project
+          example: test-project
         presets:
           type: array
           items:
@@ -554,7 +554,7 @@ components:
         name:
           type: string
           description: The name of the service account.
-          example: my-service-account
+          example: test-service-account
         accessScope:
           $ref: '#/components/schemas/ServiceAccountAccessScope'
         projectIds:
@@ -580,7 +580,7 @@ components:
         name:
           type: string
           description: The name of the service account.
-          example: my-service-account
+          example: test-service-account
         accessScope:
           $ref: '#/components/schemas/ServiceAccountAccessScope'
         projectIds:
@@ -632,6 +632,9 @@ components:
             example: 426e634f-50dd-41a0-881b-c991441b3cd5
           x-go-type-skip-optional-pointer: true
           x-go-name: ImageIDs
+          example:
+            - 426e634f-50dd-41a0-881b-c991441b3cd5
+            - 123e4567-e89b-12d3-a456-426614174000
         reprocessAll:
           type: boolean
           description: If true, reprocess all images in the project. Takes precedence over imageIds.
@@ -760,7 +763,7 @@ components:
         name:
           type: string
           description: The name of the project.
-          example: My Project
+          example: test-project
         presets:
           type: array
           description: List of presets to apply to images of the project.
@@ -974,7 +977,7 @@ components:
         name:
           type: string
           description: The name of the service account.
-          example: my-service-account
+          example: test-service-account
         accessScope:
           $ref: '#/components/schemas/ServiceAccountAccessScope'
         projects:
@@ -1028,7 +1031,7 @@ components:
         name:
           type: string
           description: The name of the project.
-          example: My Project
+          example: test-project
       required:
         - id
         - name

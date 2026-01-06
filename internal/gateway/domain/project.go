@@ -22,7 +22,7 @@ type ProjectReference struct {
 }
 
 type CreateProjectRequest struct {
-	Name    string                `validate:"required,max=128"`
+	Name    string                `validate:"required,max=128,kebabcase"`
 	Presets []CreatePresetRequest `validate:"dive,required"`
 }
 
@@ -37,7 +37,7 @@ func (r CreateProjectRequest) ToProject() Project {
 
 type UpdateProjectRequest struct {
 	ID      string                `validate:"max=36"`
-	Name    *string               `validate:"omitempty,max=128"`
+	Name    *string               `validate:"omitempty,max=128,kebabcase"`
 	Presets []UpsertPresetRequest `validate:"dive,required"`
 }
 

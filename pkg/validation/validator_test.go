@@ -10,6 +10,7 @@ type person struct {
 	Address   *address  `validate:"omitempty"`
 	Addresses []address `validate:"dive"`
 	Names     []string  `validate:"dive,required"`
+	Kebab     string    `validate:"omitempty,kebabcase"`
 }
 
 type address struct {
@@ -66,16 +67,30 @@ func TestValidator_Validate(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "kebab case",
+			input: person{
+				Kebab: "valid-kebab-case",
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid kebab case",
+			input: person{
+				Kebab: "InvalidKebabCase",
+			},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := NewValidator()
-			gotErr := v.Validate(tt.input)
+			err := v.Validate(tt.input)
 			if tt.wantErr {
-				require.Error(t, gotErr, "Validate() error = %v, wantErr %v", gotErr, tt.wantErr)
+				require.Error(t, err, "Validate() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
-				require.NoError(t, gotErr, "Validate() error = %v, wantErr %v", gotErr, tt.wantErr)
+				require.NoError(t, err, "Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

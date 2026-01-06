@@ -37,7 +37,7 @@ type ServiceAccountWithAPIKey struct {
 }
 
 type CreateServiceAccountRequest struct {
-	Name        string                      `validate:"required,max=128"`
+	Name        string                      `validate:"required,max=128,kebabcase"`
 	AccessScope serviceaccounts.AccessScope `validate:"required,validateFn=Validate"`
 	ProjectIDs  []string                    `validate:"dive,required"`
 	ExpireAt    *time.Time                  `validate:"omitempty,gt"`
@@ -57,7 +57,7 @@ func (r CreateServiceAccountRequest) ToServiceAccount(apiKeyHash string) Service
 
 type UpdateServiceAccountRequest struct {
 	ID          string                       `validate:"required,max=36"`
-	Name        *string                      `validate:"omitempty,max=128"`
+	Name        *string                      `validate:"omitempty,max=128,kebabcase"`
 	AccessScope *serviceaccounts.AccessScope `validate:"omitempty,validateFn=Validate"`
 	ProjectIDs  []string                     `validate:"dive,required"`
 	ExpireAt    *time.Time                   `validate:"omitempty,gt"`
