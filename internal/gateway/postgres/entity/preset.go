@@ -18,12 +18,12 @@ type Preset struct {
 	Name      string `gorm:"size:64; uniqueIndex:idx_project_id_name,priority:2"`
 	Default   bool
 
-	Format  images.Format `gorm:"size:32"`
-	Quality images.Quality
+	Format  images.Format  `gorm:"size:32"`
+	Quality images.Quality `gorm:"type:smallint"`
 	Fit     *images.Fit    `gorm:"size:32"`
 	Anchor  *images.Anchor `gorm:"size:32"`
-	Width   *int64
-	Height  *int64
+	Width   *int64         `gorm:"type:integer"`
+	Height  *int64         `gorm:"type:integer"`
 
 	ProjectID string `gorm:"size:36; uniqueIndex:idx_project_id_name,priority:1"`
 }
