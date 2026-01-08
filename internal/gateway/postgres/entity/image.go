@@ -28,6 +28,7 @@ type Image struct {
 
 func NewImage(img domain.Image) Image {
 	return Image{
+		ID:        img.ID,
 		FileName:  img.FileName,
 		Format:    img.Format,
 		State:     img.State,

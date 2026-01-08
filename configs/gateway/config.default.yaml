@@ -86,6 +86,6 @@ crypt:
 s3:
   bucket: imageer
   prefix:
-    image: local/images
+    image: sandbox/images
   presign:
     expiry: 10m

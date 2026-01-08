@@ -41,6 +41,7 @@ func (c *Client) MigrateSchemas(ctx context.Context) error {
 		&entity.ServiceAccount{},
 		&entity.ServiceAccountProject{},
 		&entity.Image{},
+		&entity.ImageVariant{},
 	); err != nil {
 		return apperr.NewError(apperr.CodeInternalServerError).
 			WithSummary("Failed to migrate database schemas").
