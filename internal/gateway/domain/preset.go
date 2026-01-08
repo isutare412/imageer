@@ -3,6 +3,9 @@ package domain
 import (
 	"time"
 
+	"github.com/samber/lo"
+
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 	"github.com/isutare412/imageer/pkg/images"
 )
 
@@ -70,4 +73,31 @@ func (r UpsertPresetRequest) IsUpdateRequest() bool {
 
 func (r UpsertPresetRequest) IsCreateRequest() bool {
 	return !r.IsUpdateRequest()
+}
+
+type ListPresetsParams struct {
+	Offset *int `validate:"omitempty,min=0"`
+	Limit  *int `validate:"omitempty,min=1,max=100"`
+
+	SearchFilter PresetSearchFilter
+	SortFilter   PresetSortFilter
+}
+
+func (p ListPresetsParams) OffsetOrDefault() int {
+	return lo.FromPtrOr(p.Offset, -1)
+}
+
+func (p ListPresetsParams) LimitOrDefault() int {
+	return lo.FromPtrOr(p.Limit, -1)
+}
+
+type PresetSearchFilter struct {
+	ProjectID *string
+	Names     []string
+}
+
+type PresetSortFilter struct {
+	CreatedAt bool
+	UpdatedAt bool
+	Direction dbhelpers.SortDirection
 }

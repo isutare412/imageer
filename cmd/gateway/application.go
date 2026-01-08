@@ -14,7 +14,9 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/jwt"
 	"github.com/isutare412/imageer/internal/gateway/oidc"
 	"github.com/isutare412/imageer/internal/gateway/postgres"
+	"github.com/isutare412/imageer/internal/gateway/s3"
 	"github.com/isutare412/imageer/internal/gateway/service/auth"
+	"github.com/isutare412/imageer/internal/gateway/service/image"
 	"github.com/isutare412/imageer/internal/gateway/service/project"
 	"github.com/isutare412/imageer/internal/gateway/service/serviceaccount"
 	"github.com/isutare412/imageer/internal/gateway/web"
@@ -54,6 +56,12 @@ func newApplication(cfg config.Config) (*application, error) {
 		return nil, fmt.Errorf("creating jwt verifier: %w", err)
 	}
 
+	slog.Info("Create s3 presigner")
+	s3Presigner, err := s3.NewPresigner(cfg.ToS3PresignerConfig())
+	if err != nil {
+		return nil, fmt.Errorf("creating s3 presigner: %w", err)
+	}
+
 	slog.Info("Create repository client")
 	repoClient, err := postgres.NewClient(cfg.ToRepositoryClientConfig())
 	if err != nil {
@@ -69,6 +77,15 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create project repository")
 	projectRepo := postgres.NewProjectRepository(repoClient)
 
+	slog.Info("Create image repository")
+	imageRepo := postgres.NewImageRepository(repoClient)
+
+	slog.Info("Create image variant repository")
+	imageVarRepo := postgres.NewImageVariantRepository(repoClient)
+
+	slog.Info("Create preset repository")
+	presetRepo := postgres.NewPresetRepository(repoClient)
+
 	slog.Info("Create auth service")
 	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider,
 		aesCrypter, jwtSigner, jwtVerifier, userRepo)
@@ -79,8 +96,11 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create project service")
 	projectSvc := project.NewService(projectRepo)
 
+	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, imageRepo,
+		imageVarRepo, presetRepo)
+
 	slog.Info("Create web server")
-	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc)
+	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, imageSvc)
 
 	return &application{
 		webServer:  webServer,

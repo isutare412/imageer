@@ -441,14 +441,26 @@ components:
       type: string
       enum:
         - WAITING_UPLOAD
-        - PROCESSING
-        - FAILED
         - READY
+        - FAILED
       description: The current state of the image.
       example: READY
       x-go-type: images.State
       x-go-import:
-        path: github.com/redshore/imageer/pkg/images
+        path: github.com/isutare412/imageer/pkg/images
+
+    ImageVariantState:
+      type: string
+      enum:
+        - WAITING_UPLOAD
+        - PROCESSING
+        - READY
+        - FAILED
+      description: The current state of the image variant.
+      example: READY
+      x-go-type: images.VariantState
+      x-go-import:
+        path: github.com/isutare412/imageer/pkg/images
 
     ImageFormat:
       type: string
@@ -462,7 +474,7 @@ components:
       example: WEBP
       x-go-type: images.Format
       x-go-import:
-        path: github.com/redshore/imageer/pkg/images
+        path: github.com/isutare412/imageer/pkg/images
 
     ImageFit:
       type: string
@@ -478,7 +490,7 @@ components:
       example: COVER
       x-go-type: images.Fit
       x-go-import:
-        path: github.com/redshore/imageer/pkg/images
+        path: github.com/isutare412/imageer/pkg/images
 
     ImageAnchor:
       type: string
@@ -493,7 +505,7 @@ components:
       example: SMART
       x-go-type: images.Anchor
       x-go-import:
-        path: github.com/redshore/imageer/pkg/images
+        path: github.com/isutare412/imageer/pkg/images
 
     UserRole:
       type: string
@@ -857,10 +869,17 @@ components:
         url:
           type: string
           description: >-
-            The presigned URL for uploading the image. Check
-            https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html
+            The presigned URL for uploading the image. It must be called with PUT method.
+            Check https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html
             for more details.
           example: https://aws.com/upload?key=abc123
+        header:
+          type: object
+          description: Additional headers required for the upload request.
+          additionalProperties:
+            type: string
+          example:
+            Content-Type: image/webp
         expiresAt:
           type: string
           format: date-time
@@ -869,6 +888,7 @@ components:
       required:
         - imageId
         - url
+        - header
         - expiresAt
 
     Image:
@@ -890,14 +910,23 @@ components:
           example: '2023-10-01T12:00:00Z'
         state:
           $ref: '#/components/schemas/ImageState'
-        urlSet:
-          $ref: '#/components/schemas/ImageUrlSet'
+        url:
+          type: string
+          description: The URL of the original image.
+          example: https://example.com/original/image.webp
+        format:
+          $ref: '#/components/schemas/ImageFormat'
+        variants:
+          type: array
+          description: List of image variants with applied presets.
+          items:
+            $ref: '#/components/schemas/ImageVariant'
+          x-go-type-skip-optional-pointer: true
       required:
         - id
         - createdAt
         - updatedAt
         - state
-        - urlSet
 
     Images:
       type: object
@@ -915,26 +944,23 @@ components:
         - items
         - total
 
-    ImageUrlSet:
+    ImageVariant:
       type: object
-      description: URLs for accessing the image and its variants.
       properties:
-        originalUrl:
+        id:
           type: string
-          description: The original URL of the image.
-          example: https://example.com/original/image.webp
-        variants:
-          type: array
-          description: List of URLs for the image with applied presets.
-          items:
-            $ref: '#/components/schemas/VariantUrl'
-      required:
-        - originalUrl
-        - variants
-
-    VariantUrl:
-      type: object
-      properties:
+          description: The unique identifier of the image variant.
+          example: 426e634f-50dd-41a0-881b-c991441b3cd5
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation time of the image variant.
+          example: '2023-10-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time when the image variant was updated.
+          example: '2023-10-01T12:00:00Z'
         presetId:
           type: string
           description: The unique identifier of the preset.
@@ -943,14 +969,21 @@ components:
           type: string
           description: The name of the preset.
           example: w600h800
+        state:
+          $ref: '#/components/schemas/ImageVariantState'
         url:
           type: string
           description: The URL of the image with the applied preset.
           example: https://example.com/presets/w600h800/image.webp
+        format:
+          $ref: '#/components/schemas/ImageFormat'
       required:
+        - id
+        - createdAt
+        - updatedAt
         - presetId
         - presetName
-        - url
+        - state
 
     ServiceAccount:
       type: object

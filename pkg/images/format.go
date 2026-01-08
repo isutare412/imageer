@@ -55,7 +55,7 @@ func (f Format) ValidateForPreset() error {
 	return nil
 }
 
-func (f Format) ToExtension() string {
+func (f Format) Extension() string {
 	switch f {
 	case FormatJPEG:
 		return "jpg"
@@ -66,7 +66,24 @@ func (f Format) ToExtension() string {
 	case FormatAVIF:
 		return "avif"
 	case FormatHEIC:
-		return "heif"
+		return "heic"
+	default:
+		return ""
+	}
+}
+
+func (f Format) ContentType() string {
+	switch f {
+	case FormatJPEG:
+		return "image/jpeg"
+	case FormatPNG:
+		return "image/png"
+	case FormatWebp:
+		return "image/webp"
+	case FormatAVIF:
+		return "image/avif"
+	case FormatHEIC:
+		return "image/heic"
 	default:
 		return ""
 	}

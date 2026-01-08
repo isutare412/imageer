@@ -107,6 +107,9 @@ type Image struct {
 	// CreatedAt The creation time of the image.
 	CreatedAt time.Time `json:"createdAt"`
 
+	// Format The content type of the image.
+	Format *ImageFormat `json:"format,omitempty"`
+
 	// ID The unique identifier of the image.
 	ID string `json:"id"`
 
@@ -116,8 +119,11 @@ type Image struct {
 	// UpdatedAt The last update time of the image.
 	UpdatedAt time.Time `json:"updatedAt"`
 
-	// URLSet URLs for accessing the image and its variants.
-	URLSet ImageURLSet `json:"urlSet"`
+	// URL The URL of the original image.
+	URL *string `json:"url,omitempty"`
+
+	// Variants List of image variants with applied presets.
+	Variants []ImageVariant `json:"variants,omitempty"`
 }
 
 // ImageAnchor The anchor position for image cropping.
@@ -135,14 +141,35 @@ type ImageFormat = images.Format
 // ImageState The current state of the image.
 type ImageState = images.State
 
-// ImageURLSet URLs for accessing the image and its variants.
-type ImageURLSet struct {
-	// OriginalURL The original URL of the image.
-	OriginalURL string `json:"originalUrl"`
+// ImageVariant defines model for ImageVariant.
+type ImageVariant struct {
+	// CreatedAt The creation time of the image variant.
+	CreatedAt time.Time `json:"createdAt"`
 
-	// Variants List of URLs for the image with applied presets.
-	Variants []VariantURL `json:"variants"`
+	// Format The content type of the image.
+	Format *ImageFormat `json:"format,omitempty"`
+
+	// ID The unique identifier of the image variant.
+	ID string `json:"id"`
+
+	// PresetID The unique identifier of the preset.
+	PresetID string `json:"presetId"`
+
+	// PresetName The name of the preset.
+	PresetName string `json:"presetName"`
+
+	// State The current state of the image variant.
+	State ImageVariantState `json:"state"`
+
+	// UpdatedAt The time when the image variant was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+
+	// URL The URL of the image with the applied preset.
+	URL *string `json:"url,omitempty"`
 }
+
+// ImageVariantState The current state of the image variant.
+type ImageVariantState = images.VariantState
 
 // Images defines model for Images.
 type Images struct {
@@ -324,10 +351,13 @@ type UploadURL struct {
 	// ExpiresAt The expiration time of the presigned URL.
 	ExpiresAt time.Time `json:"expiresAt"`
 
+	// Header Additional headers required for the upload request.
+	Header map[string]string `json:"header"`
+
 	// ImageID The unique identifier of the image.
 	ImageID string `json:"imageId"`
 
-	// URL The presigned URL for uploading the image. Check https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html for more details.
+	// URL The presigned URL for uploading the image. It must be called with PUT method. Check https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html for more details.
 	URL string `json:"url"`
 }
 
@@ -392,18 +422,6 @@ type User struct {
 
 // UserRole The role of the user.
 type UserRole = users.Role
-
-// VariantURL defines model for VariantUrl.
-type VariantURL struct {
-	// PresetID The unique identifier of the preset.
-	PresetID string `json:"presetId"`
-
-	// PresetName The name of the preset.
-	PresetName string `json:"presetName"`
-
-	// URL The URL of the image with the applied preset.
-	URL string `json:"url"`
-}
 
 // ImageIDPath defines model for ImageIdPath.
 type ImageIDPath = string

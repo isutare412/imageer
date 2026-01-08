@@ -5,7 +5,9 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/jwt"
 	"github.com/isutare412/imageer/internal/gateway/oidc"
 	"github.com/isutare412/imageer/internal/gateway/postgres"
+	"github.com/isutare412/imageer/internal/gateway/s3"
 	"github.com/isutare412/imageer/internal/gateway/service/auth"
+	"github.com/isutare412/imageer/internal/gateway/service/image"
 	"github.com/isutare412/imageer/internal/gateway/web"
 	"github.com/isutare412/imageer/pkg/log"
 )
@@ -81,4 +83,17 @@ func (c *Config) ToOIDCGoogleClientConfig() oidc.GoogleClientConfig {
 
 func (c *Config) ToAESCrypterConfig() crypt.AESCrypterConfig {
 	return crypt.AESCrypterConfig(c.Crypt.AES)
+}
+
+func (c *Config) ToS3PresignerConfig() s3.PresignerConfig {
+	return s3.PresignerConfig{
+		Bucket: c.S3.Bucket,
+		Expiry: c.S3.Presign.Expiry,
+	}
+}
+
+func (c *Config) ToImageServiceConfig() image.Config {
+	return image.Config{
+		S3KeyPrefix: c.S3.Prefix.Image,
+	}
 }

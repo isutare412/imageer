@@ -30,3 +30,7 @@ type ProjectService interface {
 	Update(ctx context.Context, req domain.UpdateProjectRequest) (domain.Project, error)
 	Delete(ctx context.Context, id string) error
 }
+
+type ImageService interface {
+	CreateUploadURL(context.Context, domain.CreateUploadURLRequest) (domain.UploadURL, error)
+}

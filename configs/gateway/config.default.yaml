@@ -82,3 +82,10 @@ auth:
 crypt:
   aes:
     key: <random-length-complex-string>
+
+s3:
+  bucket: imageer
+  prefix:
+    image: local/images
+  presign:
+    expiry: 10m

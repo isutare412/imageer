@@ -295,5 +295,5 @@ func testImageOutputName(testName, fileName string, format images.Format) string
 	ext := filepath.Ext(base)
 
 	return fmt.Sprintf("%s/%s-%s.out.%s", dir, base[0:len(base)-len(ext)],
-		safeName, format.ToExtension())
+		safeName, format.Extension())
 }

@@ -38,9 +38,10 @@ type UploadURL struct {
 }
 
 type CreateUploadURLRequest struct {
+	ProjectID   string        `validate:"required,max=36"`
 	FileName    string        `validate:"required,max=512"`
 	Format      images.Format `validate:"validateFn=Validate"`
-	PresetNames []string      `validate:"dive,required,max=64"`
+	PresetNames []string      `validate:"dive,required,max=64,kebabcase"`
 }
 
 type PresignPutObjectRequest struct {

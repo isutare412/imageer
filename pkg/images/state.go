@@ -12,7 +12,6 @@ type State string
 
 const (
 	StateWaitingUpload State = "WAITING_UPLOAD"
-	StateProcessing    State = "PROCESSING"
 	StateFailed        State = "FAILED"
 	StateReady         State = "READY"
 )
@@ -26,7 +25,6 @@ var (
 func (s State) Validate() error {
 	switch s {
 	case StateWaitingUpload:
-	case StateProcessing:
 	case StateFailed:
 	case StateReady:
 	default:

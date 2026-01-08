@@ -18,6 +18,7 @@ func TestCreateUploadURLRequest_Validation(t *testing.T) {
 		{
 			name: "normal case",
 			req: CreateUploadURLRequest{
+				ProjectID:   "project-1",
 				FileName:    "example.jpg",
 				Format:      images.FormatWebp,
 				PresetNames: []string{"w100h100", "w200h200"},
@@ -27,6 +28,7 @@ func TestCreateUploadURLRequest_Validation(t *testing.T) {
 		{
 			name: "invalid content type",
 			req: CreateUploadURLRequest{
+				ProjectID:   "project-1",
 				FileName:    "example.jpg",
 				Format:      images.Format("invalid"), // invalid content type
 				PresetNames: []string{"w100h100", "w200h200"},
@@ -36,6 +38,7 @@ func TestCreateUploadURLRequest_Validation(t *testing.T) {
 		{
 			name: "empty preset name",
 			req: CreateUploadURLRequest{
+				ProjectID:   "project-1",
 				FileName:    "example.jpg",
 				Format:      images.FormatWebp,
 				PresetNames: []string{"", "w200h200"}, // invalid preset name

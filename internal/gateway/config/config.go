@@ -12,6 +12,7 @@ type Config struct {
 	Database DatabaseConfig `koanf:"database"`
 	Auth     AuthConfig     `koanf:"auth"`
 	Crypt    CryptConfig    `koanf:"crypt"`
+	S3       S3Config       `koanf:"s3"`
 }
 
 type LogConfig struct {
@@ -79,4 +80,14 @@ type CryptConfig struct {
 	AES struct {
 		Key string `koanf:"key" validate:"required"`
 	} `koanf:"aes"`
+}
+
+type S3Config struct {
+	Bucket string `koanf:"bucket" validate:"required"`
+	Prefix struct {
+		Image string `koanf:"image" validate:"required"`
+	} `koanf:"prefix"`
+	Presign struct {
+		Expiry time.Duration `koanf:"expiry" validate:"required,gt=0"`
+	} `koanf:"presign"`
 }
