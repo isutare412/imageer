@@ -11,7 +11,12 @@ import (
 )
 
 func (c *Config) ToLogConfig() log.Config {
-	return log.Config(c.Log)
+	return log.Config{
+		Format:    c.Log.Format,
+		Level:     c.Log.Level,
+		AddSource: c.Log.AddSource,
+		Component: c.Log.Component,
+	}
 }
 
 func (c *Config) ToWebConfig() web.Config {

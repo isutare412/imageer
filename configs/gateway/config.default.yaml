@@ -2,6 +2,7 @@ log:
   format: json # pretty, text, json
   level: info # debug, info, warn, error
   add-source: true
+  component: imageer-gateway
 
 web:
   port: 8080

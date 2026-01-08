@@ -13,9 +13,10 @@ import (
 
 func init() {
 	handler := tint.NewHandler(os.Stdout, &tint.Options{
-		Level:      slog.LevelDebug,
-		TimeFormat: time.RFC3339,
-		NoColor:    !isatty.IsTerminal(os.Stdout.Fd()),
+		Level:       slog.LevelDebug,
+		TimeFormat:  time.RFC3339,
+		NoColor:     !isatty.IsTerminal(os.Stdout.Fd()),
+		ReplaceAttr: replaceAttrTint,
 	})
 
 	logger := slog.New(
@@ -42,14 +43,6 @@ func Init(cfg Config) {
 			AddSource:   addSource,
 			ReplaceAttr: replaceAttrJSON,
 		})
-	case FormatText:
-		handler = tint.NewHandler(writer, &tint.Options{
-			Level:       level,
-			TimeFormat:  time.RFC3339,
-			NoColor:     !isatty.IsTerminal(writer.Fd()),
-			AddSource:   addSource,
-			ReplaceAttr: replaceAttrTint,
-		})
 	case FormatPretty:
 		handler = devslog.NewHandler(writer, &devslog.Options{
 			HandlerOptions: &slog.HandlerOptions{
@@ -58,11 +51,26 @@ func Init(cfg Config) {
 				ReplaceAttr: replaceAttrDevs,
 			},
 		})
+	case FormatText:
+		fallthrough
+	default:
+		handler = tint.NewHandler(writer, &tint.Options{
+			Level:       level,
+			TimeFormat:  time.RFC3339,
+			NoColor:     !isatty.IsTerminal(writer.Fd()),
+			AddSource:   addSource,
+			ReplaceAttr: replaceAttrTint,
+		})
+	}
+
+	middlewares := []slogmulti.Middleware{newAttrContextMiddleware()}
+	if attrs := cfg.ConstAttrs(); len(attrs) > 0 {
+		middlewares = append(middlewares, newAttrConstantMiddleware(attrs...))
 	}
 
 	logger := slog.New(
 		slogmulti.
-			Pipe(newAttrContextMiddleware()).
+			Pipe(middlewares...).
 			Handler(handler),
 	)
 

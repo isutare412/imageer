@@ -18,6 +18,7 @@ type LogConfig struct {
 	Format    log.Format `koanf:"format" validate:"validateFn=Validate"`
 	Level     log.Level  `koanf:"level" validate:"validateFn=Validate"`
 	AddSource bool       `koanf:"add-source"`
+	Component string     `koanf:"component" validate:"required"`
 }
 
 type WebConfig struct {
