@@ -79,3 +79,10 @@ func (t Preset) ToDomain() domain.Preset {
 		Height:    t.Height,
 	}
 }
+
+func (t Preset) ToReference() domain.PresetReference {
+	return domain.PresetReference{
+		ID:   t.ID,
+		Name: t.Name,
+	}
+}

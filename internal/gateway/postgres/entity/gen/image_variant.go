@@ -8,26 +8,24 @@ import (
 	"gorm.io/cli/gorm/field"
 )
 
-var Image = struct {
+var ImageVariant = struct {
 	ID        field.String
 	CreatedAt field.Time
 	UpdatedAt field.Time
-	FileName  field.String
 	Format    field.Field[images.Format]
-	State     field.Field[images.State]
+	State     field.Field[images.VariantState]
 	S3Key     field.String
-	ProjectID field.String
-	Project   field.Struct[entity.Project]
-	Variants  field.Slice[entity.ImageVariant]
+	ImageID   field.String
+	PresetID  field.String
+	Preset    field.Struct[entity.Preset]
 }{
 	ID:        field.String{}.WithColumn("id"),
 	CreatedAt: field.Time{}.WithColumn("created_at"),
 	UpdatedAt: field.Time{}.WithColumn("updated_at"),
-	FileName:  field.String{}.WithColumn("file_name"),
 	Format:    field.Field[images.Format]{}.WithColumn("format"),
-	State:     field.Field[images.State]{}.WithColumn("state"),
+	State:     field.Field[images.VariantState]{}.WithColumn("state"),
 	S3Key:     field.String{}.WithColumn("s3_key"),
-	ProjectID: field.String{}.WithColumn("project_id"),
-	Project:   field.Struct[entity.Project]{}.WithName("Project"),
-	Variants:  field.Slice[entity.ImageVariant]{}.WithName("Variants"),
+	ImageID:   field.String{}.WithColumn("image_id"),
+	PresetID:  field.String{}.WithColumn("preset_id"),
+	Preset:    field.Struct[entity.Preset]{}.WithName("Preset"),
 }

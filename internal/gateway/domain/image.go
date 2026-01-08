@@ -1,19 +1,23 @@
 package domain
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/isutare412/imageer/pkg/images"
 )
 
 type Image struct {
-	ID               string
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
-	OriginalFileName string
-	Format           images.Format
-	State            images.State
-	URLSet           ImageURLSet
+	ID        string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	FileName  string
+	Format    images.Format
+	State     images.State
+	S3Key     string
+	URL       string
+	Variants  []ImageVariant
+	Project   ProjectReference
 }
 
 type Images struct {
@@ -26,25 +30,26 @@ type ReprocessImagesRequest struct {
 	ReprocessAll bool
 }
 
-type ImageURLSet struct {
-	OriginalURL string
-	Variants    []VariantURL
-}
-
-type VariantURL struct {
-	PresetID   string
-	PresetName string
-	URL        string
-}
-
 type UploadURL struct {
 	ImageID   string
 	ExpiresAt time.Time
 	URL       string
+	Header    http.Header
 }
 
 type CreateUploadURLRequest struct {
-	FileName    string        `validate:"required,max=1024"`
+	FileName    string        `validate:"required,max=512"`
 	Format      images.Format `validate:"validateFn=Validate"`
 	PresetNames []string      `validate:"dive,required,max=64"`
+}
+
+type PresignPutObjectRequest struct {
+	S3Key       string
+	ContentType string
+}
+
+type PresignPutObjectResponse struct {
+	URL      string
+	Header   http.Header
+	ExpireAt time.Time
 }

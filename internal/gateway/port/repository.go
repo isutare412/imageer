@@ -29,3 +29,16 @@ type ServiceAccountRepository interface {
 	Update(ctx context.Context, req domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error)
 	Delete(ctx context.Context, id string) error
 }
+
+type ImageRepository interface {
+	Create(context.Context, domain.Image) (domain.Image, error)
+}
+
+type ImageVariantRepository interface {
+	Create(context.Context, domain.ImageVariant) (domain.ImageVariant, error)
+}
+
+type PresetRepository interface {
+	FindByName(ctx context.Context, projectID, name string) (domain.Preset, error)
+	List(context.Context, domain.ListPresetsParams) ([]domain.Preset, error)
+}

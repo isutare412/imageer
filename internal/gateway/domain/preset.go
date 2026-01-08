@@ -21,6 +21,11 @@ type Preset struct {
 	Height  *int64
 }
 
+type PresetReference struct {
+	ID   string
+	Name string
+}
+
 type CreatePresetRequest struct {
 	Name    string `validate:"required,max=64,kebabcase"`
 	Default bool

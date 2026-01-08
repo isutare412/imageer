@@ -281,3 +281,135 @@ func (mr *MockServiceAccountRepositoryMockRecorder) Update(ctx, req any) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockServiceAccountRepository)(nil).Update), ctx, req)
 }
+
+// MockImageRepository is a mock of ImageRepository interface.
+type MockImageRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockImageRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockImageRepositoryMockRecorder is the mock recorder for MockImageRepository.
+type MockImageRepositoryMockRecorder struct {
+	mock *MockImageRepository
+}
+
+// NewMockImageRepository creates a new mock instance.
+func NewMockImageRepository(ctrl *gomock.Controller) *MockImageRepository {
+	mock := &MockImageRepository{ctrl: ctrl}
+	mock.recorder = &MockImageRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockImageRepository) EXPECT() *MockImageRepositoryMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockImageRepository) Create(arg0 context.Context, arg1 domain.Image) (domain.Image, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", arg0, arg1)
+	ret0, _ := ret[0].(domain.Image)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockImageRepositoryMockRecorder) Create(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockImageRepository)(nil).Create), arg0, arg1)
+}
+
+// MockImageVariantRepository is a mock of ImageVariantRepository interface.
+type MockImageVariantRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockImageVariantRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockImageVariantRepositoryMockRecorder is the mock recorder for MockImageVariantRepository.
+type MockImageVariantRepositoryMockRecorder struct {
+	mock *MockImageVariantRepository
+}
+
+// NewMockImageVariantRepository creates a new mock instance.
+func NewMockImageVariantRepository(ctrl *gomock.Controller) *MockImageVariantRepository {
+	mock := &MockImageVariantRepository{ctrl: ctrl}
+	mock.recorder = &MockImageVariantRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockImageVariantRepository) EXPECT() *MockImageVariantRepositoryMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockImageVariantRepository) Create(arg0 context.Context, arg1 domain.ImageVariant) (domain.ImageVariant, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", arg0, arg1)
+	ret0, _ := ret[0].(domain.ImageVariant)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockImageVariantRepositoryMockRecorder) Create(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockImageVariantRepository)(nil).Create), arg0, arg1)
+}
+
+// MockPresetRepository is a mock of PresetRepository interface.
+type MockPresetRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockPresetRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockPresetRepositoryMockRecorder is the mock recorder for MockPresetRepository.
+type MockPresetRepositoryMockRecorder struct {
+	mock *MockPresetRepository
+}
+
+// NewMockPresetRepository creates a new mock instance.
+func NewMockPresetRepository(ctrl *gomock.Controller) *MockPresetRepository {
+	mock := &MockPresetRepository{ctrl: ctrl}
+	mock.recorder = &MockPresetRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockPresetRepository) EXPECT() *MockPresetRepositoryMockRecorder {
+	return m.recorder
+}
+
+// FindByName mocks base method.
+func (m *MockPresetRepository) FindByName(ctx context.Context, projectID, name string) (domain.Preset, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByName", ctx, projectID, name)
+	ret0, _ := ret[0].(domain.Preset)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByName indicates an expected call of FindByName.
+func (mr *MockPresetRepositoryMockRecorder) FindByName(ctx, projectID, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByName", reflect.TypeOf((*MockPresetRepository)(nil).FindByName), ctx, projectID, name)
+}
+
+// List mocks base method.
+func (m *MockPresetRepository) List(arg0 context.Context, arg1 domain.ListPresetsParams) ([]domain.Preset, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", arg0, arg1)
+	ret0, _ := ret[0].([]domain.Preset)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List.
+func (mr *MockPresetRepositoryMockRecorder) List(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockPresetRepository)(nil).List), arg0, arg1)
+}
