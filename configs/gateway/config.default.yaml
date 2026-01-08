@@ -88,4 +88,4 @@ s3:
   prefix:
     image: sandbox/images
   presign:
-    expiry: 10m
+    expiry: 5m

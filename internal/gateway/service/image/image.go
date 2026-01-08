@@ -12,7 +12,7 @@ func (s *Service) imageS3BasePath(projectID, imageID string) string {
 
 func (s *Service) imageS3Key(projectID, imageID string, format images.Format) string {
 	base := s.imageS3BasePath(projectID, imageID)
-	return fmt.Sprintf("%s.%s", base, format.Extension())
+	return fmt.Sprintf("%s/original.%s", base, format.Extension())
 }
 
 func (s *Service) imageVariantS3Key(projectID, imageID, presetID string, format images.Format) string {
