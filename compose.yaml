@@ -23,3 +23,12 @@ services:
       APP_DB_NAME: ${APP_DB_NAME}
       APP_DB_USER: ${APP_DB_USER}
       APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+
+  valkey:
+    image: valkey/valkey:9-trixie
+    networks:
+      app-tier:
+    ports:
+      - ${VALKEY_PORT}:6379
+    environment:
+      VALKEY_EXTRA_FLAGS: "--bind * -::* --user admin on +@all >complex_password --maxmemory 2gb --maxmemory-policy allkeys-lru"
