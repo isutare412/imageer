@@ -69,3 +69,13 @@ vips: ## Check and install vips if needed
 	else \
 		echo "✅ vips is already installed."; \
 	fi
+
+.PHONY: buf
+buf: ## Check and install buf if needed
+	@if ! command -v buf >/dev/null 2>&1; then \
+		echo "⚠️ buf not found. Please install buf before proceeding."; \
+		brew install bufbuild/buf/buf && \
+		echo "✅ buf installed successfully."; \
+	else \
+		echo "✅ buf is already installed."; \
+	fi

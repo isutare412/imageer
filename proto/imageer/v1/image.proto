@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package imageer.v1;
+
+import "google/protobuf/timestamp.proto";
+
+enum Format {
+  FORMAT_UNSPECIFIED = 0;
+  FORMAT_JPEG = 1;
+  FORMAT_PNG = 2;
+  FORMAT_WEBP = 3;
+  FORMAT_AVIF = 4;
+  FORMAT_HEIC = 5;
+}
+
+enum Fit {
+  FIT_UNSPECIFIED = 0;
+  FIT_COVER = 1;
+  FIT_CONTAIN = 2;
+  FIT_FILL = 3;
+}
+
+enum Anchor {
+  ANCHOR_UNSPECIFIED = 0;
+  ANCHOR_CENTER = 1;
+  ANCHOR_NORTH = 2;
+  ANCHOR_SOUTH = 3;
+  ANCHOR_EAST = 4;
+  ANCHOR_WEST = 5;
+}
+
+enum State {
+  STATE_UNSPECIFIED = 0;
+  STATE_WAITING_UPLOAD = 1;
+  STATE_FAILED = 2;
+  STATE_READY = 3;
+}
+
+enum VariantState {
+  VARIANT_STATE_UNSPECIFIED = 0;
+  VARIANT_STATE_WAITING_UPLOAD = 1;
+  VARIANT_STATE_PROCESSING = 2;
+  VARIANT_STATE_FAILED = 3;
+  VARIANT_STATE_READY = 4;
+}
+
+message Image {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  string file_name = 4;
+  Format format = 5;
+  State state = 6;
+  string s3_key = 7;
+  string url = 8;
+  string project_id = 9;
+}
+
+message ImageVariant {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  Format format = 4;
+  VariantState state = 5;
+  string s3_key = 6;
+  string url = 7;
+  string image_id = 8;
+}

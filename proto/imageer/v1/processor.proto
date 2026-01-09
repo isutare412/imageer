@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package imageer.v1;
+
+import "google/protobuf/duration.proto";
+import "imageer/v1/image.proto";
+import "imageer/v1/preset.proto";
+
+message ImageProcessRequest {
+  Image image = 1;
+  ImageVariant variant = 2;
+  Preset preset = 3;
+}
+
+message ImageProcessResponse {
+  string image_id = 1;
+  string image_variant_id = 2;
+  string preset_id = 3;
+  bool is_success = 4;
+  string error_message = 5;
+  google.protobuf.Duration processing_time = 6;
+}

@@ -42,6 +42,7 @@ require (
 	github.com/valkey-io/valkey-go v1.0.70
 	go.uber.org/mock v0.5.2
 	golang.org/x/oauth2 v0.30.0
+	google.golang.org/protobuf v1.36.11
 	gorm.io/cli/gorm v0.2.4
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/driver/sqlite v1.6.0

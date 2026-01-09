@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package imageer.v1;
+
+import "google/protobuf/timestamp.proto";
+import "imageer/v1/image.proto";
+
+message Preset {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  string name = 4;
+  bool default = 5;
+  Format format = 6;
+  int32 quality = 7;
+  Fit fit = 8;
+  Anchor anchor = 9;
+  optional int32 width = 10;
+  optional int32 height = 11;
+}
