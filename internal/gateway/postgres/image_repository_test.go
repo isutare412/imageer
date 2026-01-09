@@ -1,6 +1,7 @@
 package postgres_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -16,9 +17,10 @@ import (
 
 func TestImageRepository_Create(t *testing.T) {
 	type testSet struct {
-		name      string // description of this test case
-		imageRepo *postgres.ImageRepository
-		mock      sqlmock.Sqlmock
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		imageRepo     *postgres.ImageRepository
+		mock          sqlmock.Sqlmock
 
 		req     domain.Image
 		setup   func(t *testing.T, tt *testSet)
@@ -38,7 +40,8 @@ func TestImageRepository_Create(t *testing.T) {
 				},
 			},
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.imageRepo = postgres.NewImageRepository(postgresClient)
 				tt.mock = mock
 
@@ -81,7 +84,10 @@ func TestImageRepository_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.imageRepo.Create(t.Context(), tt.req)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.imageRepo.Create(ctx, tt.req)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

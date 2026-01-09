@@ -2,11 +2,17 @@ package port
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 )
 
 //go:generate sh -c "go tool mockgen -package $GOPACKAGE -source=$GOFILE -destination=$(basename $GOFILE .go)_mock.go"
+
+type Transactioner interface {
+	BeginTx(ctx context.Context, opts ...*sql.TxOptions) (ctxWithTx context.Context, commit, rollback func() error)
+	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
+}
 
 type UserRepository interface {
 	FindByID(ctx context.Context, id string) (domain.User, error)

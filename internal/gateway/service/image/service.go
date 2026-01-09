@@ -14,23 +14,26 @@ import (
 )
 
 type Service struct {
-	s3Presigner  port.S3Presigner
-	imageRepo    port.ImageRepository
-	imageVarRepo port.ImageVariantRepository
-	presetRepo   port.PresetRepository
+	s3Presigner   port.S3Presigner
+	transactioner port.Transactioner
+	imageRepo     port.ImageRepository
+	imageVarRepo  port.ImageVariantRepository
+	presetRepo    port.PresetRepository
 
 	cfg Config
 }
 
-func NewService(cfg Config, s3Presigner port.S3Presigner, imageRepo port.ImageRepository,
-	imageVarRepo port.ImageVariantRepository, presetRepo port.PresetRepository,
+func NewService(cfg Config, s3Presigner port.S3Presigner, transactioner port.Transactioner,
+	imageRepo port.ImageRepository, imageVarRepo port.ImageVariantRepository,
+	presetRepo port.PresetRepository,
 ) *Service {
 	return &Service{
-		s3Presigner:  s3Presigner,
-		imageRepo:    imageRepo,
-		imageVarRepo: imageVarRepo,
-		presetRepo:   presetRepo,
-		cfg:          cfg,
+		s3Presigner:   s3Presigner,
+		transactioner: transactioner,
+		imageRepo:     imageRepo,
+		imageVarRepo:  imageVarRepo,
+		presetRepo:    presetRepo,
+		cfg:           cfg,
 	}
 }
 
@@ -40,50 +43,57 @@ func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadUR
 		return domain.UploadURL{}, fmt.Errorf("validating request: %w", err)
 	}
 
-	// Check presets exist
-	params := domain.ListPresetsParams{
-		SearchFilter: domain.PresetSearchFilter{
-			ProjectID: &req.ProjectID,
-			Names:     req.PresetNames,
-		},
-	}
-	presets, err := s.presetRepo.List(ctx, params)
-	if err != nil {
-		return domain.UploadURL{}, fmt.Errorf("listing presets: %w", err)
-	}
-	diffs := findPresetNameDiference(req.PresetNames, presets)
-	if len(diffs) > 0 {
-		return domain.UploadURL{}, apperr.NewError(apperr.CodeNotFound).
-			WithSummary("Presets not found: %v", diffs)
-	}
-
-	// Create image record
-	imageID := uuid.NewString()
-	image := domain.Image{
-		ID:       imageID,
-		FileName: req.FileName,
-		Format:   req.Format,
-		State:    images.StateWaitingUpload,
-		S3Key:    s.imageS3Key(req.ProjectID, imageID, req.Format),
-		Project:  domain.ProjectReference{ID: req.ProjectID},
-	}
-	image, err = s.imageRepo.Create(ctx, image)
-	if err != nil {
-		return domain.UploadURL{}, fmt.Errorf("creating image: %w", err)
-	}
-
-	// Create image variant records
-	for _, preset := range presets {
-		variant := domain.ImageVariant{
-			Format:  preset.Format,
-			State:   images.VariantStateWaitingUpload,
-			S3Key:   s.imageVariantS3Key(req.ProjectID, imageID, preset.ID, preset.Format),
-			ImageID: imageID,
-			Preset:  domain.PresetReference{ID: preset.ID},
+	var image domain.Image
+	err := s.transactioner.WithTx(ctx, func(ctx context.Context) error {
+		// Check presets exist
+		params := domain.ListPresetsParams{
+			SearchFilter: domain.PresetSearchFilter{
+				ProjectID: &req.ProjectID,
+				Names:     req.PresetNames,
+			},
 		}
-		if _, err = s.imageVarRepo.Create(ctx, variant); err != nil {
-			return domain.UploadURL{}, fmt.Errorf("creating image variant for preset: %w", err)
+		presets, err := s.presetRepo.List(ctx, params)
+		if err != nil {
+			return fmt.Errorf("listing presets: %w", err)
 		}
+		diffs := findPresetNameDiference(req.PresetNames, presets)
+		if len(diffs) > 0 {
+			return apperr.NewError(apperr.CodeNotFound).WithSummary("Presets not found: %v", diffs)
+		}
+
+		// Create image record
+		imageID := uuid.NewString()
+		image = domain.Image{
+			ID:       imageID,
+			FileName: req.FileName,
+			Format:   req.Format,
+			State:    images.StateWaitingUpload,
+			S3Key:    s.imageS3Key(req.ProjectID, imageID, req.Format),
+			Project:  domain.ProjectReference{ID: req.ProjectID},
+		}
+		image, err = s.imageRepo.Create(ctx, image)
+		if err != nil {
+			return fmt.Errorf("creating image: %w", err)
+		}
+
+		// Create image variant records
+		for _, preset := range presets {
+			variant := domain.ImageVariant{
+				Format:  preset.Format,
+				State:   images.VariantStateWaitingUpload,
+				S3Key:   s.imageVariantS3Key(req.ProjectID, imageID, preset.ID, preset.Format),
+				ImageID: imageID,
+				Preset:  domain.PresetReference{ID: preset.ID},
+			}
+			if _, err = s.imageVarRepo.Create(ctx, variant); err != nil {
+				return fmt.Errorf("creating image variant for preset: %w", err)
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return domain.UploadURL{}, fmt.Errorf("during transaction: %w", err)
 	}
 
 	// Presign image upload URL

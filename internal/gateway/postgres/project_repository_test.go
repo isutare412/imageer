@@ -1,6 +1,7 @@
 package postgres_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -17,9 +18,10 @@ import (
 
 func TestProjectRepository_FindByID(t *testing.T) {
 	type testSet struct {
-		name        string // description of this test case
-		projectRepo *postgres.ProjectRepository
-		mock        sqlmock.Sqlmock
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		projectRepo   *postgres.ProjectRepository
+		mock          sqlmock.Sqlmock
 
 		id      string
 		setup   func(t *testing.T, tt *testSet)
@@ -31,10 +33,12 @@ func TestProjectRepository_FindByID(t *testing.T) {
 			name: "normal case",
 			id:   "project-1",
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.projectRepo = postgres.NewProjectRepository(postgresClient)
 				tt.mock = mock
 
+				mock.ExpectBegin()
 				mock.ExpectQuery(`SELECT * FROM "projects" WHERE "id" = $1 ORDER BY "projects"."id" LIMIT $2`).
 					WithArgs("project-1", 1).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
@@ -44,6 +48,7 @@ func TestProjectRepository_FindByID(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Preset]()).
 						AddRow("preset-1", time.Now(), time.Now(), "preset-1", false, images.FormatWebp,
 							images.Quality(90), images.FitCover, nil, 100, 100, "project-1"))
+				mock.ExpectCommit()
 			},
 			wantErr: false,
 		},
@@ -52,7 +57,10 @@ func TestProjectRepository_FindByID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.projectRepo.FindByID(t.Context(), tt.id)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.projectRepo.FindByID(ctx, tt.id)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -67,9 +75,10 @@ func TestProjectRepository_FindByID(t *testing.T) {
 
 func TestProjectRepository_List(t *testing.T) {
 	type testSet struct {
-		name        string // description of this test case
-		projectRepo *postgres.ProjectRepository
-		mock        sqlmock.Sqlmock
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		projectRepo   *postgres.ProjectRepository
+		mock          sqlmock.Sqlmock
 
 		req     domain.ListProjectsParams
 		setup   func(t *testing.T, tt *testSet)
@@ -91,7 +100,8 @@ func TestProjectRepository_List(t *testing.T) {
 				},
 			},
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.projectRepo = postgres.NewProjectRepository(postgresClient)
 				tt.mock = mock
 
@@ -121,7 +131,10 @@ func TestProjectRepository_List(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.projectRepo.List(t.Context(), tt.req)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.projectRepo.List(ctx, tt.req)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -136,9 +149,10 @@ func TestProjectRepository_List(t *testing.T) {
 
 func TestProjectRepository_Create(t *testing.T) {
 	type testSet struct {
-		name        string // description of this test case
-		projectRepo *postgres.ProjectRepository
-		mock        sqlmock.Sqlmock
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		projectRepo   *postgres.ProjectRepository
+		mock          sqlmock.Sqlmock
 
 		req     domain.Project
 		setup   func(t *testing.T, tt *testSet)
@@ -174,7 +188,8 @@ func TestProjectRepository_Create(t *testing.T) {
 				},
 			},
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.projectRepo = postgres.NewProjectRepository(postgresClient)
 				tt.mock = mock
 
@@ -197,7 +212,10 @@ func TestProjectRepository_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.projectRepo.Create(t.Context(), tt.req)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.projectRepo.Create(ctx, tt.req)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -212,9 +230,10 @@ func TestProjectRepository_Create(t *testing.T) {
 
 func TestProjectRepository_Update(t *testing.T) {
 	type testSet struct {
-		name        string // description of this test case
-		projectRepo *postgres.ProjectRepository
-		mock        sqlmock.Sqlmock
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		projectRepo   *postgres.ProjectRepository
+		mock          sqlmock.Sqlmock
 
 		req     domain.UpdateProjectRequest
 		setup   func(t *testing.T, tt *testSet)
@@ -245,7 +264,8 @@ func TestProjectRepository_Update(t *testing.T) {
 				},
 			},
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.projectRepo = postgres.NewProjectRepository(postgresClient)
 				tt.mock = mock
 
@@ -284,7 +304,10 @@ func TestProjectRepository_Update(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.projectRepo.Update(t.Context(), tt.req)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.projectRepo.Update(ctx, tt.req)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -299,9 +322,10 @@ func TestProjectRepository_Update(t *testing.T) {
 
 func TestProjectRepository_Delete(t *testing.T) {
 	type testSet struct {
-		name        string // description of this test case
-		projectRepo *postgres.ProjectRepository
-		mock        sqlmock.Sqlmock
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		projectRepo   *postgres.ProjectRepository
+		mock          sqlmock.Sqlmock
 
 		id      string
 		setup   func(t *testing.T, tt *testSet)
@@ -313,7 +337,8 @@ func TestProjectRepository_Delete(t *testing.T) {
 			name: "normal case",
 			id:   "project-1",
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.projectRepo = postgres.NewProjectRepository(postgresClient)
 				tt.mock = mock
 
@@ -330,7 +355,10 @@ func TestProjectRepository_Delete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			err := tt.projectRepo.Delete(t.Context(), tt.id)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				err := tt.projectRepo.Delete(ctx, tt.id)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

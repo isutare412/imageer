@@ -26,7 +26,9 @@ func NewProjectRepository(client *Client) *ProjectRepository {
 }
 
 func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Project, error) {
-	proj, err := gorm.G[entity.Project](r.db).
+	tx := GetTxOrDB(ctx, r.db)
+
+	proj, err := gorm.G[entity.Project](tx).
 		Where(gen.Project.ID.Eq(id)).
 		Preload(gen.Project.Presets.Name(), nil).
 		First(ctx)
@@ -40,36 +42,26 @@ func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Pro
 func (r *ProjectRepository) List(
 	ctx context.Context, params domain.ListProjectsParams,
 ) (domain.Projects, error) {
-	var (
-		projects   []entity.Project
-		totalCount int64
-	)
-	if err := r.db.Transaction(func(tx *gorm.DB) error {
-		// Fetch projects
-		q := gorm.G[entity.Project](r.db).Scopes()
-		q = applyProjectSearchFilter(q, params.SearchFilter)
-		q = applyProjectSortFilter(q, params.SortFilter)
-		q = applyPagination(q, params.LimitOrDefault(), params.OffsetOrDefault())
-		_projects, err := q.
-			Preload(gen.Project.Presets.Name(), nil).
-			Find(ctx)
-		if err != nil {
-			return dbhelpers.WrapError(err, "Failed to list projects")
-		}
+	tx := GetTxOrDB(ctx, r.db)
 
-		// Fetch total count
-		q = gorm.G[entity.Project](tx).Scopes()
-		q = applyProjectSearchFilter(q, params.SearchFilter)
-		count, err := q.Count(ctx, "COUNT(1)")
-		if err != nil {
-			return dbhelpers.WrapError(err, "Failed to count projects")
-		}
+	// Fetch projects
+	q := gorm.G[entity.Project](r.db).Scopes()
+	q = applyProjectSearchFilter(q, params.SearchFilter)
+	q = applyProjectSortFilter(q, params.SortFilter)
+	q = applyPagination(q, params.LimitOrDefault(), params.OffsetOrDefault())
+	projects, err := q.
+		Preload(gen.Project.Presets.Name(), nil).
+		Find(ctx)
+	if err != nil {
+		return domain.Projects{}, dbhelpers.WrapError(err, "Failed to list projects")
+	}
 
-		projects = _projects
-		totalCount = count
-		return nil
-	}); err != nil {
-		return domain.Projects{}, fmt.Errorf("during transaction: %w", err)
+	// Fetch total count
+	q = gorm.G[entity.Project](tx).Scopes()
+	q = applyProjectSearchFilter(q, params.SearchFilter)
+	totalCount, err := q.Count(ctx, "COUNT(1)")
+	if err != nil {
+		return domain.Projects{}, dbhelpers.WrapError(err, "Failed to count projects")
 	}
 
 	return domain.Projects{
@@ -81,9 +73,10 @@ func (r *ProjectRepository) List(
 }
 
 func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (domain.Project, error) {
-	proj := entity.NewProject(req)
+	tx := GetTxOrDB(ctx, r.db)
 
-	if err := gorm.G[entity.Project](r.db).Create(ctx, &proj); err != nil {
+	proj := entity.NewProject(req)
+	if err := gorm.G[entity.Project](tx).Create(ctx, &proj); err != nil {
 		return domain.Project{}, dbhelpers.WrapError(err, "Failed to create project")
 	}
 
@@ -93,44 +86,41 @@ func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (dom
 func (r *ProjectRepository) Update(
 	ctx context.Context, req domain.UpdateProjectRequest,
 ) (domain.Project, error) {
-	var proj domain.Project
-	if err := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := r.syncPresets(ctx, tx, req.ID, req.Presets); err != nil {
-			return fmt.Errorf("syncing presets: %w", err)
-		}
+	tx := GetTxOrDB(ctx, r.db)
 
-		// Update project fields
-		assigners := buildProjectUpdateAssigners(req)
-		if len(assigners) > 0 {
-			_, err := gorm.G[entity.Project](tx).
-				Where(gen.Project.ID.Eq(req.ID)).
-				Set(append(assigners, gen.Project.UpdatedAt.Set(time.Now()))...).
-				Update(ctx)
-			if err != nil {
-				return dbhelpers.WrapError(err, "Failed to update project %s", req.ID)
-			}
-		}
-
-		// Fetch updated project
-		p, err := gorm.G[entity.Project](tx).
-			Where(gen.Project.ID.Eq(req.ID)).
-			Preload(gen.Project.Presets.Name(), nil).
-			First(ctx)
-		if err != nil {
-			return dbhelpers.WrapError(err, "Failed to fetch updated project %s", req.ID)
-		}
-
-		proj = p.ToDomain()
-		return nil
-	}); err != nil {
-		return domain.Project{}, fmt.Errorf("during transaction: %w", err)
+	if err := r.syncPresets(ctx, tx, req.ID, req.Presets); err != nil {
+		return domain.Project{}, fmt.Errorf("syncing presets: %w", err)
 	}
 
-	return proj, nil
+	// Update project fields
+	assigners := buildProjectUpdateAssigners(req)
+	if len(assigners) > 0 {
+		_, err := gorm.G[entity.Project](tx).
+			Where(gen.Project.ID.Eq(req.ID)).
+			Set(append(assigners, gen.Project.UpdatedAt.Set(time.Now()))...).
+			Update(ctx)
+		if err != nil {
+			return domain.Project{}, dbhelpers.WrapError(err, "Failed to update project %s", req.ID)
+		}
+	}
+
+	// Fetch updated project
+	proj, err := gorm.G[entity.Project](tx).
+		Where(gen.Project.ID.Eq(req.ID)).
+		Preload(gen.Project.Presets.Name(), nil).
+		First(ctx)
+	if err != nil {
+		return domain.Project{},
+			dbhelpers.WrapError(err, "Failed to fetch updated project %s", req.ID)
+	}
+
+	return proj.ToDomain(), nil
 }
 
 func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
-	_, err := gorm.G[entity.Project](r.db).
+	tx := GetTxOrDB(ctx, r.db)
+
+	_, err := gorm.G[entity.Project](tx).
 		Where(gen.Project.ID.Eq(id)).
 		Delete(ctx)
 	if err != nil {

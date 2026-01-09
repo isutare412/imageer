@@ -879,7 +879,7 @@ components:
           additionalProperties:
             type: string
           example:
-            Content-Type: image/webp
+            Host: foo.s3.amazonaws.com
         expiresAt:
           type: string
           format: date-time

@@ -11,11 +11,71 @@ package port
 
 import (
 	context "context"
+	sql "database/sql"
 	reflect "reflect"
 
 	domain "github.com/isutare412/imageer/internal/gateway/domain"
 	gomock "go.uber.org/mock/gomock"
 )
+
+// MockTransactioner is a mock of Transactioner interface.
+type MockTransactioner struct {
+	ctrl     *gomock.Controller
+	recorder *MockTransactionerMockRecorder
+	isgomock struct{}
+}
+
+// MockTransactionerMockRecorder is the mock recorder for MockTransactioner.
+type MockTransactionerMockRecorder struct {
+	mock *MockTransactioner
+}
+
+// NewMockTransactioner creates a new mock instance.
+func NewMockTransactioner(ctrl *gomock.Controller) *MockTransactioner {
+	mock := &MockTransactioner{ctrl: ctrl}
+	mock.recorder = &MockTransactionerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTransactioner) EXPECT() *MockTransactionerMockRecorder {
+	return m.recorder
+}
+
+// BeginTx mocks base method.
+func (m *MockTransactioner) BeginTx(ctx context.Context, opts ...*sql.TxOptions) (context.Context, func() error, func() error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BeginTx", varargs...)
+	ret0, _ := ret[0].(context.Context)
+	ret1, _ := ret[1].(func() error)
+	ret2, _ := ret[2].(func() error)
+	return ret0, ret1, ret2
+}
+
+// BeginTx indicates an expected call of BeginTx.
+func (mr *MockTransactionerMockRecorder) BeginTx(ctx any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BeginTx", reflect.TypeOf((*MockTransactioner)(nil).BeginTx), varargs...)
+}
+
+// WithTx mocks base method.
+func (m *MockTransactioner) WithTx(ctx context.Context, fn func(context.Context) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithTx", ctx, fn)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WithTx indicates an expected call of WithTx.
+func (mr *MockTransactionerMockRecorder) WithTx(ctx, fn any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithTx", reflect.TypeOf((*MockTransactioner)(nil).WithTx), ctx, fn)
+}
 
 // MockUserRepository is a mock of UserRepository interface.
 type MockUserRepository struct {

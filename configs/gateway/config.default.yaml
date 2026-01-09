@@ -1,7 +1,7 @@
 log:
   format: json # pretty, text, json
   level: info # debug, info, warn, error
-  add-source: true
+  add-source: false
   component: imageer-gateway
 
 web:
@@ -88,4 +88,4 @@ s3:
   prefix:
     image: sandbox/images
   presign:
-    expiry: 5m
+    expiry: 10m

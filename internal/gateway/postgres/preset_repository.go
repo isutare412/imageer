@@ -24,7 +24,9 @@ func NewPresetRepository(client *Client) *PresetRepository {
 
 func (r *PresetRepository) FindByName(ctx context.Context, projectID, name string,
 ) (domain.Preset, error) {
-	preset, err := gorm.G[entity.Preset](r.db).
+	tx := GetTxOrDB(ctx, r.db)
+
+	preset, err := gorm.G[entity.Preset](tx).
 		Where(gen.Preset.ProjectID.Eq(projectID)).
 		Where(gen.Preset.Name.Eq(name)).
 		First(ctx)
@@ -37,7 +39,9 @@ func (r *PresetRepository) FindByName(ctx context.Context, projectID, name strin
 
 func (r *PresetRepository) List(ctx context.Context, params domain.ListPresetsParams,
 ) ([]domain.Preset, error) {
-	q := gorm.G[entity.Preset](r.db).Scopes()
+	tx := GetTxOrDB(ctx, r.db)
+
+	q := gorm.G[entity.Preset](tx).Scopes()
 	q = applyPresetSearchFilter(q, params.SearchFilter)
 	q = applyPresetSortFilter(q, params.SortFilter)
 	q = applyPagination(q, params.LimitOrDefault(), params.OffsetOrDefault())

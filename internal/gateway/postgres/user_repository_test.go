@@ -1,6 +1,7 @@
 package postgres_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -15,7 +16,7 @@ import (
 )
 
 func TestUserRepository_Upsert(t *testing.T) {
-	postgresClient, mock := postgres.NewClientWithMock(t)
+	postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
 	userRepo := postgres.NewUserRepository(postgresClient)
 
 	mock.ExpectBegin()
@@ -35,7 +36,10 @@ func TestUserRepository_Upsert(t *testing.T) {
 			AddRow("user-1", time.Now(), time.Now(), users.RoleGuest, "nickname-1", "email-1", "photo-url-1"))
 	mock.ExpectCommit()
 
-	_, err := userRepo.Upsert(t.Context(), domain.User{})
+	err := transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+		_, err := userRepo.Upsert(ctx, domain.User{})
+		return err
+	})
 	require.NoError(t, err)
 
 	err = mock.ExpectationsWereMet()

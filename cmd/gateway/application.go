@@ -68,6 +68,9 @@ func newApplication(cfg config.Config) (*application, error) {
 		return nil, fmt.Errorf("creating repository client: %w", err)
 	}
 
+	slog.Info("Create transactioner")
+	transactioner := postgres.NewTransactioner(repoClient)
+
 	slog.Info("Create user repository")
 	userRepo := postgres.NewUserRepository(repoClient)
 
@@ -96,7 +99,7 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create project service")
 	projectSvc := project.NewService(projectRepo)
 
-	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, imageRepo,
+	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, transactioner, imageRepo,
 		imageVarRepo, presetRepo)
 
 	slog.Info("Create web server")

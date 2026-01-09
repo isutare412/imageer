@@ -1,6 +1,7 @@
 package postgres_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 func TestServiceAccountRepository_FindByID(t *testing.T) {
 	type testSet struct {
 		name           string // description of this test case
+		transactioner  *postgres.Transactioner
 		svcAccountRepo *postgres.ServiceAccountRepository
 		mock           sqlmock.Sqlmock
 
@@ -31,10 +33,12 @@ func TestServiceAccountRepository_FindByID(t *testing.T) {
 			name: "normal case",
 			id:   "account-1",
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.svcAccountRepo = postgres.NewServiceAccountRepository(postgresClient)
 				tt.mock = mock
 
+				mock.ExpectBegin()
 				mock.ExpectQuery(
 					`SELECT * FROM "service_accounts" WHERE "id" = $1 ORDER BY "service_accounts"."id" LIMIT $2`).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.ServiceAccount]()).
@@ -51,6 +55,7 @@ func TestServiceAccountRepository_FindByID(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
 						AddRow("project-1", time.Now(), time.Now(), "project-name-1").
 						AddRow("project-2", time.Now(), time.Now(), "project-name-2"))
+				mock.ExpectCommit()
 			},
 			wantErr: false,
 		},
@@ -59,7 +64,10 @@ func TestServiceAccountRepository_FindByID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.svcAccountRepo.FindByID(t.Context(), tt.id)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.svcAccountRepo.FindByID(ctx, tt.id)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -75,6 +83,7 @@ func TestServiceAccountRepository_FindByID(t *testing.T) {
 func TestServiceAccountRepository_FindByAPIKeyHash(t *testing.T) {
 	type testSet struct {
 		name           string // description of this test case
+		transactioner  *postgres.Transactioner
 		svcAccountRepo *postgres.ServiceAccountRepository
 		mock           sqlmock.Sqlmock
 
@@ -88,10 +97,12 @@ func TestServiceAccountRepository_FindByAPIKeyHash(t *testing.T) {
 			name: "normal case",
 			hash: "test-hash-1",
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.svcAccountRepo = postgres.NewServiceAccountRepository(postgresClient)
 				tt.mock = mock
 
+				mock.ExpectBegin()
 				mock.ExpectQuery(
 					`SELECT * FROM "service_accounts" WHERE "api_key_hash" = $1 ` +
 						`ORDER BY "service_accounts"."id" LIMIT $2`).
@@ -109,6 +120,7 @@ func TestServiceAccountRepository_FindByAPIKeyHash(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
 						AddRow("project-1", time.Now(), time.Now(), "project-name-1").
 						AddRow("project-2", time.Now(), time.Now(), "project-name-2"))
+				mock.ExpectCommit()
 			},
 			wantErr: false,
 		},
@@ -117,7 +129,10 @@ func TestServiceAccountRepository_FindByAPIKeyHash(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.svcAccountRepo.FindByAPIKeyHash(t.Context(), tt.hash)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.svcAccountRepo.FindByAPIKeyHash(ctx, tt.hash)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -133,6 +148,7 @@ func TestServiceAccountRepository_FindByAPIKeyHash(t *testing.T) {
 func TestServiceAccountRepository_List(t *testing.T) {
 	type testSet struct {
 		name           string // description of this test case
+		transactioner  *postgres.Transactioner
 		svcAccountRepo *postgres.ServiceAccountRepository
 		mock           sqlmock.Sqlmock
 
@@ -156,7 +172,8 @@ func TestServiceAccountRepository_List(t *testing.T) {
 				},
 			},
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.svcAccountRepo = postgres.NewServiceAccountRepository(postgresClient)
 				tt.mock = mock
 
@@ -192,7 +209,10 @@ func TestServiceAccountRepository_List(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.svcAccountRepo.List(t.Context(), tt.req)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.svcAccountRepo.List(ctx, tt.req)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -208,6 +228,7 @@ func TestServiceAccountRepository_List(t *testing.T) {
 func TestServiceAccountRepository_Create(t *testing.T) {
 	type testSet struct {
 		name           string // description of this test case
+		transactioner  *postgres.Transactioner
 		svcAccountRepo *postgres.ServiceAccountRepository
 		mock           sqlmock.Sqlmock
 
@@ -230,7 +251,8 @@ func TestServiceAccountRepository_Create(t *testing.T) {
 				},
 			},
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.svcAccountRepo = postgres.NewServiceAccountRepository(postgresClient)
 				tt.mock = mock
 
@@ -270,7 +292,10 @@ func TestServiceAccountRepository_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.svcAccountRepo.Create(t.Context(), tt.req)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.svcAccountRepo.Create(ctx, tt.req)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -286,6 +311,7 @@ func TestServiceAccountRepository_Create(t *testing.T) {
 func TestServiceAccountRepository_Update(t *testing.T) {
 	type testSet struct {
 		name           string // description of this test case
+		transactioner  *postgres.Transactioner
 		svcAccountRepo *postgres.ServiceAccountRepository
 		mock           sqlmock.Sqlmock
 
@@ -308,7 +334,8 @@ func TestServiceAccountRepository_Update(t *testing.T) {
 				ExpireAt: lo.ToPtr(time.Now().Add(time.Hour)),
 			},
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.svcAccountRepo = postgres.NewServiceAccountRepository(postgresClient)
 				tt.mock = mock
 
@@ -349,7 +376,10 @@ func TestServiceAccountRepository_Update(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.svcAccountRepo.Update(t.Context(), tt.req)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.svcAccountRepo.Update(ctx, tt.req)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -365,6 +395,7 @@ func TestServiceAccountRepository_Update(t *testing.T) {
 func TestServiceAccountRepository_Delete(t *testing.T) {
 	type testSet struct {
 		name           string // description of this test case
+		transactioner  *postgres.Transactioner
 		svcAccountRepo *postgres.ServiceAccountRepository
 		mock           sqlmock.Sqlmock
 
@@ -378,7 +409,8 @@ func TestServiceAccountRepository_Delete(t *testing.T) {
 			name: "normal case",
 			id:   "account-1",
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.svcAccountRepo = postgres.NewServiceAccountRepository(postgresClient)
 				tt.mock = mock
 
@@ -395,7 +427,10 @@ func TestServiceAccountRepository_Delete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			err := tt.svcAccountRepo.Delete(t.Context(), tt.id)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				err := tt.svcAccountRepo.Delete(ctx, tt.id)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

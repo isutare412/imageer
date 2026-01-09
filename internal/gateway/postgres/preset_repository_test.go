@@ -1,6 +1,7 @@
 package postgres_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -17,9 +18,10 @@ import (
 
 func TestPresetRepository_FindByName(t *testing.T) {
 	type testSet struct {
-		name       string // description of this test case
-		presetRepo *postgres.PresetRepository
-		mock       sqlmock.Sqlmock
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		presetRepo    *postgres.PresetRepository
+		mock          sqlmock.Sqlmock
 
 		projectID  string
 		presetName string
@@ -33,10 +35,12 @@ func TestPresetRepository_FindByName(t *testing.T) {
 			projectID:  "project-1",
 			presetName: "preset-name-1",
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.presetRepo = postgres.NewPresetRepository(postgresClient)
 				tt.mock = mock
 
+				mock.ExpectBegin()
 				mock.ExpectQuery(
 					`SELECT * FROM "presets" WHERE "project_id" = $1 AND "name" = $2 `+
 						`ORDER BY "presets"."id" LIMIT $3`).
@@ -44,6 +48,7 @@ func TestPresetRepository_FindByName(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Preset]()).
 						AddRow("preset-1", time.Now(), time.Now(), "preset-name-1", false,
 							images.FormatWebp, images.Quality(90), nil, nil, nil, nil, "project-1"))
+				mock.ExpectCommit()
 			},
 			wantErr: false,
 		},
@@ -52,7 +57,10 @@ func TestPresetRepository_FindByName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.presetRepo.FindByName(t.Context(), tt.projectID, tt.presetName)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.presetRepo.FindByName(ctx, tt.projectID, tt.presetName)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -67,9 +75,10 @@ func TestPresetRepository_FindByName(t *testing.T) {
 
 func TestPresetRepository_List(t *testing.T) {
 	type testSet struct {
-		name       string // description of this test case
-		presetRepo *postgres.PresetRepository
-		mock       sqlmock.Sqlmock
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		presetRepo    *postgres.PresetRepository
+		mock          sqlmock.Sqlmock
 
 		req     domain.ListPresetsParams
 		setup   func(t *testing.T, tt *testSet)
@@ -92,10 +101,12 @@ func TestPresetRepository_List(t *testing.T) {
 				},
 			},
 			setup: func(t *testing.T, tt *testSet) {
-				postgresClient, mock := postgres.NewClientWithMock(t)
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
 				tt.presetRepo = postgres.NewPresetRepository(postgresClient)
 				tt.mock = mock
 
+				mock.ExpectBegin()
 				mock.ExpectQuery(
 					`SELECT * FROM "presets" WHERE "project_id" = $1 AND "name" IN ($2,$3) `+
 						`ORDER BY "updated_at" DESC LIMIT $4 OFFSET $5`).
@@ -105,6 +116,7 @@ func TestPresetRepository_List(t *testing.T) {
 							images.FormatWebp, images.Quality(90), nil, nil, nil, nil, "project-1").
 						AddRow("preset-2", time.Now(), time.Now(), "preset-name-2", false,
 							images.FormatWebp, images.Quality(90), nil, nil, nil, nil, "project-1"))
+				mock.ExpectCommit()
 			},
 			wantErr: false,
 		},
@@ -113,7 +125,10 @@ func TestPresetRepository_List(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t, &tt)
 
-			_, err := tt.presetRepo.List(t.Context(), tt.req)
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.presetRepo.List(ctx, tt.req)
+				return err
+			})
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
