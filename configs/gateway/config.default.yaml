@@ -83,18 +83,19 @@ crypt:
   aes:
     key: <random-length-complex-string>
 
-s3:
-  bucket: imageer
-  prefix:
-    image: sandbox/images
-  presign:
-    expiry: 10m
+aws:
+  s3:
+    bucket: imageer
+    prefix:
+      image: sandbox/images
+    presign:
+      expiry: 10m
 
-sqs:
-  image-upload-event-queue:
-    queue-url: https://sqs.us-east-1.amazonaws.com/123456789012/queue-name
-    batch-count: 10
-    polling-wait-timeout: 20s
-    visibility-timeout: 30s
-    batch-handle-timeout: 25s
-    handle-timeout: 20s
+  sqs:
+    image-upload-event-queue:
+      queue-url: https://sqs.us-east-1.amazonaws.com/123456789012/queue-name
+      batch-count: 10
+      polling-wait-timeout: 20s
+      visibility-timeout: 30s
+      batch-handle-timeout: 25s
+      handle-timeout: 20s

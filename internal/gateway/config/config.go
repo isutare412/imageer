@@ -12,8 +12,7 @@ type Config struct {
 	Database DatabaseConfig `koanf:"database"`
 	Auth     AuthConfig     `koanf:"auth"`
 	Crypt    CryptConfig    `koanf:"crypt"`
-	S3       S3Config       `koanf:"s3"`
-	SQS      SQSConfig      `koanf:"sqs"`
+	AWS      AWSConfig      `koanf:"aws"`
 }
 
 type LogConfig struct {
@@ -81,6 +80,11 @@ type CryptConfig struct {
 	AES struct {
 		Key string `koanf:"key" validate:"required"`
 	} `koanf:"aes"`
+}
+
+type AWSConfig struct {
+	S3  S3Config  `koanf:"s3"`
+	SQS SQSConfig `koanf:"sqs"`
 }
 
 type S3Config struct {

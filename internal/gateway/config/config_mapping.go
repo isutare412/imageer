@@ -88,17 +88,17 @@ func (c *Config) ToAESCrypterConfig() crypt.AESCrypterConfig {
 
 func (c *Config) ToS3PresignerConfig() s3.PresignerConfig {
 	return s3.PresignerConfig{
-		Bucket: c.S3.Bucket,
-		Expiry: c.S3.Presign.Expiry,
+		Bucket: c.AWS.S3.Bucket,
+		Expiry: c.AWS.S3.Presign.Expiry,
 	}
 }
 
 func (c *Config) ToSQSImageUploadListenerConfig() sqs.ImageUploadListenerConfig {
-	return sqs.ImageUploadListenerConfig(c.SQS.ImageUploadEventQueue)
+	return sqs.ImageUploadListenerConfig(c.AWS.SQS.ImageUploadEventQueue)
 }
 
 func (c *Config) ToImageServiceConfig() image.Config {
 	return image.Config{
-		S3KeyPrefix: c.S3.Prefix.Image,
+		S3KeyPrefix: c.AWS.S3.Prefix.Image,
 	}
 }
