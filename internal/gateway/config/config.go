@@ -13,6 +13,7 @@ type Config struct {
 	Auth     AuthConfig     `koanf:"auth"`
 	Crypt    CryptConfig    `koanf:"crypt"`
 	S3       S3Config       `koanf:"s3"`
+	SQS      SQSConfig      `koanf:"sqs"`
 }
 
 type LogConfig struct {
@@ -90,4 +91,15 @@ type S3Config struct {
 	Presign struct {
 		Expiry time.Duration `koanf:"expiry" validate:"required,gt=0"`
 	} `koanf:"presign"`
+}
+
+type SQSConfig struct {
+	ImageUploadEventQueue struct {
+		QueueURL           string        `koanf:"queue-url" validate:"required"`
+		BatchCount         int32         `koanf:"batch-count" validate:"required,gt=0,lte=10"`
+		PollingWaitTimeout time.Duration `koanf:"polling-wait-timeout" validate:"required,gt=0,lte=20s"`
+		VisibilityTimeout  time.Duration `koanf:"visibility-timeout" validate:"required,gt=0,lte=12h"`
+		BatchHandleTimeout time.Duration `koanf:"batch-handle-timeout" validate:"required,gt=0,lte=10m"`
+		HandleTimeout      time.Duration `koanf:"handle-timeout" validate:"required,gt=0,lte=10m"`
+	} `koanf:"image-upload-event-queue"`
 }

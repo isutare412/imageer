@@ -8,6 +8,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/s3"
 	"github.com/isutare412/imageer/internal/gateway/service/auth"
 	"github.com/isutare412/imageer/internal/gateway/service/image"
+	"github.com/isutare412/imageer/internal/gateway/sqs"
 	"github.com/isutare412/imageer/internal/gateway/web"
 	"github.com/isutare412/imageer/pkg/log"
 )
@@ -90,6 +91,10 @@ func (c *Config) ToS3PresignerConfig() s3.PresignerConfig {
 		Bucket: c.S3.Bucket,
 		Expiry: c.S3.Presign.Expiry,
 	}
+}
+
+func (c *Config) ToSQSImageUploadListenerConfig() sqs.ImageUploadListenerConfig {
+	return sqs.ImageUploadListenerConfig(c.SQS.ImageUploadEventQueue)
 }
 
 func (c *Config) ToImageServiceConfig() image.Config {

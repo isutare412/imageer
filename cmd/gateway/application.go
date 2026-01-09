@@ -19,12 +19,14 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/service/image"
 	"github.com/isutare412/imageer/internal/gateway/service/project"
 	"github.com/isutare412/imageer/internal/gateway/service/serviceaccount"
+	"github.com/isutare412/imageer/internal/gateway/sqs"
 	"github.com/isutare412/imageer/internal/gateway/web"
 )
 
 type application struct {
-	webServer  *web.Server
-	repoClient *postgres.Client
+	webServer         *web.Server
+	imageUploadLister *sqs.ImageUploadListener
+	repoClient        *postgres.Client
 
 	cfg config.Config
 }
@@ -105,10 +107,17 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create web server")
 	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, imageSvc)
 
+	slog.Info("Create SQS image upload listener")
+	imageUploadListener, err := sqs.NewImageUploadListener(cfg.ToSQSImageUploadListenerConfig())
+	if err != nil {
+		return nil, fmt.Errorf("creating SQS image upload listener: %w", err)
+	}
+
 	return &application{
-		webServer:  webServer,
-		repoClient: repoClient,
-		cfg:        cfg,
+		webServer:         webServer,
+		imageUploadLister: imageUploadListener,
+		repoClient:        repoClient,
+		cfg:               cfg,
 	}, nil
 }
 
@@ -130,6 +139,9 @@ func (a *application) initialize() error {
 }
 
 func (a *application) run() {
+	slog.Info("Run SQS image upload listener")
+	a.imageUploadLister.Run()
+
 	slog.Info("Run web server")
 	webServerErrs := a.webServer.Run()
 
@@ -150,6 +162,9 @@ func (a *application) shutdown() {
 	if err := a.webServer.Shutdown(); err != nil {
 		slog.Error("Failed to shutdown web server", "error", err)
 	}
+
+	slog.Info("Shutdown SQS image upload listener")
+	a.imageUploadLister.Shutdown()
 }
 
 func logDuration(operation string) func() {
