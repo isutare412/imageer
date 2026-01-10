@@ -82,7 +82,7 @@ func (x *ImageProcessRequest) GetPreset() *Preset {
 	return nil
 }
 
-type ImageProcessResponse struct {
+type ImageProcessResult struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	ImageId        string                 `protobuf:"bytes,1,opt,name=image_id,json=imageId,proto3" json:"image_id,omitempty"`
 	ImageVariantId string                 `protobuf:"bytes,2,opt,name=image_variant_id,json=imageVariantId,proto3" json:"image_variant_id,omitempty"`
@@ -94,20 +94,20 @@ type ImageProcessResponse struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *ImageProcessResponse) Reset() {
-	*x = ImageProcessResponse{}
+func (x *ImageProcessResult) Reset() {
+	*x = ImageProcessResult{}
 	mi := &file_imageer_v1_processor_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ImageProcessResponse) String() string {
+func (x *ImageProcessResult) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ImageProcessResponse) ProtoMessage() {}
+func (*ImageProcessResult) ProtoMessage() {}
 
-func (x *ImageProcessResponse) ProtoReflect() protoreflect.Message {
+func (x *ImageProcessResult) ProtoReflect() protoreflect.Message {
 	mi := &file_imageer_v1_processor_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -119,47 +119,47 @@ func (x *ImageProcessResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ImageProcessResponse.ProtoReflect.Descriptor instead.
-func (*ImageProcessResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ImageProcessResult.ProtoReflect.Descriptor instead.
+func (*ImageProcessResult) Descriptor() ([]byte, []int) {
 	return file_imageer_v1_processor_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ImageProcessResponse) GetImageId() string {
+func (x *ImageProcessResult) GetImageId() string {
 	if x != nil {
 		return x.ImageId
 	}
 	return ""
 }
 
-func (x *ImageProcessResponse) GetImageVariantId() string {
+func (x *ImageProcessResult) GetImageVariantId() string {
 	if x != nil {
 		return x.ImageVariantId
 	}
 	return ""
 }
 
-func (x *ImageProcessResponse) GetPresetId() string {
+func (x *ImageProcessResult) GetPresetId() string {
 	if x != nil {
 		return x.PresetId
 	}
 	return ""
 }
 
-func (x *ImageProcessResponse) GetIsSuccess() bool {
+func (x *ImageProcessResult) GetIsSuccess() bool {
 	if x != nil {
 		return x.IsSuccess
 	}
 	return false
 }
 
-func (x *ImageProcessResponse) GetErrorMessage() string {
+func (x *ImageProcessResult) GetErrorMessage() string {
 	if x != nil {
 		return x.ErrorMessage
 	}
 	return ""
 }
 
-func (x *ImageProcessResponse) GetProcessingTime() *durationpb.Duration {
+func (x *ImageProcessResult) GetProcessingTime() *durationpb.Duration {
 	if x != nil {
 		return x.ProcessingTime
 	}
@@ -175,8 +175,8 @@ const file_imageer_v1_processor_proto_rawDesc = "" +
 	"\x13ImageProcessRequest\x12'\n" +
 	"\x05image\x18\x01 \x01(\v2\x11.imageer.v1.ImageR\x05image\x122\n" +
 	"\avariant\x18\x02 \x01(\v2\x18.imageer.v1.ImageVariantR\avariant\x12*\n" +
-	"\x06preset\x18\x03 \x01(\v2\x12.imageer.v1.PresetR\x06preset\"\x80\x02\n" +
-	"\x14ImageProcessResponse\x12\x19\n" +
+	"\x06preset\x18\x03 \x01(\v2\x12.imageer.v1.PresetR\x06preset\"\xfe\x01\n" +
+	"\x12ImageProcessResult\x12\x19\n" +
 	"\bimage_id\x18\x01 \x01(\tR\aimageId\x12(\n" +
 	"\x10image_variant_id\x18\x02 \x01(\tR\x0eimageVariantId\x12\x1b\n" +
 	"\tpreset_id\x18\x03 \x01(\tR\bpresetId\x12\x1d\n" +
@@ -202,18 +202,18 @@ func file_imageer_v1_processor_proto_rawDescGZIP() []byte {
 
 var file_imageer_v1_processor_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_imageer_v1_processor_proto_goTypes = []any{
-	(*ImageProcessRequest)(nil),  // 0: imageer.v1.ImageProcessRequest
-	(*ImageProcessResponse)(nil), // 1: imageer.v1.ImageProcessResponse
-	(*Image)(nil),                // 2: imageer.v1.Image
-	(*ImageVariant)(nil),         // 3: imageer.v1.ImageVariant
-	(*Preset)(nil),               // 4: imageer.v1.Preset
-	(*durationpb.Duration)(nil),  // 5: google.protobuf.Duration
+	(*ImageProcessRequest)(nil), // 0: imageer.v1.ImageProcessRequest
+	(*ImageProcessResult)(nil),  // 1: imageer.v1.ImageProcessResult
+	(*Image)(nil),               // 2: imageer.v1.Image
+	(*ImageVariant)(nil),        // 3: imageer.v1.ImageVariant
+	(*Preset)(nil),              // 4: imageer.v1.Preset
+	(*durationpb.Duration)(nil), // 5: google.protobuf.Duration
 }
 var file_imageer_v1_processor_proto_depIdxs = []int32{
 	2, // 0: imageer.v1.ImageProcessRequest.image:type_name -> imageer.v1.Image
 	3, // 1: imageer.v1.ImageProcessRequest.variant:type_name -> imageer.v1.ImageVariant
 	4, // 2: imageer.v1.ImageProcessRequest.preset:type_name -> imageer.v1.Preset
-	5, // 3: imageer.v1.ImageProcessResponse.processing_time:type_name -> google.protobuf.Duration
+	5, // 3: imageer.v1.ImageProcessResult.processing_time:type_name -> google.protobuf.Duration
 	4, // [4:4] is the sub-list for method output_type
 	4, // [4:4] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name

@@ -12,7 +12,7 @@ message ImageProcessRequest {
   Preset preset = 3;
 }
 
-message ImageProcessResponse {
+message ImageProcessResult {
   string image_id = 1;
   string image_variant_id = 2;
   string preset_id = 3;

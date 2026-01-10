@@ -22,278 +22,281 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Format int32
+type ImageFormat int32
 
 const (
-	Format_FORMAT_UNSPECIFIED Format = 0
-	Format_FORMAT_JPEG        Format = 1
-	Format_FORMAT_PNG         Format = 2
-	Format_FORMAT_WEBP        Format = 3
-	Format_FORMAT_AVIF        Format = 4
-	Format_FORMAT_HEIC        Format = 5
+	ImageFormat_IMAGE_FORMAT_UNSPECIFIED ImageFormat = 0
+	ImageFormat_IMAGE_FORMAT_JPEG        ImageFormat = 1
+	ImageFormat_IMAGE_FORMAT_PNG         ImageFormat = 2
+	ImageFormat_IMAGE_FORMAT_WEBP        ImageFormat = 3
+	ImageFormat_IMAGE_FORMAT_AVIF        ImageFormat = 4
+	ImageFormat_IMAGE_FORMAT_HEIC        ImageFormat = 5
 )
 
-// Enum value maps for Format.
+// Enum value maps for ImageFormat.
 var (
-	Format_name = map[int32]string{
-		0: "FORMAT_UNSPECIFIED",
-		1: "FORMAT_JPEG",
-		2: "FORMAT_PNG",
-		3: "FORMAT_WEBP",
-		4: "FORMAT_AVIF",
-		5: "FORMAT_HEIC",
+	ImageFormat_name = map[int32]string{
+		0: "IMAGE_FORMAT_UNSPECIFIED",
+		1: "IMAGE_FORMAT_JPEG",
+		2: "IMAGE_FORMAT_PNG",
+		3: "IMAGE_FORMAT_WEBP",
+		4: "IMAGE_FORMAT_AVIF",
+		5: "IMAGE_FORMAT_HEIC",
 	}
-	Format_value = map[string]int32{
-		"FORMAT_UNSPECIFIED": 0,
-		"FORMAT_JPEG":        1,
-		"FORMAT_PNG":         2,
-		"FORMAT_WEBP":        3,
-		"FORMAT_AVIF":        4,
-		"FORMAT_HEIC":        5,
+	ImageFormat_value = map[string]int32{
+		"IMAGE_FORMAT_UNSPECIFIED": 0,
+		"IMAGE_FORMAT_JPEG":        1,
+		"IMAGE_FORMAT_PNG":         2,
+		"IMAGE_FORMAT_WEBP":        3,
+		"IMAGE_FORMAT_AVIF":        4,
+		"IMAGE_FORMAT_HEIC":        5,
 	}
 )
 
-func (x Format) Enum() *Format {
-	p := new(Format)
+func (x ImageFormat) Enum() *ImageFormat {
+	p := new(ImageFormat)
 	*p = x
 	return p
 }
 
-func (x Format) String() string {
+func (x ImageFormat) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Format) Descriptor() protoreflect.EnumDescriptor {
+func (ImageFormat) Descriptor() protoreflect.EnumDescriptor {
 	return file_imageer_v1_image_proto_enumTypes[0].Descriptor()
 }
 
-func (Format) Type() protoreflect.EnumType {
+func (ImageFormat) Type() protoreflect.EnumType {
 	return &file_imageer_v1_image_proto_enumTypes[0]
 }
 
-func (x Format) Number() protoreflect.EnumNumber {
+func (x ImageFormat) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Format.Descriptor instead.
-func (Format) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use ImageFormat.Descriptor instead.
+func (ImageFormat) EnumDescriptor() ([]byte, []int) {
 	return file_imageer_v1_image_proto_rawDescGZIP(), []int{0}
 }
 
-type Fit int32
+type ImageFit int32
 
 const (
-	Fit_FIT_UNSPECIFIED Fit = 0
-	Fit_FIT_COVER       Fit = 1
-	Fit_FIT_CONTAIN     Fit = 2
-	Fit_FIT_FILL        Fit = 3
+	ImageFit_IMAGE_FIT_UNSPECIFIED ImageFit = 0
+	ImageFit_IMAGE_FIT_COVER       ImageFit = 1
+	ImageFit_IMAGE_FIT_CONTAIN     ImageFit = 2
+	ImageFit_IMAGE_FIT_FILL        ImageFit = 3
 )
 
-// Enum value maps for Fit.
+// Enum value maps for ImageFit.
 var (
-	Fit_name = map[int32]string{
-		0: "FIT_UNSPECIFIED",
-		1: "FIT_COVER",
-		2: "FIT_CONTAIN",
-		3: "FIT_FILL",
+	ImageFit_name = map[int32]string{
+		0: "IMAGE_FIT_UNSPECIFIED",
+		1: "IMAGE_FIT_COVER",
+		2: "IMAGE_FIT_CONTAIN",
+		3: "IMAGE_FIT_FILL",
 	}
-	Fit_value = map[string]int32{
-		"FIT_UNSPECIFIED": 0,
-		"FIT_COVER":       1,
-		"FIT_CONTAIN":     2,
-		"FIT_FILL":        3,
+	ImageFit_value = map[string]int32{
+		"IMAGE_FIT_UNSPECIFIED": 0,
+		"IMAGE_FIT_COVER":       1,
+		"IMAGE_FIT_CONTAIN":     2,
+		"IMAGE_FIT_FILL":        3,
 	}
 )
 
-func (x Fit) Enum() *Fit {
-	p := new(Fit)
+func (x ImageFit) Enum() *ImageFit {
+	p := new(ImageFit)
 	*p = x
 	return p
 }
 
-func (x Fit) String() string {
+func (x ImageFit) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Fit) Descriptor() protoreflect.EnumDescriptor {
+func (ImageFit) Descriptor() protoreflect.EnumDescriptor {
 	return file_imageer_v1_image_proto_enumTypes[1].Descriptor()
 }
 
-func (Fit) Type() protoreflect.EnumType {
+func (ImageFit) Type() protoreflect.EnumType {
 	return &file_imageer_v1_image_proto_enumTypes[1]
 }
 
-func (x Fit) Number() protoreflect.EnumNumber {
+func (x ImageFit) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Fit.Descriptor instead.
-func (Fit) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use ImageFit.Descriptor instead.
+func (ImageFit) EnumDescriptor() ([]byte, []int) {
 	return file_imageer_v1_image_proto_rawDescGZIP(), []int{1}
 }
 
-type Anchor int32
+type ImageAnchor int32
 
 const (
-	Anchor_ANCHOR_UNSPECIFIED Anchor = 0
-	Anchor_ANCHOR_CENTER      Anchor = 1
-	Anchor_ANCHOR_NORTH       Anchor = 2
-	Anchor_ANCHOR_SOUTH       Anchor = 3
-	Anchor_ANCHOR_EAST        Anchor = 4
-	Anchor_ANCHOR_WEST        Anchor = 5
+	ImageAnchor_IMAGE_ANCHOR_UNSPECIFIED ImageAnchor = 0
+	ImageAnchor_IMAGE_ANCHOR_SMART       ImageAnchor = 1
+	ImageAnchor_IMAGE_ANCHOR_CENTER      ImageAnchor = 2
+	ImageAnchor_IMAGE_ANCHOR_NORTH       ImageAnchor = 3
+	ImageAnchor_IMAGE_ANCHOR_SOUTH       ImageAnchor = 4
+	ImageAnchor_IMAGE_ANCHOR_EAST        ImageAnchor = 5
+	ImageAnchor_IMAGE_ANCHOR_WEST        ImageAnchor = 6
 )
 
-// Enum value maps for Anchor.
+// Enum value maps for ImageAnchor.
 var (
-	Anchor_name = map[int32]string{
-		0: "ANCHOR_UNSPECIFIED",
-		1: "ANCHOR_CENTER",
-		2: "ANCHOR_NORTH",
-		3: "ANCHOR_SOUTH",
-		4: "ANCHOR_EAST",
-		5: "ANCHOR_WEST",
+	ImageAnchor_name = map[int32]string{
+		0: "IMAGE_ANCHOR_UNSPECIFIED",
+		1: "IMAGE_ANCHOR_SMART",
+		2: "IMAGE_ANCHOR_CENTER",
+		3: "IMAGE_ANCHOR_NORTH",
+		4: "IMAGE_ANCHOR_SOUTH",
+		5: "IMAGE_ANCHOR_EAST",
+		6: "IMAGE_ANCHOR_WEST",
 	}
-	Anchor_value = map[string]int32{
-		"ANCHOR_UNSPECIFIED": 0,
-		"ANCHOR_CENTER":      1,
-		"ANCHOR_NORTH":       2,
-		"ANCHOR_SOUTH":       3,
-		"ANCHOR_EAST":        4,
-		"ANCHOR_WEST":        5,
+	ImageAnchor_value = map[string]int32{
+		"IMAGE_ANCHOR_UNSPECIFIED": 0,
+		"IMAGE_ANCHOR_SMART":       1,
+		"IMAGE_ANCHOR_CENTER":      2,
+		"IMAGE_ANCHOR_NORTH":       3,
+		"IMAGE_ANCHOR_SOUTH":       4,
+		"IMAGE_ANCHOR_EAST":        5,
+		"IMAGE_ANCHOR_WEST":        6,
 	}
 )
 
-func (x Anchor) Enum() *Anchor {
-	p := new(Anchor)
+func (x ImageAnchor) Enum() *ImageAnchor {
+	p := new(ImageAnchor)
 	*p = x
 	return p
 }
 
-func (x Anchor) String() string {
+func (x ImageAnchor) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Anchor) Descriptor() protoreflect.EnumDescriptor {
+func (ImageAnchor) Descriptor() protoreflect.EnumDescriptor {
 	return file_imageer_v1_image_proto_enumTypes[2].Descriptor()
 }
 
-func (Anchor) Type() protoreflect.EnumType {
+func (ImageAnchor) Type() protoreflect.EnumType {
 	return &file_imageer_v1_image_proto_enumTypes[2]
 }
 
-func (x Anchor) Number() protoreflect.EnumNumber {
+func (x ImageAnchor) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Anchor.Descriptor instead.
-func (Anchor) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use ImageAnchor.Descriptor instead.
+func (ImageAnchor) EnumDescriptor() ([]byte, []int) {
 	return file_imageer_v1_image_proto_rawDescGZIP(), []int{2}
 }
 
-type State int32
+type ImageState int32
 
 const (
-	State_STATE_UNSPECIFIED    State = 0
-	State_STATE_WAITING_UPLOAD State = 1
-	State_STATE_FAILED         State = 2
-	State_STATE_READY          State = 3
+	ImageState_IMAGE_STATE_UNSPECIFIED    ImageState = 0
+	ImageState_IMAGE_STATE_WAITING_UPLOAD ImageState = 1
+	ImageState_IMAGE_STATE_FAILED         ImageState = 2
+	ImageState_IMAGE_STATE_READY          ImageState = 3
 )
 
-// Enum value maps for State.
+// Enum value maps for ImageState.
 var (
-	State_name = map[int32]string{
-		0: "STATE_UNSPECIFIED",
-		1: "STATE_WAITING_UPLOAD",
-		2: "STATE_FAILED",
-		3: "STATE_READY",
+	ImageState_name = map[int32]string{
+		0: "IMAGE_STATE_UNSPECIFIED",
+		1: "IMAGE_STATE_WAITING_UPLOAD",
+		2: "IMAGE_STATE_FAILED",
+		3: "IMAGE_STATE_READY",
 	}
-	State_value = map[string]int32{
-		"STATE_UNSPECIFIED":    0,
-		"STATE_WAITING_UPLOAD": 1,
-		"STATE_FAILED":         2,
-		"STATE_READY":          3,
+	ImageState_value = map[string]int32{
+		"IMAGE_STATE_UNSPECIFIED":    0,
+		"IMAGE_STATE_WAITING_UPLOAD": 1,
+		"IMAGE_STATE_FAILED":         2,
+		"IMAGE_STATE_READY":          3,
 	}
 )
 
-func (x State) Enum() *State {
-	p := new(State)
+func (x ImageState) Enum() *ImageState {
+	p := new(ImageState)
 	*p = x
 	return p
 }
 
-func (x State) String() string {
+func (x ImageState) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (State) Descriptor() protoreflect.EnumDescriptor {
+func (ImageState) Descriptor() protoreflect.EnumDescriptor {
 	return file_imageer_v1_image_proto_enumTypes[3].Descriptor()
 }
 
-func (State) Type() protoreflect.EnumType {
+func (ImageState) Type() protoreflect.EnumType {
 	return &file_imageer_v1_image_proto_enumTypes[3]
 }
 
-func (x State) Number() protoreflect.EnumNumber {
+func (x ImageState) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use State.Descriptor instead.
-func (State) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use ImageState.Descriptor instead.
+func (ImageState) EnumDescriptor() ([]byte, []int) {
 	return file_imageer_v1_image_proto_rawDescGZIP(), []int{3}
 }
 
-type VariantState int32
+type ImageVariantState int32
 
 const (
-	VariantState_VARIANT_STATE_UNSPECIFIED    VariantState = 0
-	VariantState_VARIANT_STATE_WAITING_UPLOAD VariantState = 1
-	VariantState_VARIANT_STATE_PROCESSING     VariantState = 2
-	VariantState_VARIANT_STATE_FAILED         VariantState = 3
-	VariantState_VARIANT_STATE_READY          VariantState = 4
+	ImageVariantState_IMAGE_VARIANT_STATE_UNSPECIFIED    ImageVariantState = 0
+	ImageVariantState_IMAGE_VARIANT_STATE_WAITING_UPLOAD ImageVariantState = 1
+	ImageVariantState_IMAGE_VARIANT_STATE_PROCESSING     ImageVariantState = 2
+	ImageVariantState_IMAGE_VARIANT_STATE_FAILED         ImageVariantState = 3
+	ImageVariantState_IMAGE_VARIANT_STATE_READY          ImageVariantState = 4
 )
 
-// Enum value maps for VariantState.
+// Enum value maps for ImageVariantState.
 var (
-	VariantState_name = map[int32]string{
-		0: "VARIANT_STATE_UNSPECIFIED",
-		1: "VARIANT_STATE_WAITING_UPLOAD",
-		2: "VARIANT_STATE_PROCESSING",
-		3: "VARIANT_STATE_FAILED",
-		4: "VARIANT_STATE_READY",
+	ImageVariantState_name = map[int32]string{
+		0: "IMAGE_VARIANT_STATE_UNSPECIFIED",
+		1: "IMAGE_VARIANT_STATE_WAITING_UPLOAD",
+		2: "IMAGE_VARIANT_STATE_PROCESSING",
+		3: "IMAGE_VARIANT_STATE_FAILED",
+		4: "IMAGE_VARIANT_STATE_READY",
 	}
-	VariantState_value = map[string]int32{
-		"VARIANT_STATE_UNSPECIFIED":    0,
-		"VARIANT_STATE_WAITING_UPLOAD": 1,
-		"VARIANT_STATE_PROCESSING":     2,
-		"VARIANT_STATE_FAILED":         3,
-		"VARIANT_STATE_READY":          4,
+	ImageVariantState_value = map[string]int32{
+		"IMAGE_VARIANT_STATE_UNSPECIFIED":    0,
+		"IMAGE_VARIANT_STATE_WAITING_UPLOAD": 1,
+		"IMAGE_VARIANT_STATE_PROCESSING":     2,
+		"IMAGE_VARIANT_STATE_FAILED":         3,
+		"IMAGE_VARIANT_STATE_READY":          4,
 	}
 )
 
-func (x VariantState) Enum() *VariantState {
-	p := new(VariantState)
+func (x ImageVariantState) Enum() *ImageVariantState {
+	p := new(ImageVariantState)
 	*p = x
 	return p
 }
 
-func (x VariantState) String() string {
+func (x ImageVariantState) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (VariantState) Descriptor() protoreflect.EnumDescriptor {
+func (ImageVariantState) Descriptor() protoreflect.EnumDescriptor {
 	return file_imageer_v1_image_proto_enumTypes[4].Descriptor()
 }
 
-func (VariantState) Type() protoreflect.EnumType {
+func (ImageVariantState) Type() protoreflect.EnumType {
 	return &file_imageer_v1_image_proto_enumTypes[4]
 }
 
-func (x VariantState) Number() protoreflect.EnumNumber {
+func (x ImageVariantState) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use VariantState.Descriptor instead.
-func (VariantState) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use ImageVariantState.Descriptor instead.
+func (ImageVariantState) EnumDescriptor() ([]byte, []int) {
 	return file_imageer_v1_image_proto_rawDescGZIP(), []int{4}
 }
 
@@ -303,8 +306,8 @@ type Image struct {
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	FileName      string                 `protobuf:"bytes,4,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	Format        Format                 `protobuf:"varint,5,opt,name=format,proto3,enum=imageer.v1.Format" json:"format,omitempty"`
-	State         State                  `protobuf:"varint,6,opt,name=state,proto3,enum=imageer.v1.State" json:"state,omitempty"`
+	Format        ImageFormat            `protobuf:"varint,5,opt,name=format,proto3,enum=imageer.v1.ImageFormat" json:"format,omitempty"`
+	State         ImageState             `protobuf:"varint,6,opt,name=state,proto3,enum=imageer.v1.ImageState" json:"state,omitempty"`
 	S3Key         string                 `protobuf:"bytes,7,opt,name=s3_key,json=s3Key,proto3" json:"s3_key,omitempty"`
 	Url           string                 `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
 	ProjectId     string                 `protobuf:"bytes,9,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
@@ -370,18 +373,18 @@ func (x *Image) GetFileName() string {
 	return ""
 }
 
-func (x *Image) GetFormat() Format {
+func (x *Image) GetFormat() ImageFormat {
 	if x != nil {
 		return x.Format
 	}
-	return Format_FORMAT_UNSPECIFIED
+	return ImageFormat_IMAGE_FORMAT_UNSPECIFIED
 }
 
-func (x *Image) GetState() State {
+func (x *Image) GetState() ImageState {
 	if x != nil {
 		return x.State
 	}
-	return State_STATE_UNSPECIFIED
+	return ImageState_IMAGE_STATE_UNSPECIFIED
 }
 
 func (x *Image) GetS3Key() string {
@@ -410,8 +413,8 @@ type ImageVariant struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Format        Format                 `protobuf:"varint,4,opt,name=format,proto3,enum=imageer.v1.Format" json:"format,omitempty"`
-	State         VariantState           `protobuf:"varint,5,opt,name=state,proto3,enum=imageer.v1.VariantState" json:"state,omitempty"`
+	Format        ImageFormat            `protobuf:"varint,4,opt,name=format,proto3,enum=imageer.v1.ImageFormat" json:"format,omitempty"`
+	State         ImageVariantState      `protobuf:"varint,5,opt,name=state,proto3,enum=imageer.v1.ImageVariantState" json:"state,omitempty"`
 	S3Key         string                 `protobuf:"bytes,6,opt,name=s3_key,json=s3Key,proto3" json:"s3_key,omitempty"`
 	Url           string                 `protobuf:"bytes,7,opt,name=url,proto3" json:"url,omitempty"`
 	ImageId       string                 `protobuf:"bytes,8,opt,name=image_id,json=imageId,proto3" json:"image_id,omitempty"`
@@ -470,18 +473,18 @@ func (x *ImageVariant) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *ImageVariant) GetFormat() Format {
+func (x *ImageVariant) GetFormat() ImageFormat {
 	if x != nil {
 		return x.Format
 	}
-	return Format_FORMAT_UNSPECIFIED
+	return ImageFormat_IMAGE_FORMAT_UNSPECIFIED
 }
 
-func (x *ImageVariant) GetState() VariantState {
+func (x *ImageVariant) GetState() ImageVariantState {
 	if x != nil {
 		return x.State
 	}
-	return VariantState_VARIANT_STATE_UNSPECIFIED
+	return ImageVariantState_IMAGE_VARIANT_STATE_UNSPECIFIED
 }
 
 func (x *ImageVariant) GetS3Key() string {
@@ -510,62 +513,63 @@ var File_imageer_v1_image_proto protoreflect.FileDescriptor
 const file_imageer_v1_image_proto_rawDesc = "" +
 	"\n" +
 	"\x16imageer/v1/image.proto\x12\n" +
-	"imageer.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc7\x02\n" +
+	"imageer.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd1\x02\n" +
 	"\x05Image\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\n" +
 	"created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x1b\n" +
-	"\tfile_name\x18\x04 \x01(\tR\bfileName\x12*\n" +
-	"\x06format\x18\x05 \x01(\x0e2\x12.imageer.v1.FormatR\x06format\x12'\n" +
-	"\x05state\x18\x06 \x01(\x0e2\x11.imageer.v1.StateR\x05state\x12\x15\n" +
+	"\tfile_name\x18\x04 \x01(\tR\bfileName\x12/\n" +
+	"\x06format\x18\x05 \x01(\x0e2\x17.imageer.v1.ImageFormatR\x06format\x12,\n" +
+	"\x05state\x18\x06 \x01(\x0e2\x16.imageer.v1.ImageStateR\x05state\x12\x15\n" +
 	"\x06s3_key\x18\a \x01(\tR\x05s3Key\x12\x10\n" +
 	"\x03url\x18\b \x01(\tR\x03url\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\t \x01(\tR\tprojectId\"\xb4\x02\n" +
+	"project_id\x18\t \x01(\tR\tprojectId\"\xbe\x02\n" +
 	"\fImageVariant\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\n" +
 	"created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12*\n" +
-	"\x06format\x18\x04 \x01(\x0e2\x12.imageer.v1.FormatR\x06format\x12.\n" +
-	"\x05state\x18\x05 \x01(\x0e2\x18.imageer.v1.VariantStateR\x05state\x12\x15\n" +
+	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12/\n" +
+	"\x06format\x18\x04 \x01(\x0e2\x17.imageer.v1.ImageFormatR\x06format\x123\n" +
+	"\x05state\x18\x05 \x01(\x0e2\x1d.imageer.v1.ImageVariantStateR\x05state\x12\x15\n" +
 	"\x06s3_key\x18\x06 \x01(\tR\x05s3Key\x12\x10\n" +
 	"\x03url\x18\a \x01(\tR\x03url\x12\x19\n" +
-	"\bimage_id\x18\b \x01(\tR\aimageId*t\n" +
-	"\x06Format\x12\x16\n" +
-	"\x12FORMAT_UNSPECIFIED\x10\x00\x12\x0f\n" +
-	"\vFORMAT_JPEG\x10\x01\x12\x0e\n" +
+	"\bimage_id\x18\b \x01(\tR\aimageId*\x9d\x01\n" +
+	"\vImageFormat\x12\x1c\n" +
+	"\x18IMAGE_FORMAT_UNSPECIFIED\x10\x00\x12\x15\n" +
+	"\x11IMAGE_FORMAT_JPEG\x10\x01\x12\x14\n" +
+	"\x10IMAGE_FORMAT_PNG\x10\x02\x12\x15\n" +
+	"\x11IMAGE_FORMAT_WEBP\x10\x03\x12\x15\n" +
+	"\x11IMAGE_FORMAT_AVIF\x10\x04\x12\x15\n" +
+	"\x11IMAGE_FORMAT_HEIC\x10\x05*e\n" +
+	"\bImageFit\x12\x19\n" +
+	"\x15IMAGE_FIT_UNSPECIFIED\x10\x00\x12\x13\n" +
+	"\x0fIMAGE_FIT_COVER\x10\x01\x12\x15\n" +
+	"\x11IMAGE_FIT_CONTAIN\x10\x02\x12\x12\n" +
+	"\x0eIMAGE_FIT_FILL\x10\x03*\xba\x01\n" +
+	"\vImageAnchor\x12\x1c\n" +
+	"\x18IMAGE_ANCHOR_UNSPECIFIED\x10\x00\x12\x16\n" +
+	"\x12IMAGE_ANCHOR_SMART\x10\x01\x12\x17\n" +
+	"\x13IMAGE_ANCHOR_CENTER\x10\x02\x12\x16\n" +
+	"\x12IMAGE_ANCHOR_NORTH\x10\x03\x12\x16\n" +
+	"\x12IMAGE_ANCHOR_SOUTH\x10\x04\x12\x15\n" +
+	"\x11IMAGE_ANCHOR_EAST\x10\x05\x12\x15\n" +
+	"\x11IMAGE_ANCHOR_WEST\x10\x06*x\n" +
 	"\n" +
-	"FORMAT_PNG\x10\x02\x12\x0f\n" +
-	"\vFORMAT_WEBP\x10\x03\x12\x0f\n" +
-	"\vFORMAT_AVIF\x10\x04\x12\x0f\n" +
-	"\vFORMAT_HEIC\x10\x05*H\n" +
-	"\x03Fit\x12\x13\n" +
-	"\x0fFIT_UNSPECIFIED\x10\x00\x12\r\n" +
-	"\tFIT_COVER\x10\x01\x12\x0f\n" +
-	"\vFIT_CONTAIN\x10\x02\x12\f\n" +
-	"\bFIT_FILL\x10\x03*y\n" +
-	"\x06Anchor\x12\x16\n" +
-	"\x12ANCHOR_UNSPECIFIED\x10\x00\x12\x11\n" +
-	"\rANCHOR_CENTER\x10\x01\x12\x10\n" +
-	"\fANCHOR_NORTH\x10\x02\x12\x10\n" +
-	"\fANCHOR_SOUTH\x10\x03\x12\x0f\n" +
-	"\vANCHOR_EAST\x10\x04\x12\x0f\n" +
-	"\vANCHOR_WEST\x10\x05*[\n" +
-	"\x05State\x12\x15\n" +
-	"\x11STATE_UNSPECIFIED\x10\x00\x12\x18\n" +
-	"\x14STATE_WAITING_UPLOAD\x10\x01\x12\x10\n" +
-	"\fSTATE_FAILED\x10\x02\x12\x0f\n" +
-	"\vSTATE_READY\x10\x03*\xa0\x01\n" +
-	"\fVariantState\x12\x1d\n" +
-	"\x19VARIANT_STATE_UNSPECIFIED\x10\x00\x12 \n" +
-	"\x1cVARIANT_STATE_WAITING_UPLOAD\x10\x01\x12\x1c\n" +
-	"\x18VARIANT_STATE_PROCESSING\x10\x02\x12\x18\n" +
-	"\x14VARIANT_STATE_FAILED\x10\x03\x12\x17\n" +
-	"\x13VARIANT_STATE_READY\x10\x04B\x9d\x01\n" +
+	"ImageState\x12\x1b\n" +
+	"\x17IMAGE_STATE_UNSPECIFIED\x10\x00\x12\x1e\n" +
+	"\x1aIMAGE_STATE_WAITING_UPLOAD\x10\x01\x12\x16\n" +
+	"\x12IMAGE_STATE_FAILED\x10\x02\x12\x15\n" +
+	"\x11IMAGE_STATE_READY\x10\x03*\xc3\x01\n" +
+	"\x11ImageVariantState\x12#\n" +
+	"\x1fIMAGE_VARIANT_STATE_UNSPECIFIED\x10\x00\x12&\n" +
+	"\"IMAGE_VARIANT_STATE_WAITING_UPLOAD\x10\x01\x12\"\n" +
+	"\x1eIMAGE_VARIANT_STATE_PROCESSING\x10\x02\x12\x1e\n" +
+	"\x1aIMAGE_VARIANT_STATE_FAILED\x10\x03\x12\x1d\n" +
+	"\x19IMAGE_VARIANT_STATE_READY\x10\x04B\x9d\x01\n" +
 	"\x0ecom.imageer.v1B\n" +
 	"ImageProtoP\x01Z6github.com/isutare412/imageer/gen/imageer/v1;imageerv1\xa2\x02\x03IXX\xaa\x02\n" +
 	"Imageer.V1\xca\x02\n" +
@@ -586,11 +590,11 @@ func file_imageer_v1_image_proto_rawDescGZIP() []byte {
 var file_imageer_v1_image_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_imageer_v1_image_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_imageer_v1_image_proto_goTypes = []any{
-	(Format)(0),                   // 0: imageer.v1.Format
-	(Fit)(0),                      // 1: imageer.v1.Fit
-	(Anchor)(0),                   // 2: imageer.v1.Anchor
-	(State)(0),                    // 3: imageer.v1.State
-	(VariantState)(0),             // 4: imageer.v1.VariantState
+	(ImageFormat)(0),              // 0: imageer.v1.ImageFormat
+	(ImageFit)(0),                 // 1: imageer.v1.ImageFit
+	(ImageAnchor)(0),              // 2: imageer.v1.ImageAnchor
+	(ImageState)(0),               // 3: imageer.v1.ImageState
+	(ImageVariantState)(0),        // 4: imageer.v1.ImageVariantState
 	(*Image)(nil),                 // 5: imageer.v1.Image
 	(*ImageVariant)(nil),          // 6: imageer.v1.ImageVariant
 	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
@@ -598,12 +602,12 @@ var file_imageer_v1_image_proto_goTypes = []any{
 var file_imageer_v1_image_proto_depIdxs = []int32{
 	7, // 0: imageer.v1.Image.created_at:type_name -> google.protobuf.Timestamp
 	7, // 1: imageer.v1.Image.updated_at:type_name -> google.protobuf.Timestamp
-	0, // 2: imageer.v1.Image.format:type_name -> imageer.v1.Format
-	3, // 3: imageer.v1.Image.state:type_name -> imageer.v1.State
+	0, // 2: imageer.v1.Image.format:type_name -> imageer.v1.ImageFormat
+	3, // 3: imageer.v1.Image.state:type_name -> imageer.v1.ImageState
 	7, // 4: imageer.v1.ImageVariant.created_at:type_name -> google.protobuf.Timestamp
 	7, // 5: imageer.v1.ImageVariant.updated_at:type_name -> google.protobuf.Timestamp
-	0, // 6: imageer.v1.ImageVariant.format:type_name -> imageer.v1.Format
-	4, // 7: imageer.v1.ImageVariant.state:type_name -> imageer.v1.VariantState
+	0, // 6: imageer.v1.ImageVariant.format:type_name -> imageer.v1.ImageFormat
+	4, // 7: imageer.v1.ImageVariant.state:type_name -> imageer.v1.ImageVariantState
 	8, // [8:8] is the sub-list for method output_type
 	8, // [8:8] is the sub-list for method input_type
 	8, // [8:8] is the sub-list for extension type_name

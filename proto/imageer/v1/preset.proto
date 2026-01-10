@@ -11,10 +11,10 @@ message Preset {
   google.protobuf.Timestamp updated_at = 3;
   string name = 4;
   bool default = 5;
-  Format format = 6;
+  ImageFormat format = 6;
   int32 quality = 7;
-  Fit fit = 8;
-  Anchor anchor = 9;
+  ImageFit fit = 8;
+  ImageAnchor anchor = 9;
   optional int32 width = 10;
   optional int32 height = 11;
 }

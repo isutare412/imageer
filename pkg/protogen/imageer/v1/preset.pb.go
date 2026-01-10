@@ -29,10 +29,10 @@ type Preset struct {
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	Default       bool                   `protobuf:"varint,5,opt,name=default,proto3" json:"default,omitempty"`
-	Format        Format                 `protobuf:"varint,6,opt,name=format,proto3,enum=imageer.v1.Format" json:"format,omitempty"`
+	Format        ImageFormat            `protobuf:"varint,6,opt,name=format,proto3,enum=imageer.v1.ImageFormat" json:"format,omitempty"`
 	Quality       int32                  `protobuf:"varint,7,opt,name=quality,proto3" json:"quality,omitempty"`
-	Fit           Fit                    `protobuf:"varint,8,opt,name=fit,proto3,enum=imageer.v1.Fit" json:"fit,omitempty"`
-	Anchor        Anchor                 `protobuf:"varint,9,opt,name=anchor,proto3,enum=imageer.v1.Anchor" json:"anchor,omitempty"`
+	Fit           ImageFit               `protobuf:"varint,8,opt,name=fit,proto3,enum=imageer.v1.ImageFit" json:"fit,omitempty"`
+	Anchor        ImageAnchor            `protobuf:"varint,9,opt,name=anchor,proto3,enum=imageer.v1.ImageAnchor" json:"anchor,omitempty"`
 	Width         *int32                 `protobuf:"varint,10,opt,name=width,proto3,oneof" json:"width,omitempty"`
 	Height        *int32                 `protobuf:"varint,11,opt,name=height,proto3,oneof" json:"height,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -104,11 +104,11 @@ func (x *Preset) GetDefault() bool {
 	return false
 }
 
-func (x *Preset) GetFormat() Format {
+func (x *Preset) GetFormat() ImageFormat {
 	if x != nil {
 		return x.Format
 	}
-	return Format_FORMAT_UNSPECIFIED
+	return ImageFormat_IMAGE_FORMAT_UNSPECIFIED
 }
 
 func (x *Preset) GetQuality() int32 {
@@ -118,18 +118,18 @@ func (x *Preset) GetQuality() int32 {
 	return 0
 }
 
-func (x *Preset) GetFit() Fit {
+func (x *Preset) GetFit() ImageFit {
 	if x != nil {
 		return x.Fit
 	}
-	return Fit_FIT_UNSPECIFIED
+	return ImageFit_IMAGE_FIT_UNSPECIFIED
 }
 
-func (x *Preset) GetAnchor() Anchor {
+func (x *Preset) GetAnchor() ImageAnchor {
 	if x != nil {
 		return x.Anchor
 	}
-	return Anchor_ANCHOR_UNSPECIFIED
+	return ImageAnchor_IMAGE_ANCHOR_UNSPECIFIED
 }
 
 func (x *Preset) GetWidth() int32 {
@@ -151,7 +151,7 @@ var File_imageer_v1_preset_proto protoreflect.FileDescriptor
 const file_imageer_v1_preset_proto_rawDesc = "" +
 	"\n" +
 	"\x17imageer/v1/preset.proto\x12\n" +
-	"imageer.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16imageer/v1/image.proto\"\x9e\x03\n" +
+	"imageer.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16imageer/v1/image.proto\"\xad\x03\n" +
 	"\x06Preset\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\n" +
@@ -159,11 +159,11 @@ const file_imageer_v1_preset_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x12\n" +
 	"\x04name\x18\x04 \x01(\tR\x04name\x12\x18\n" +
-	"\adefault\x18\x05 \x01(\bR\adefault\x12*\n" +
-	"\x06format\x18\x06 \x01(\x0e2\x12.imageer.v1.FormatR\x06format\x12\x18\n" +
-	"\aquality\x18\a \x01(\x05R\aquality\x12!\n" +
-	"\x03fit\x18\b \x01(\x0e2\x0f.imageer.v1.FitR\x03fit\x12*\n" +
-	"\x06anchor\x18\t \x01(\x0e2\x12.imageer.v1.AnchorR\x06anchor\x12\x19\n" +
+	"\adefault\x18\x05 \x01(\bR\adefault\x12/\n" +
+	"\x06format\x18\x06 \x01(\x0e2\x17.imageer.v1.ImageFormatR\x06format\x12\x18\n" +
+	"\aquality\x18\a \x01(\x05R\aquality\x12&\n" +
+	"\x03fit\x18\b \x01(\x0e2\x14.imageer.v1.ImageFitR\x03fit\x12/\n" +
+	"\x06anchor\x18\t \x01(\x0e2\x17.imageer.v1.ImageAnchorR\x06anchor\x12\x19\n" +
 	"\x05width\x18\n" +
 	" \x01(\x05H\x00R\x05width\x88\x01\x01\x12\x1b\n" +
 	"\x06height\x18\v \x01(\x05H\x01R\x06height\x88\x01\x01B\b\n" +
@@ -189,16 +189,16 @@ var file_imageer_v1_preset_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_imageer_v1_preset_proto_goTypes = []any{
 	(*Preset)(nil),                // 0: imageer.v1.Preset
 	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
-	(Format)(0),                   // 2: imageer.v1.Format
-	(Fit)(0),                      // 3: imageer.v1.Fit
-	(Anchor)(0),                   // 4: imageer.v1.Anchor
+	(ImageFormat)(0),              // 2: imageer.v1.ImageFormat
+	(ImageFit)(0),                 // 3: imageer.v1.ImageFit
+	(ImageAnchor)(0),              // 4: imageer.v1.ImageAnchor
 }
 var file_imageer_v1_preset_proto_depIdxs = []int32{
 	1, // 0: imageer.v1.Preset.created_at:type_name -> google.protobuf.Timestamp
 	1, // 1: imageer.v1.Preset.updated_at:type_name -> google.protobuf.Timestamp
-	2, // 2: imageer.v1.Preset.format:type_name -> imageer.v1.Format
-	3, // 3: imageer.v1.Preset.fit:type_name -> imageer.v1.Fit
-	4, // 4: imageer.v1.Preset.anchor:type_name -> imageer.v1.Anchor
+	2, // 2: imageer.v1.Preset.format:type_name -> imageer.v1.ImageFormat
+	3, // 3: imageer.v1.Preset.fit:type_name -> imageer.v1.ImageFit
+	4, // 4: imageer.v1.Preset.anchor:type_name -> imageer.v1.ImageAnchor
 	5, // [5:5] is the sub-list for method output_type
 	5, // [5:5] is the sub-list for method input_type
 	5, // [5:5] is the sub-list for extension type_name
