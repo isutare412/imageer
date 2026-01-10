@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/isutare412/imageer/pkg/apperr"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 type VariantState string
@@ -32,6 +33,19 @@ func (s VariantState) Validate() error {
 		return apperr.NewError(apperr.CodeBadRequest).WithSummary("Unexpected image variant state %q", s)
 	}
 	return nil
+}
+
+func (s VariantState) ToProto() imageerv1.ImageVariantState {
+	switch s {
+	case VariantStateProcessing:
+		return imageerv1.ImageVariantState_IMAGE_VARIANT_STATE_PROCESSING
+	case VariantStateFailed:
+		return imageerv1.ImageVariantState_IMAGE_VARIANT_STATE_FAILED
+	case VariantStateReady:
+		return imageerv1.ImageVariantState_IMAGE_VARIANT_STATE_READY
+	default:
+		return imageerv1.ImageVariantState_IMAGE_VARIANT_STATE_UNSPECIFIED
+	}
 }
 
 func (s VariantState) Value() (driver.Value, error) {

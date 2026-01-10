@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/isutare412/imageer/pkg/apperr"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 type State string
@@ -31,6 +32,19 @@ func (s State) Validate() error {
 		return apperr.NewError(apperr.CodeBadRequest).WithSummary("Unexpected image state %q", s)
 	}
 	return nil
+}
+
+func (s State) ToProto() imageerv1.ImageState {
+	switch s {
+	case StateWaitingUpload:
+		return imageerv1.ImageState_IMAGE_STATE_WAITING_UPLOAD
+	case StateFailed:
+		return imageerv1.ImageState_IMAGE_STATE_FAILED
+	case StateReady:
+		return imageerv1.ImageState_IMAGE_STATE_READY
+	default:
+		return imageerv1.ImageState_IMAGE_STATE_UNSPECIFIED
+	}
 }
 
 func (s State) Value() (driver.Value, error) {

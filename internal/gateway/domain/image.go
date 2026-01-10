@@ -4,7 +4,10 @@ import (
 	"net/http"
 	"time"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/isutare412/imageer/pkg/images"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 type Image struct {
@@ -18,6 +21,20 @@ type Image struct {
 	URL       string
 	Variants  []ImageVariant
 	Project   ProjectReference
+}
+
+func (i Image) ToProto() *imageerv1.Image {
+	return &imageerv1.Image{
+		Id:        i.ID,
+		CreatedAt: timestamppb.New(i.CreatedAt),
+		UpdatedAt: timestamppb.New(i.UpdatedAt),
+		FileName:  i.FileName,
+		Format:    i.Format.ToProto(),
+		State:     i.State.ToProto(),
+		S3Key:     i.S3Key,
+		Url:       i.URL,
+		ProjectId: i.Project.ID,
+	}
 }
 
 type Images struct {

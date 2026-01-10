@@ -8,6 +8,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/isutare412/imageer/pkg/apperr"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 type Anchor string
@@ -43,6 +44,25 @@ func (a Anchor) Validate() error {
 		return apperr.NewError(apperr.CodeBadRequest).WithSummary("Unexpected image anchor %q", a)
 	}
 	return nil
+}
+
+func (a Anchor) ToProto() imageerv1.ImageAnchor {
+	switch a {
+	case AnchorSmart:
+		return imageerv1.ImageAnchor_IMAGE_ANCHOR_SMART
+	case AnchorCenter:
+		return imageerv1.ImageAnchor_IMAGE_ANCHOR_CENTER
+	case AnchorNorth:
+		return imageerv1.ImageAnchor_IMAGE_ANCHOR_NORTH
+	case AnchorSouth:
+		return imageerv1.ImageAnchor_IMAGE_ANCHOR_SOUTH
+	case AnchorEast:
+		return imageerv1.ImageAnchor_IMAGE_ANCHOR_EAST
+	case AnchorWest:
+		return imageerv1.ImageAnchor_IMAGE_ANCHOR_WEST
+	default:
+		return imageerv1.ImageAnchor_IMAGE_ANCHOR_UNSPECIFIED
+	}
 }
 
 func (a Anchor) Value() (driver.Value, error) {

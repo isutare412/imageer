@@ -8,6 +8,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/isutare412/imageer/pkg/apperr"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 type Format string
@@ -86,6 +87,23 @@ func (f Format) ContentType() string {
 		return "image/heic"
 	default:
 		return ""
+	}
+}
+
+func (f Format) ToProto() imageerv1.ImageFormat {
+	switch f {
+	case FormatJPEG:
+		return imageerv1.ImageFormat_IMAGE_FORMAT_JPEG
+	case FormatPNG:
+		return imageerv1.ImageFormat_IMAGE_FORMAT_PNG
+	case FormatWebp:
+		return imageerv1.ImageFormat_IMAGE_FORMAT_WEBP
+	case FormatAVIF:
+		return imageerv1.ImageFormat_IMAGE_FORMAT_AVIF
+	case FormatHEIC:
+		return imageerv1.ImageFormat_IMAGE_FORMAT_HEIC
+	default:
+		return imageerv1.ImageFormat_IMAGE_FORMAT_UNSPECIFIED
 	}
 }
 

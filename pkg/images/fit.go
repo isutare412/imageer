@@ -8,6 +8,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/isutare412/imageer/pkg/apperr"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 type Fit string
@@ -45,6 +46,19 @@ func (f Fit) Validate() error {
 		return apperr.NewError(apperr.CodeBadRequest).WithSummary("Unexpected image crop mode %q", f)
 	}
 	return nil
+}
+
+func (f Fit) ToProto() imageerv1.ImageFit {
+	switch f {
+	case FitCover:
+		return imageerv1.ImageFit_IMAGE_FIT_COVER
+	case FitContain:
+		return imageerv1.ImageFit_IMAGE_FIT_CONTAIN
+	case FitFill:
+		return imageerv1.ImageFit_IMAGE_FIT_FILL
+	default:
+		return imageerv1.ImageFit_IMAGE_FIT_UNSPECIFIED
+	}
 }
 
 func (f Fit) Value() (driver.Value, error) {

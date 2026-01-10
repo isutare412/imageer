@@ -4,9 +4,11 @@ import (
 	"time"
 
 	"github.com/samber/lo"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/isutare412/imageer/pkg/dbhelpers"
 	"github.com/isutare412/imageer/pkg/images"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 type Preset struct {
@@ -22,6 +24,33 @@ type Preset struct {
 	Anchor  *images.Anchor
 	Width   *int64
 	Height  *int64
+}
+
+func (p Preset) ToProto() *imageerv1.Preset {
+	preset := &imageerv1.Preset{
+		Id:        p.ID,
+		CreatedAt: timestamppb.New(p.CreatedAt),
+		UpdatedAt: timestamppb.New(p.UpdatedAt),
+		Name:      p.Name,
+		Default:   p.Default,
+		Format:    p.Format.ToProto(),
+		Quality:   int32(p.Quality),
+	}
+
+	if p.Fit != nil {
+		preset.Fit = p.Fit.ToProto()
+	}
+	if p.Anchor != nil {
+		preset.Anchor = p.Anchor.ToProto()
+	}
+	if p.Width != nil {
+		preset.Width = lo.ToPtr(int32(*p.Width))
+	}
+	if p.Height != nil {
+		preset.Height = lo.ToPtr(int32(*p.Height))
+	}
+
+	return preset
 }
 
 type PresetReference struct {
