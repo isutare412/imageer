@@ -3,6 +3,7 @@ package image
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 
@@ -10,30 +11,33 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/images"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 	"github.com/isutare412/imageer/pkg/validation"
 )
 
 type Service struct {
-	s3Presigner   port.S3Presigner
-	transactioner port.Transactioner
-	imageRepo     port.ImageRepository
-	imageVarRepo  port.ImageVariantRepository
-	presetRepo    port.PresetRepository
+	s3Presigner     port.S3Presigner
+	transactioner   port.Transactioner
+	imageRepo       port.ImageRepository
+	imageVarRepo    port.ImageVariantRepository
+	presetRepo      port.PresetRepository
+	imageEventQueue port.ImageEventQueue
 
 	cfg Config
 }
 
 func NewService(cfg Config, s3Presigner port.S3Presigner, transactioner port.Transactioner,
 	imageRepo port.ImageRepository, imageVarRepo port.ImageVariantRepository,
-	presetRepo port.PresetRepository,
+	presetRepo port.PresetRepository, imageEventQueue port.ImageEventQueue,
 ) *Service {
 	return &Service{
-		s3Presigner:   s3Presigner,
-		transactioner: transactioner,
-		imageRepo:     imageRepo,
-		imageVarRepo:  imageVarRepo,
-		presetRepo:    presetRepo,
-		cfg:           cfg,
+		s3Presigner:     s3Presigner,
+		transactioner:   transactioner,
+		imageRepo:       imageRepo,
+		imageVarRepo:    imageVarRepo,
+		presetRepo:      presetRepo,
+		imageEventQueue: imageEventQueue,
+		cfg:             cfg,
 	}
 }
 
@@ -114,4 +118,41 @@ func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadUR
 		URL:       presignResp.URL,
 		Header:    presignResp.Header,
 	}, nil
+}
+
+func (s *Service) StartImageProcessingOnUpload(ctx context.Context, s3Key string) error {
+	_, imageID, ok := parseImageS3Key(s3Key)
+	if !ok {
+		return apperr.NewError(apperr.CodeBadRequest).
+			WithSummary("Unexpected s3 key of uploaded image: %s", s3Key)
+	}
+
+	image, err := s.imageRepo.FindByID(ctx, imageID)
+	if err != nil {
+		return fmt.Errorf("finding image by ID: %w", err)
+	}
+
+	procRequests := make([]*imageerv1.ImageProcessRequest, 0, len(image.Variants))
+	for _, variant := range image.Variants {
+		preset, err := s.presetRepo.FindByID(ctx, variant.Preset.ID)
+		if err != nil {
+			return fmt.Errorf("finding preset by ID: %w", err)
+		}
+
+		procRequests = append(procRequests, &imageerv1.ImageProcessRequest{
+			Image:   image.ToProto(),
+			Variant: variant.ToProto(),
+			Preset:  preset.ToProto(),
+		})
+	}
+
+	for _, req := range procRequests {
+		if err := s.imageEventQueue.PushImageProcessRequest(ctx, req); err != nil {
+			return fmt.Errorf("enqueuing image process request: %w", err)
+		}
+	}
+
+	slog.InfoContext(ctx, "Started image processing after client upload", "imageId", image.ID)
+
+	return nil
 }

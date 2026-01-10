@@ -2,9 +2,12 @@ package image
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/isutare412/imageer/pkg/images"
 )
+
+var imageS3KeyPattern = regexp.MustCompile(`projects/([^/]+)/images/([^/]+)`)
 
 func imageBasePath(projectID, imageID string) string {
 	return fmt.Sprintf("projects/%s/images/%s", projectID, imageID)
@@ -34,4 +37,12 @@ func (s *Service) imageVariantPublicURL(projectID, imageID, presetID string, for
 ) string {
 	return fmt.Sprintf("%s/%s/variants/%s.%s", s.cfg.CDNDomain, imageBasePath(projectID, imageID),
 		presetID, format.Extension())
+}
+
+func parseImageS3Key(key string) (projectID, imageID string, ok bool) {
+	matches := imageS3KeyPattern.FindStringSubmatch(key)
+	if len(matches) != 3 {
+		return "", "", false
+	}
+	return matches[1], matches[2], true
 }

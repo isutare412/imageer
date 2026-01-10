@@ -1,6 +1,10 @@
 package valkey
 
-import "github.com/valkey-io/valkey-go"
+import (
+	"strconv"
+
+	"github.com/valkey-io/valkey-go"
+)
 
 type ClientConfig struct {
 	Addresses []string
@@ -12,4 +16,13 @@ func (c ClientConfig) applyToOption(opt *valkey.ClientOption) {
 	opt.InitAddress = c.Addresses
 	opt.Username = c.Username
 	opt.Password = c.Password
+}
+
+type ImageEventQueueConfig struct {
+	StreamKey  string
+	StreamSize int
+}
+
+func (c ImageEventQueueConfig) StreamSizeString() string {
+	return strconv.Itoa(c.StreamSize)
 }

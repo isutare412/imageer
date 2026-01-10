@@ -335,3 +335,17 @@ func (mr *MockImageServiceMockRecorder) CreateUploadURL(arg0, arg1 any) *gomock.
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUploadURL", reflect.TypeOf((*MockImageService)(nil).CreateUploadURL), arg0, arg1)
 }
+
+// StartImageProcessingOnUpload mocks base method.
+func (m *MockImageService) StartImageProcessingOnUpload(ctx context.Context, s3Key string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StartImageProcessingOnUpload", ctx, s3Key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// StartImageProcessingOnUpload indicates an expected call of StartImageProcessingOnUpload.
+func (mr *MockImageServiceMockRecorder) StartImageProcessingOnUpload(ctx, s3Key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartImageProcessingOnUpload", reflect.TypeOf((*MockImageService)(nil).StartImageProcessingOnUpload), ctx, s3Key)
+}

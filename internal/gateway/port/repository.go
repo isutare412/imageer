@@ -37,6 +37,7 @@ type ServiceAccountRepository interface {
 }
 
 type ImageRepository interface {
+	FindByID(ctx context.Context, id string) (domain.Image, error)
 	Create(context.Context, domain.Image) (domain.Image, error)
 }
 
@@ -45,6 +46,7 @@ type ImageVariantRepository interface {
 }
 
 type PresetRepository interface {
+	FindByID(ctx context.Context, id string) (domain.Preset, error)
 	FindByName(ctx context.Context, projectID, name string) (domain.Preset, error)
 	List(context.Context, domain.ListPresetsParams) ([]domain.Preset, error)
 }

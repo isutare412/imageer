@@ -33,4 +33,5 @@ type ProjectService interface {
 
 type ImageService interface {
 	CreateUploadURL(context.Context, domain.CreateUploadURLRequest) (domain.UploadURL, error)
+	StartImageProcessingOnUpload(ctx context.Context, s3Key string) error
 }

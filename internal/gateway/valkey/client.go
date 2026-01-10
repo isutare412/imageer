@@ -12,6 +12,8 @@ type Client struct {
 
 func NewClient(cfg ClientConfig) (*Client, error) {
 	opt := valkey.ClientOption{
+		// Activate pipelining for context cancel support
+		// ref: https://github.com/valkey-io/valkey-go?tab=readme-ov-file#canceling-a-context-before-its-deadline
 		AlwaysPipelining: true,
 	}
 	cfg.applyToOption(&opt)

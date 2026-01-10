@@ -22,6 +22,19 @@ func NewPresetRepository(client *Client) *PresetRepository {
 	}
 }
 
+func (r *PresetRepository) FindByID(ctx context.Context, id string) (domain.Preset, error) {
+	tx := GetTxOrDB(ctx, r.db)
+
+	preset, err := gorm.G[entity.Preset](tx).
+		Where(gen.Preset.ID.Eq(id)).
+		First(ctx)
+	if err != nil {
+		return domain.Preset{}, dbhelpers.WrapError(err, "Failed to find preset %s", id)
+	}
+
+	return preset.ToDomain(), nil
+}
+
 func (r *PresetRepository) FindByName(ctx context.Context, projectID, name string,
 ) (domain.Preset, error) {
 	tx := GetTxOrDB(ctx, r.db)

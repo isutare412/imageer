@@ -16,6 +16,60 @@ import (
 	"github.com/isutare412/imageer/pkg/images"
 )
 
+func TestPresetRepository_FindByID(t *testing.T) {
+	type testSet struct {
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		presetRepo    *postgres.PresetRepository
+		mock          sqlmock.Sqlmock
+
+		id      string
+		setup   func(t *testing.T, tt *testSet)
+		wantErr bool
+	}
+
+	tests := []testSet{
+		{
+			name: "normal case",
+			id:   "preset-1",
+			setup: func(t *testing.T, tt *testSet) {
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
+				tt.presetRepo = postgres.NewPresetRepository(postgresClient)
+				tt.mock = mock
+
+				mock.ExpectBegin()
+				mock.ExpectQuery(
+					`SELECT * FROM "presets" WHERE "id" = $1 ORDER BY "presets"."id" LIMIT $2`).
+					WithArgs("preset-1", 1).
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Preset]()).
+						AddRow("preset-1", time.Now(), time.Now(), "preset-name-1", false,
+							images.FormatWebp, images.Quality(90), nil, nil, nil, nil, "project-1"))
+				mock.ExpectCommit()
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup(t, &tt)
+
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.presetRepo.FindByID(ctx, tt.id)
+				return err
+			})
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			err = tt.mock.ExpectationsWereMet()
+			require.NoError(t, err)
+		})
+	}
+}
+
 func TestPresetRepository_FindByName(t *testing.T) {
 	type testSet struct {
 		name          string // description of this test case

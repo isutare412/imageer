@@ -21,6 +21,22 @@ func NewImageRepository(client *Client) *ImageRepository {
 	}
 }
 
+func (r *ImageRepository) FindByID(ctx context.Context, id string) (domain.Image, error) {
+	tx := GetTxOrDB(ctx, r.db)
+
+	img, err := gorm.G[entity.Image](tx).
+		Where(gen.Image.ID.Eq(id)).
+		Preload(gen.Image.Project.Name(), nil).
+		Preload(gen.Image.Variants.Name(), nil).
+		Preload(gen.Image.Variants.Name()+"."+gen.ImageVariant.Preset.Name(), nil).
+		First(ctx)
+	if err != nil {
+		return domain.Image{}, dbhelpers.WrapError(err, "Failed to get image %s", id)
+	}
+
+	return img.ToDomain(), nil
+}
+
 func (r *ImageRepository) Create(ctx context.Context, image domain.Image) (domain.Image, error) {
 	tx := GetTxOrDB(ctx, r.db)
 

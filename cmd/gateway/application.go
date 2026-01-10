@@ -20,13 +20,15 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/service/project"
 	"github.com/isutare412/imageer/internal/gateway/service/serviceaccount"
 	"github.com/isutare412/imageer/internal/gateway/sqs"
+	"github.com/isutare412/imageer/internal/gateway/valkey"
 	"github.com/isutare412/imageer/internal/gateway/web"
 )
 
 type application struct {
 	webServer         *web.Server
 	imageUploadLister *sqs.ImageUploadListener
-	repoClient        *postgres.Client
+	postgresClient    *postgres.Client
+	valkeyClient      *valkey.Client
 
 	cfg config.Config
 }
@@ -65,31 +67,40 @@ func newApplication(cfg config.Config) (*application, error) {
 	}
 
 	slog.Info("Create repository client")
-	repoClient, err := postgres.NewClient(cfg.ToRepositoryClientConfig())
+	postgresClient, err := postgres.NewClient(cfg.ToRepositoryClientConfig())
 	if err != nil {
 		return nil, fmt.Errorf("creating repository client: %w", err)
 	}
 
 	slog.Info("Create transactioner")
-	transactioner := postgres.NewTransactioner(repoClient)
+	transactioner := postgres.NewTransactioner(postgresClient)
 
 	slog.Info("Create user repository")
-	userRepo := postgres.NewUserRepository(repoClient)
+	userRepo := postgres.NewUserRepository(postgresClient)
 
 	slog.Info("Create service account repository")
-	serviceAccountRepo := postgres.NewServiceAccountRepository(repoClient)
+	serviceAccountRepo := postgres.NewServiceAccountRepository(postgresClient)
 
 	slog.Info("Create project repository")
-	projectRepo := postgres.NewProjectRepository(repoClient)
+	projectRepo := postgres.NewProjectRepository(postgresClient)
 
 	slog.Info("Create image repository")
-	imageRepo := postgres.NewImageRepository(repoClient)
+	imageRepo := postgres.NewImageRepository(postgresClient)
 
 	slog.Info("Create image variant repository")
-	imageVarRepo := postgres.NewImageVariantRepository(repoClient)
+	imageVarRepo := postgres.NewImageVariantRepository(postgresClient)
 
 	slog.Info("Create preset repository")
-	presetRepo := postgres.NewPresetRepository(repoClient)
+	presetRepo := postgres.NewPresetRepository(postgresClient)
+
+	slog.Info("Create valkey client")
+	valkeyClient, err := valkey.NewClient(cfg.ToValkeyClientConfig())
+	if err != nil {
+		return nil, fmt.Errorf("creating valkey client: %w", err)
+	}
+
+	slog.Info("Create valkey image event queue")
+	imageEventQueue := valkey.NewImageEventQueue(cfg.ToValkeyImageEventQueueConfig(), valkeyClient)
 
 	slog.Info("Create auth service")
 	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider,
@@ -102,13 +113,14 @@ func newApplication(cfg config.Config) (*application, error) {
 	projectSvc := project.NewService(projectRepo)
 
 	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, transactioner, imageRepo,
-		imageVarRepo, presetRepo)
+		imageVarRepo, presetRepo, imageEventQueue)
 
 	slog.Info("Create web server")
 	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, imageSvc)
 
 	slog.Info("Create SQS image upload listener")
-	imageUploadListener, err := sqs.NewImageUploadListener(cfg.ToSQSImageUploadListenerConfig())
+	imageUploadListener, err := sqs.NewImageUploadListener(cfg.ToSQSImageUploadListenerConfig(),
+		imageSvc)
 	if err != nil {
 		return nil, fmt.Errorf("creating SQS image upload listener: %w", err)
 	}
@@ -116,7 +128,8 @@ func newApplication(cfg config.Config) (*application, error) {
 	return &application{
 		webServer:         webServer,
 		imageUploadLister: imageUploadListener,
-		repoClient:        repoClient,
+		postgresClient:    postgresClient,
+		valkeyClient:      valkeyClient,
 		cfg:               cfg,
 	}, nil
 }
@@ -131,7 +144,7 @@ func (a *application) initialize() error {
 	defer cancelSignal()
 
 	slog.Info("Migrate database schemas")
-	if err := a.repoClient.MigrateSchemas(ctx); err != nil {
+	if err := a.postgresClient.MigrateSchemas(ctx); err != nil {
 		return fmt.Errorf("migrating database schemas: %w", err)
 	}
 
@@ -165,6 +178,9 @@ func (a *application) shutdown() {
 
 	slog.Info("Shutdown SQS image upload listener")
 	a.imageUploadLister.Shutdown()
+
+	slog.Info("Shutdown valkey client")
+	a.valkeyClient.Shutdown()
 }
 
 func logDuration(operation string) func() {

@@ -19,6 +19,16 @@ database:
     password: password
     database: database_name
 
+valkey:
+  addresses: localhost:15410
+  username: admin
+  password: complex_password
+
+  streams:
+    image-process-request:
+      stream-key: imageer:local:image-process-request-stream
+      stream-size: 100
+
 auth:
   cookies:
     oidc-state:
@@ -90,6 +100,10 @@ aws:
       image: sandbox/images
     presign:
       expiry: 10m
+
+  cloudfront:
+    images:
+      distribution-domain: https://example.cloudfront.net
 
   sqs:
     image-upload-event-queue:

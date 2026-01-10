@@ -381,6 +381,21 @@ func (mr *MockImageRepositoryMockRecorder) Create(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockImageRepository)(nil).Create), arg0, arg1)
 }
 
+// FindByID mocks base method.
+func (m *MockImageRepository) FindByID(ctx context.Context, id string) (domain.Image, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByID", ctx, id)
+	ret0, _ := ret[0].(domain.Image)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByID indicates an expected call of FindByID.
+func (mr *MockImageRepositoryMockRecorder) FindByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockImageRepository)(nil).FindByID), ctx, id)
+}
+
 // MockImageVariantRepository is a mock of ImageVariantRepository interface.
 type MockImageVariantRepository struct {
 	ctrl     *gomock.Controller
@@ -442,6 +457,21 @@ func NewMockPresetRepository(ctrl *gomock.Controller) *MockPresetRepository {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockPresetRepository) EXPECT() *MockPresetRepositoryMockRecorder {
 	return m.recorder
+}
+
+// FindByID mocks base method.
+func (m *MockPresetRepository) FindByID(ctx context.Context, id string) (domain.Preset, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByID", ctx, id)
+	ret0, _ := ret[0].(domain.Preset)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByID indicates an expected call of FindByID.
+func (mr *MockPresetRepositoryMockRecorder) FindByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockPresetRepository)(nil).FindByID), ctx, id)
 }
 
 // FindByName mocks base method.

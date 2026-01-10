@@ -1,6 +1,10 @@
 package config
 
 import (
+	"strings"
+
+	"github.com/samber/lo"
+
 	"github.com/isutare412/imageer/internal/gateway/crypt"
 	"github.com/isutare412/imageer/internal/gateway/jwt"
 	"github.com/isutare412/imageer/internal/gateway/oidc"
@@ -9,6 +13,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/service/auth"
 	"github.com/isutare412/imageer/internal/gateway/service/image"
 	"github.com/isutare412/imageer/internal/gateway/sqs"
+	"github.com/isutare412/imageer/internal/gateway/valkey"
 	"github.com/isutare412/imageer/internal/gateway/web"
 	"github.com/isutare412/imageer/pkg/log"
 )
@@ -41,6 +46,21 @@ func (c *Config) ToRepositoryClientConfig() postgres.ClientConfig {
 		Database:    c.Database.Postgres.Database,
 		TraceLog:    c.Database.TraceLog,
 		UseInMemory: c.Database.UseInMemory,
+	}
+}
+
+func (c *Config) ToValkeyClientConfig() valkey.ClientConfig {
+	return valkey.ClientConfig{
+		Addresses: parseCSV(c.Valkey.Addresses, ","),
+		Username:  c.Valkey.Username,
+		Password:  c.Valkey.Password,
+	}
+}
+
+func (c *Config) ToValkeyImageEventQueueConfig() valkey.ImageEventQueueConfig {
+	return valkey.ImageEventQueueConfig{
+		StreamKey:  c.Valkey.Streams.ImageProcessRequest.StreamKey,
+		StreamSize: c.Valkey.Streams.ImageProcessRequest.StreamSize,
 	}
 }
 
@@ -102,4 +122,13 @@ func (c *Config) ToImageServiceConfig() image.Config {
 		CDNDomain:   c.AWS.CloudFront.Images.DistributionDomain,
 		S3KeyPrefix: c.AWS.S3.Prefix.Image,
 	}
+}
+
+func parseCSV(s string, delim string) []string {
+	parts := strings.Split(s, delim)
+	parts = lo.Map(parts, func(item string, _ int) string { return strings.TrimSpace(item) })
+	parts = lo.Filter(parts, func(item string, _ int) bool {
+		return item != ""
+	})
+	return parts
 }

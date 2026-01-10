@@ -10,6 +10,7 @@ type Config struct {
 	Log      LogConfig      `koanf:"log"`
 	Web      WebConfig      `koanf:"web"`
 	Database DatabaseConfig `koanf:"database"`
+	Valkey   ValkeyConfig   `koanf:"valkey"`
 	Auth     AuthConfig     `koanf:"auth"`
 	Crypt    CryptConfig    `koanf:"crypt"`
 	AWS      AWSConfig      `koanf:"aws"`
@@ -40,6 +41,19 @@ type PostgresConfig struct {
 	User     string `koanf:"user" validate:"required"`
 	Password string `koanf:"password" validate:"required"`
 	Database string `koanf:"database" validate:"required"`
+}
+
+type ValkeyConfig struct {
+	Addresses string `koanf:"addresses" validate:"required"`
+	Username  string `koanf:"username" validate:"required"`
+	Password  string `koanf:"password" validate:"required"`
+
+	Streams struct {
+		ImageProcessRequest struct {
+			StreamKey  string `koanf:"stream-key" validate:"required"`
+			StreamSize int    `koanf:"stream-size" validate:"required,gt=0"`
+		} `koanf:"image-process-request"`
+	} `koanf:"streams"`
 }
 
 type AuthConfig struct {

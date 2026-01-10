@@ -14,11 +14,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
+	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
 type ImageUploadListener struct {
-	client *sqs.Client
+	client   *sqs.Client
+	imageSvc port.ImageService
 
 	workers        *sync.WaitGroup
 	lifetimeCtx    context.Context
@@ -27,7 +29,8 @@ type ImageUploadListener struct {
 	cfg ImageUploadListenerConfig
 }
 
-func NewImageUploadListener(cfg ImageUploadListenerConfig) (*ImageUploadListener, error) {
+func NewImageUploadListener(cfg ImageUploadListenerConfig, imageSvc port.ImageService,
+) (*ImageUploadListener, error) {
 	awsCfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("loading default aws config: %w", err)
@@ -37,6 +40,7 @@ func NewImageUploadListener(cfg ImageUploadListenerConfig) (*ImageUploadListener
 
 	return &ImageUploadListener{
 		client:         sqs.NewFromConfig(awsCfg),
+		imageSvc:       imageSvc,
 		workers:        &sync.WaitGroup{},
 		lifetimeCtx:    ctx,
 		lifetimeCancel: cancel,
@@ -150,7 +154,19 @@ func (l *ImageUploadListener) handleRecord(ctx context.Context, record events.S3
 	ctx, cancel := context.WithTimeout(ctx, l.cfg.HandleTimeout)
 	defer cancel()
 
-	slog.DebugContext(ctx, "Received S3 PutObject event", "record", record)
+	s3Key := record.S3.Object.Key
+	err := l.imageSvc.StartImageProcessingOnUpload(ctx, s3Key)
+	switch {
+	case apperr.IsErrorCode(err, apperr.CodeBadRequest):
+		fallthrough
+	case apperr.IsErrorCode(err, apperr.CodeNotFound):
+		slog.WarnContext(ctx, "Skipping image processing for invalid upload",
+			"error", err, "s3Key", s3Key)
+		return nil
+
+	case err != nil:
+		return fmt.Errorf("starting image processing: %w", err)
+	}
 
 	return nil
 }
