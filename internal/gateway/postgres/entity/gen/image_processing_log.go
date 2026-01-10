@@ -10,6 +10,7 @@ var ImageProcessingLog = struct {
 	ID             field.Number[int]
 	CreatedAt      field.Time
 	IsSuccess      field.Bool
+	ErrorCode      field.Number[int]
 	ErrorMessage   field.String
 	DurationMillis field.Number[int]
 	ImageVariantID field.String
@@ -17,6 +18,7 @@ var ImageProcessingLog = struct {
 	ID:             field.Number[int]{}.WithColumn("id"),
 	CreatedAt:      field.Time{}.WithColumn("created_at"),
 	IsSuccess:      field.Bool{}.WithColumn("is_success"),
+	ErrorCode:      field.Number[int]{}.WithColumn("error_code"),
 	ErrorMessage:   field.String{}.WithColumn("error_message"),
 	DurationMillis: field.Number[int]{}.WithColumn("duration_millis"),
 	ImageVariantID: field.String{}.WithColumn("image_variant_id"),
