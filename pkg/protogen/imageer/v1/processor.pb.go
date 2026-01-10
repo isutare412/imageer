@@ -88,8 +88,9 @@ type ImageProcessResult struct {
 	ImageVariantId string                 `protobuf:"bytes,2,opt,name=image_variant_id,json=imageVariantId,proto3" json:"image_variant_id,omitempty"`
 	PresetId       string                 `protobuf:"bytes,3,opt,name=preset_id,json=presetId,proto3" json:"preset_id,omitempty"`
 	IsSuccess      bool                   `protobuf:"varint,4,opt,name=is_success,json=isSuccess,proto3" json:"is_success,omitempty"`
-	ErrorMessage   string                 `protobuf:"bytes,5,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
-	ProcessingTime *durationpb.Duration   `protobuf:"bytes,6,opt,name=processing_time,json=processingTime,proto3" json:"processing_time,omitempty"`
+	ErrorCode      int32                  `protobuf:"varint,5,opt,name=error_code,json=errorCode,proto3" json:"error_code,omitempty"`
+	ErrorMessage   string                 `protobuf:"bytes,6,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	ProcessingTime *durationpb.Duration   `protobuf:"bytes,7,opt,name=processing_time,json=processingTime,proto3" json:"processing_time,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -152,6 +153,13 @@ func (x *ImageProcessResult) GetIsSuccess() bool {
 	return false
 }
 
+func (x *ImageProcessResult) GetErrorCode() int32 {
+	if x != nil {
+		return x.ErrorCode
+	}
+	return 0
+}
+
 func (x *ImageProcessResult) GetErrorMessage() string {
 	if x != nil {
 		return x.ErrorMessage
@@ -175,15 +183,17 @@ const file_imageer_v1_processor_proto_rawDesc = "" +
 	"\x13ImageProcessRequest\x12'\n" +
 	"\x05image\x18\x01 \x01(\v2\x11.imageer.v1.ImageR\x05image\x122\n" +
 	"\avariant\x18\x02 \x01(\v2\x18.imageer.v1.ImageVariantR\avariant\x12*\n" +
-	"\x06preset\x18\x03 \x01(\v2\x12.imageer.v1.PresetR\x06preset\"\xfe\x01\n" +
+	"\x06preset\x18\x03 \x01(\v2\x12.imageer.v1.PresetR\x06preset\"\x9d\x02\n" +
 	"\x12ImageProcessResult\x12\x19\n" +
 	"\bimage_id\x18\x01 \x01(\tR\aimageId\x12(\n" +
 	"\x10image_variant_id\x18\x02 \x01(\tR\x0eimageVariantId\x12\x1b\n" +
 	"\tpreset_id\x18\x03 \x01(\tR\bpresetId\x12\x1d\n" +
 	"\n" +
-	"is_success\x18\x04 \x01(\bR\tisSuccess\x12#\n" +
-	"\rerror_message\x18\x05 \x01(\tR\ferrorMessage\x12B\n" +
-	"\x0fprocessing_time\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eprocessingTimeB\xa1\x01\n" +
+	"is_success\x18\x04 \x01(\bR\tisSuccess\x12\x1d\n" +
+	"\n" +
+	"error_code\x18\x05 \x01(\x05R\terrorCode\x12#\n" +
+	"\rerror_message\x18\x06 \x01(\tR\ferrorMessage\x12B\n" +
+	"\x0fprocessing_time\x18\a \x01(\v2\x19.google.protobuf.DurationR\x0eprocessingTimeB\xa1\x01\n" +
 	"\x0ecom.imageer.v1B\x0eProcessorProtoP\x01Z6github.com/isutare412/imageer/gen/imageer/v1;imageerv1\xa2\x02\x03IXX\xaa\x02\n" +
 	"Imageer.V1\xca\x02\n" +
 	"Imageer\\V1\xe2\x02\x16Imageer\\V1\\GPBMetadata\xea\x02\vImageer::V1b\x06proto3"

@@ -17,6 +17,7 @@ message ImageProcessResult {
   string image_variant_id = 2;
   string preset_id = 3;
   bool is_success = 4;
-  string error_message = 5;
-  google.protobuf.Duration processing_time = 6;
+  int32 error_code = 5;
+  string error_message = 6;
+  google.protobuf.Duration processing_time = 7;
 }
