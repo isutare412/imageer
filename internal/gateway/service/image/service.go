@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/port"
@@ -127,23 +128,49 @@ func (s *Service) StartImageProcessingOnUpload(ctx context.Context, s3Key string
 			WithSummary("Unexpected s3 key of uploaded image: %s", s3Key)
 	}
 
-	image, err := s.imageRepo.FindByID(ctx, imageID)
-	if err != nil {
-		return fmt.Errorf("finding image by ID: %w", err)
-	}
+	var (
+		image        domain.Image
+		procRequests []*imageerv1.ImageProcessRequest
+	)
+	err := s.transactioner.WithTx(ctx, func(ctx context.Context) error {
+		var err error
 
-	procRequests := make([]*imageerv1.ImageProcessRequest, 0, len(image.Variants))
-	for _, variant := range image.Variants {
-		preset, err := s.presetRepo.FindByID(ctx, variant.Preset.ID)
+		// Update image state to "ready"
+		image, err = s.imageRepo.Update(ctx, domain.UpdateImageRequest{
+			ID:    imageID,
+			State: lo.ToPtr(images.StateReady),
+		})
 		if err != nil {
-			return fmt.Errorf("finding preset by ID: %w", err)
+			return fmt.Errorf("updating image: %w", err)
 		}
 
-		procRequests = append(procRequests, &imageerv1.ImageProcessRequest{
-			Image:   image.ToProto(),
-			Variant: variant.ToProto(),
-			Preset:  preset.ToProto(),
-		})
+		procRequests = make([]*imageerv1.ImageProcessRequest, 0, len(image.Variants))
+		for _, variant := range image.Variants {
+			// Update image variant state to "processing"
+			variant, err := s.imageVarRepo.Update(ctx, domain.UpdateImageVariantRequest{
+				ID:    variant.ID,
+				State: lo.ToPtr(images.VariantStateProcessing),
+			})
+			if err != nil {
+				return fmt.Errorf("updating image variant: %w", err)
+			}
+
+			preset, err := s.presetRepo.FindByID(ctx, variant.Preset.ID)
+			if err != nil {
+				return fmt.Errorf("finding preset by ID: %w", err)
+			}
+
+			procRequests = append(procRequests, &imageerv1.ImageProcessRequest{
+				Image:   image.ToProto(),
+				Variant: variant.ToProto(),
+				Preset:  preset.ToProto(),
+			})
+		}
+
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("during transaction: %w", err)
 	}
 
 	for _, req := range procRequests {

@@ -396,6 +396,21 @@ func (mr *MockImageRepositoryMockRecorder) FindByID(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockImageRepository)(nil).FindByID), ctx, id)
 }
 
+// Update mocks base method.
+func (m *MockImageRepository) Update(arg0 context.Context, arg1 domain.UpdateImageRequest) (domain.Image, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", arg0, arg1)
+	ret0, _ := ret[0].(domain.Image)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockImageRepositoryMockRecorder) Update(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockImageRepository)(nil).Update), arg0, arg1)
+}
+
 // MockImageVariantRepository is a mock of ImageVariantRepository interface.
 type MockImageVariantRepository struct {
 	ctrl     *gomock.Controller
@@ -433,6 +448,21 @@ func (m *MockImageVariantRepository) Create(arg0 context.Context, arg1 domain.Im
 func (mr *MockImageVariantRepositoryMockRecorder) Create(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockImageVariantRepository)(nil).Create), arg0, arg1)
+}
+
+// Update mocks base method.
+func (m *MockImageVariantRepository) Update(arg0 context.Context, arg1 domain.UpdateImageVariantRequest) (domain.ImageVariant, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", arg0, arg1)
+	ret0, _ := ret[0].(domain.ImageVariant)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockImageVariantRepositoryMockRecorder) Update(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockImageVariantRepository)(nil).Update), arg0, arg1)
 }
 
 // MockPresetRepository is a mock of PresetRepository interface.

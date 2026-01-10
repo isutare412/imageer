@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -24,14 +26,9 @@ func NewImageRepository(client *Client) *ImageRepository {
 func (r *ImageRepository) FindByID(ctx context.Context, id string) (domain.Image, error) {
 	tx := GetTxOrDB(ctx, r.db)
 
-	img, err := gorm.G[entity.Image](tx).
-		Where(gen.Image.ID.Eq(id)).
-		Preload(gen.Image.Project.Name(), nil).
-		Preload(gen.Image.Variants.Name(), nil).
-		Preload(gen.Image.Variants.Name()+"."+gen.ImageVariant.Preset.Name(), nil).
-		First(ctx)
+	img, err := r.get(ctx, tx, id)
 	if err != nil {
-		return domain.Image{}, dbhelpers.WrapError(err, "Failed to get image %s", id)
+		return domain.Image{}, fmt.Errorf("getting image: %w", err)
 	}
 
 	return img.ToDomain(), nil
@@ -52,15 +49,44 @@ func (r *ImageRepository) Create(ctx context.Context, image domain.Image) (domai
 		return domain.Image{}, dbhelpers.WrapError(err, "Failed to create image")
 	}
 
-	img, err = gorm.G[entity.Image](tx).
-		Where(gen.Image.ID.Eq(img.ID)).
+	img, err = r.get(ctx, tx, img.ID)
+	if err != nil {
+		return domain.Image{}, fmt.Errorf("getting image: %w", err)
+	}
+
+	return img.ToDomain(), nil
+}
+
+func (r *ImageRepository) Update(ctx context.Context, req domain.UpdateImageRequest,
+) (domain.Image, error) {
+	tx := GetTxOrDB(ctx, r.db)
+
+	assigners := buildImageUpdateAssigners(req)
+	_, err := gorm.G[entity.Image](tx).
+		Where(gen.Image.ID.Eq(req.ID)).
+		Set(append(assigners, gen.Image.UpdatedAt.Set(time.Now()))...).
+		Update(ctx)
+	if err != nil {
+		return domain.Image{}, dbhelpers.WrapError(err, "Failed to update image %s", req.ID)
+	}
+
+	img, err := r.get(ctx, tx, req.ID)
+	if err != nil {
+		return domain.Image{}, fmt.Errorf("getting image: %w", err)
+	}
+
+	return img.ToDomain(), nil
+}
+
+func (r *ImageRepository) get(ctx context.Context, tx *gorm.DB, id string) (entity.Image, error) {
+	img, err := gorm.G[entity.Image](tx).
+		Where(gen.Image.ID.Eq(id)).
 		Preload(gen.Image.Project.Name(), nil).
 		Preload(gen.Image.Variants.Name(), nil).
 		Preload(gen.Image.Variants.Name()+"."+gen.ImageVariant.Preset.Name(), nil).
 		First(ctx)
 	if err != nil {
-		return domain.Image{}, dbhelpers.WrapError(err, "Failed to fetch created image %s", img.ID)
+		return entity.Image{}, dbhelpers.WrapError(err, "Failed to fetch created image %s", id)
 	}
-
-	return img.ToDomain(), nil
+	return img, nil
 }

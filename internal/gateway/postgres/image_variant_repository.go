@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -46,14 +48,46 @@ func (r *ImageVariantRepository) Create(
 		return domain.ImageVariant{}, dbhelpers.WrapError(err, "Failed to create image variant")
 	}
 
-	iv, err = gorm.G[entity.ImageVariant](tx).
-		Where(gen.ImageVariant.ID.Eq(iv.ID)).
-		Preload(gen.ImageVariant.Preset.Name(), nil).
-		First(ctx)
+	iv, err = r.get(ctx, tx, iv.ID)
 	if err != nil {
-		return domain.ImageVariant{},
-			dbhelpers.WrapError(err, "Failed to fetch created image variant %s", iv.ID)
+		return domain.ImageVariant{}, fmt.Errorf("getting image variant: %w", err)
 	}
 
 	return iv.ToDomain(), nil
+}
+
+func (r *ImageVariantRepository) Update(ctx context.Context, req domain.UpdateImageVariantRequest,
+) (domain.ImageVariant, error) {
+	tx := GetTxOrDB(ctx, r.db)
+
+	assigners := buildImageVariantUpdateAssigners(req)
+	_, err := gorm.G[entity.ImageVariant](tx).
+		Where(gen.ImageVariant.ID.Eq(req.ID)).
+		Set(append(assigners, gen.ImageVariant.UpdatedAt.Set(time.Now()))...).
+		Update(ctx)
+	if err != nil {
+		return domain.ImageVariant{}, dbhelpers.WrapError(err,
+			"Failed to update image variant %s", req.ID)
+	}
+
+	iv, err := r.get(ctx, tx, req.ID)
+	if err != nil {
+		return domain.ImageVariant{}, fmt.Errorf("getting image variant: %w", err)
+	}
+
+	return iv.ToDomain(), nil
+}
+
+func (r *ImageVariantRepository) get(ctx context.Context, tx *gorm.DB, id string,
+) (entity.ImageVariant, error) {
+	variant, err := gorm.G[entity.ImageVariant](tx).
+		Where(gen.ImageVariant.ID.Eq(id)).
+		Preload(gen.ImageVariant.Preset.Name(), nil).
+		First(ctx)
+	if err != nil {
+		return entity.ImageVariant{},
+			dbhelpers.WrapError(err, "Failed to get image variant %s", id)
+	}
+
+	return variant, nil
 }

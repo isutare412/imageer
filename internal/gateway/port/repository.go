@@ -39,10 +39,12 @@ type ServiceAccountRepository interface {
 type ImageRepository interface {
 	FindByID(ctx context.Context, id string) (domain.Image, error)
 	Create(context.Context, domain.Image) (domain.Image, error)
+	Update(context.Context, domain.UpdateImageRequest) (domain.Image, error)
 }
 
 type ImageVariantRepository interface {
 	Create(context.Context, domain.ImageVariant) (domain.ImageVariant, error)
+	Update(context.Context, domain.UpdateImageVariantRequest) (domain.ImageVariant, error)
 }
 
 type PresetRepository interface {

@@ -138,19 +138,17 @@ func (r *ServiceAccountRepository) Update(
 
 	// Update service account fields
 	assigners := buildServiceAccountUpdateAssigners(req)
-	if len(assigners) > 0 {
-		_, err := gorm.G[entity.ServiceAccount](tx).
-			Where(gen.ServiceAccount.ID.Eq(req.ID)).
-			Set(append(assigners, gen.ServiceAccount.UpdatedAt.Set(time.Now()))...).
-			Update(ctx)
-		if err != nil {
-			return domain.ServiceAccount{},
-				dbhelpers.WrapError(err, "Failed to update service account %s", req.ID)
-		}
+	_, err := gorm.G[entity.ServiceAccount](tx).
+		Where(gen.ServiceAccount.ID.Eq(req.ID)).
+		Set(append(assigners, gen.ServiceAccount.UpdatedAt.Set(time.Now()))...).
+		Update(ctx)
+	if err != nil {
+		return domain.ServiceAccount{},
+			dbhelpers.WrapError(err, "Failed to update service account %s", req.ID)
 	}
 
 	// Delete existing project associations
-	_, err := gorm.G[entity.ServiceAccountProject](tx).
+	_, err = gorm.G[entity.ServiceAccountProject](tx).
 		Where(gen.ServiceAccountProject.ServiceAccountID.Eq(req.ID)).
 		Delete(ctx)
 	if err != nil {

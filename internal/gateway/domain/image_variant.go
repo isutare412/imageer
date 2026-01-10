@@ -34,3 +34,8 @@ func (i ImageVariant) ToProto() *imageerv1.ImageVariant {
 		ImageId:   i.ImageID,
 	}
 }
+
+type UpdateImageVariantRequest struct {
+	ID    string
+	State *images.VariantState
+}

@@ -42,6 +42,11 @@ type Images struct {
 	Total int64
 }
 
+type UpdateImageRequest struct {
+	ID    string
+	State *images.State
+}
+
 type ReprocessImagesRequest struct {
 	ImageIDs     []string
 	ReprocessAll bool
