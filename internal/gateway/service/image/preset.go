@@ -6,7 +6,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/domain"
 )
 
-func findPresetNameDiference(requested []string, existing []domain.Preset) []string {
+func findPresetNameDifference(requested []string, existing []domain.Preset) []string {
 	existingNames := lo.Map(existing, func(p domain.Preset, _ int) string {
 		return p.Name
 	})

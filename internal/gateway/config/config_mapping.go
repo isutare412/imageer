@@ -99,6 +99,7 @@ func (c *Config) ToSQSImageUploadListenerConfig() sqs.ImageUploadListenerConfig 
 
 func (c *Config) ToImageServiceConfig() image.Config {
 	return image.Config{
+		CDNDomain:   c.AWS.CloudFront.Images.DistributionDomain,
 		S3KeyPrefix: c.AWS.S3.Prefix.Image,
 	}
 }

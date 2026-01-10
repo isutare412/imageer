@@ -83,8 +83,9 @@ type CryptConfig struct {
 }
 
 type AWSConfig struct {
-	S3  S3Config  `koanf:"s3"`
-	SQS SQSConfig `koanf:"sqs"`
+	S3         S3Config         `koanf:"s3"`
+	CloudFront CloudFrontConfig `koanf:"cloudfront"`
+	SQS        SQSConfig        `koanf:"sqs"`
 }
 
 type S3Config struct {
@@ -95,6 +96,12 @@ type S3Config struct {
 	Presign struct {
 		Expiry time.Duration `koanf:"expiry" validate:"required,gt=0"`
 	} `koanf:"presign"`
+}
+
+type CloudFrontConfig struct {
+	Images struct {
+		DistributionDomain string `koanf:"distribution-domain" validate:"required"`
+	} `koanf:"images"`
 }
 
 type SQSConfig struct {

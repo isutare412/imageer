@@ -15,6 +15,7 @@ var ImageVariant = struct {
 	Format    field.Field[images.Format]
 	State     field.Field[images.VariantState]
 	S3Key     field.String
+	URL       field.String
 	ImageID   field.String
 	PresetID  field.String
 	Preset    field.Struct[entity.Preset]
@@ -25,6 +26,7 @@ var ImageVariant = struct {
 	Format:    field.Field[images.Format]{}.WithColumn("format"),
 	State:     field.Field[images.VariantState]{}.WithColumn("state"),
 	S3Key:     field.String{}.WithColumn("s3_key"),
+	URL:       field.String{}.WithColumn("url"),
 	ImageID:   field.String{}.WithColumn("image_id"),
 	PresetID:  field.String{}.WithColumn("preset_id"),
 	Preset:    field.Struct[entity.Preset]{}.WithName("Preset"),

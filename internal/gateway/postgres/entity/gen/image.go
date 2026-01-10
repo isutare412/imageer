@@ -16,6 +16,7 @@ var Image = struct {
 	Format    field.Field[images.Format]
 	State     field.Field[images.State]
 	S3Key     field.String
+	URL       field.String
 	ProjectID field.String
 	Project   field.Struct[entity.Project]
 	Variants  field.Slice[entity.ImageVariant]
@@ -27,6 +28,7 @@ var Image = struct {
 	Format:    field.Field[images.Format]{}.WithColumn("format"),
 	State:     field.Field[images.State]{}.WithColumn("state"),
 	S3Key:     field.String{}.WithColumn("s3_key"),
+	URL:       field.String{}.WithColumn("url"),
 	ProjectID: field.String{}.WithColumn("project_id"),
 	Project:   field.Struct[entity.Project]{}.WithName("Project"),
 	Variants:  field.Slice[entity.ImageVariant]{}.WithName("Variants"),

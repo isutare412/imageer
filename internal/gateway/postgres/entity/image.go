@@ -19,6 +19,7 @@ type Image struct {
 	Format    images.Format `gorm:"size:32"`
 	State     images.State  `gorm:"size:32"`
 	S3Key     string        `gorm:"size:1024"`
+	URL       string        `gorm:"size:1024"`
 
 	ProjectID string  `gorm:"size:36"`
 	Project   Project `gorm:"constraint:OnDelete:SET NULL"`
@@ -33,6 +34,7 @@ func NewImage(img domain.Image) Image {
 		Format:    img.Format,
 		State:     img.State,
 		S3Key:     img.S3Key,
+		URL:       img.URL,
 		ProjectID: img.Project.ID,
 	}
 }
@@ -53,6 +55,7 @@ func (i Image) ToDomain() domain.Image {
 		Format:    i.Format,
 		State:     i.State,
 		S3Key:     i.S3Key,
+		URL:       i.URL,
 		Project:   i.Project.ToReference(),
 		Variants: lo.Map(i.Variants, func(v ImageVariant, _ int) domain.ImageVariant {
 			return v.ToDomain()

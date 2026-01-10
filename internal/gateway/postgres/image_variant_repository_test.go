@@ -51,7 +51,7 @@ func TestImageVariantRepository_Create(t *testing.T) {
 					WithArgs(tt.req.ImageID, sqlmock.AnyArg()).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Image]()).
 						AddRow("image-1", time.Now(), time.Now(), "file-1.jpg", images.FormatJPEG,
-							images.StateReady, "s3-key-1", "project-1"))
+							images.StateReady, "s3-key-1", "url-1", "project-1"))
 				mock.ExpectQuery(
 					`SELECT * FROM "presets" WHERE "id" = $1 ORDER BY "presets"."id" LIMIT $2`).
 					WithArgs(tt.req.Preset.ID, sqlmock.AnyArg()).
@@ -60,14 +60,14 @@ func TestImageVariantRepository_Create(t *testing.T) {
 							images.FormatWebp, images.Quality(90), nil, nil, nil, nil, "project-1"))
 				mock.ExpectExec(
 					`INSERT INTO "image_variants" ` +
-						`("id","created_at","updated_at","format","state","s3_key","image_id","preset_id") VALUES ` +
-						`($1,$2,$3,$4,$5,$6,$7,$8)`).
+						`("id","created_at","updated_at","format","state","s3_key","url","image_id","preset_id") VALUES ` +
+						`($1,$2,$3,$4,$5,$6,$7,$8,$9)`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectQuery(
 					`SELECT * FROM "image_variants" WHERE "id" = $1 ORDER BY "image_variants"."id" LIMIT $2`).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.ImageVariant]()).
 						AddRow("variant-1", time.Now(), time.Now(), images.FormatWebp,
-							images.VariantStateReady, "s3-key-1", "image-1", "preset-1"))
+							images.VariantStateReady, "s3-key-1", "url-1", "image-1", "preset-1"))
 				mock.ExpectQuery(
 					`SELECT * FROM "presets" WHERE "presets"."id" = $1`).
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Preset]()).

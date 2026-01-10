@@ -17,6 +17,7 @@ type ImageVariant struct {
 	Format    images.Format       `gorm:"size:32"`
 	State     images.VariantState `gorm:"size:32"`
 	S3Key     string              `gorm:"size:1024"`
+	URL       string              `gorm:"size:1024"`
 
 	ImageID  string `gorm:"size:36; uniqueIndex:idx_image_id_preset_id,priority:1"`
 	PresetID string `gorm:"size:36; uniqueIndex:idx_image_id_preset_id,priority:2; index"`
@@ -28,6 +29,7 @@ func NewImageVariant(iv domain.ImageVariant) ImageVariant {
 		Format:   iv.Format,
 		State:    iv.State,
 		S3Key:    iv.S3Key,
+		URL:      iv.URL,
 		ImageID:  iv.ImageID,
 		PresetID: iv.Preset.ID,
 	}
@@ -48,6 +50,7 @@ func (i ImageVariant) ToDomain() domain.ImageVariant {
 		Format:    i.Format,
 		State:     i.State,
 		S3Key:     i.S3Key,
+		URL:       i.URL,
 		ImageID:   i.ImageID,
 		Preset:    i.Preset.ToReference(),
 	}

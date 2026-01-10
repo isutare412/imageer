@@ -56,7 +56,7 @@ func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadUR
 		if err != nil {
 			return fmt.Errorf("listing presets: %w", err)
 		}
-		diffs := findPresetNameDiference(req.PresetNames, presets)
+		diffs := findPresetNameDifference(req.PresetNames, presets)
 		if len(diffs) > 0 {
 			return apperr.NewError(apperr.CodeNotFound).WithSummary("Presets not found: %v", diffs)
 		}
@@ -69,6 +69,7 @@ func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadUR
 			Format:   req.Format,
 			State:    images.StateWaitingUpload,
 			S3Key:    s.imageS3Key(req.ProjectID, imageID, req.Format),
+			URL:      s.imagePublicURL(req.ProjectID, imageID, req.Format),
 			Project:  domain.ProjectReference{ID: req.ProjectID},
 		}
 		image, err = s.imageRepo.Create(ctx, image)
@@ -82,6 +83,7 @@ func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadUR
 				Format:  preset.Format,
 				State:   images.VariantStateWaitingUpload,
 				S3Key:   s.imageVariantS3Key(req.ProjectID, imageID, preset.ID, preset.Format),
+				URL:     s.imageVariantPublicURL(req.ProjectID, imageID, preset.ID, preset.Format),
 				ImageID: imageID,
 				Preset:  domain.PresetReference{ID: preset.ID},
 			}

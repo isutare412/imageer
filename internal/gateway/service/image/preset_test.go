@@ -61,7 +61,7 @@ func Test_findPresetNameDiference(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := findPresetNameDiference(tt.requested, tt.existing)
+			got := findPresetNameDifference(tt.requested, tt.existing)
 			assert.Equal(t, tt.want, got)
 		})
 	}
