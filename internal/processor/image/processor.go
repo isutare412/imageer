@@ -16,8 +16,7 @@ func NewProcessor() *Processor {
 	return &Processor{}
 }
 
-func (c *Processor) Process(ctx context.Context, input domain.RawImage,
-	preset domain.Preset,
+func (c *Processor) Process(ctx context.Context, input domain.RawImage, preset domain.Preset,
 ) (domain.RawImage, error) {
 	var opt bimg.Options
 	applyPreset(&opt, preset)
