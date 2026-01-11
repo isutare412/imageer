@@ -64,6 +64,21 @@ func (c *Config) ToValkeyImageEventQueueConfig() valkey.ImageEventQueueConfig {
 	}
 }
 
+func (c *Config) ToValkeyImageProcessResultHandlerConfig() valkey.ImageProcessResultHandlerConfig {
+	return valkey.ImageProcessResultHandlerConfig{
+		StreamKey:            c.Valkey.Streams.ImageProcessResult.StreamKey,
+		GroupName:            c.Valkey.Streams.ImageProcessResult.GroupName,
+		HandleConcurrency:    c.Valkey.Streams.ImageProcessResult.Handler.Concurrency,
+		HandleTimeout:        c.Valkey.Streams.ImageProcessResult.Handler.Timeout,
+		ReadBlockTimeout:     c.Valkey.Streams.ImageProcessResult.Reader.BlockTimeout,
+		ReadBatchSize:        c.Valkey.Streams.ImageProcessResult.Reader.BatchSize,
+		ReapConsumerIdleTime: c.Valkey.Streams.ImageProcessResult.Reaper.MinIdleTime,
+		StealInterval:        c.Valkey.Streams.ImageProcessResult.Stealer.Interval,
+		StealMinIdleTime:     c.Valkey.Streams.ImageProcessResult.Stealer.MinIdleTime,
+		MaxDeliveryAttempt:   c.Valkey.Streams.ImageProcessResult.Stealer.MaxDeliveryAttempt,
+	}
+}
+
 func (c *Config) ToAuthServiceConfig() auth.ServiceConfig {
 	return auth.ServiceConfig{
 		StateCookieName: c.Auth.Cookies.OIDCState.Name,

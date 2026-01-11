@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -50,18 +51,20 @@ func NewImageUploadListener(cfg ImageUploadListenerConfig, imageSvc port.ImageSe
 
 func (l *ImageUploadListener) Run() {
 	l.workers.Go(func() {
+	MAIN_LOOP:
 		for {
-			if err := l.handleMessageBatch(); err != nil {
+			err := l.handleMessageBatch()
+			switch {
+			case l.lifetimeCtx.Err() != nil:
+				break MAIN_LOOP
+			case err != nil:
 				slog.Error("Failed to handle image upload event message batch", "error", err)
-			}
-
-			select {
-			case <-l.lifetimeCtx.Done():
-				slog.Info("Image upload listener received shutdown signal")
-				return
-			default:
+				time.Sleep(5 * time.Second)
+				continue
 			}
 		}
+
+		slog.Info("Image upload listener loop terminated")
 	})
 }
 
@@ -75,16 +78,14 @@ func (l *ImageUploadListener) handleMessageBatch() error {
 	defer cancel()
 
 	// Receive messages from SQS
+	// NOTE: We use separate lifetime context to ensure ReceiveMessage is cancelled on shutdown
 	output, err := l.client.ReceiveMessage(l.lifetimeCtx, &sqs.ReceiveMessageInput{
 		QueueUrl:            &l.cfg.QueueURL,
 		MaxNumberOfMessages: l.cfg.BatchCount,
 		VisibilityTimeout:   int32(l.cfg.VisibilityTimeout.Seconds()),
 		WaitTimeSeconds:     int32(l.cfg.PollingWaitTimeout.Seconds()),
 	})
-	switch {
-	case l.lifetimeCtx.Err() != nil:
-		return nil // Listener is shutting down
-	case err != nil:
+	if err != nil {
 		return apperr.NewError(apperr.CodeInternalServerError).
 			WithCause(err).
 			WithSummary("Failed to receive image upload events from SQS")

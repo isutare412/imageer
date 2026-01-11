@@ -53,6 +53,27 @@ type ValkeyConfig struct {
 			StreamKey  string `koanf:"stream-key" validate:"required"`
 			StreamSize int    `koanf:"stream-size" validate:"required,gt=0"`
 		} `koanf:"image-process-request"`
+
+		ImageProcessResult struct {
+			StreamKey string `koanf:"stream-key" validate:"required"`
+			GroupName string `koanf:"group-name" validate:"required"`
+			Handler   struct {
+				Concurrency int           `koanf:"concurrency" validate:"required,gt=0"`
+				Timeout     time.Duration `koanf:"timeout" validate:"required,gt=0"`
+			} `koanf:"handler"`
+			Reader struct {
+				BatchSize    int64         `koanf:"batch-size" validate:"required,gt=0"`
+				BlockTimeout time.Duration `koanf:"block-timeout" validate:"required,gt=0"`
+			} `koanf:"reader"`
+			Stealer struct {
+				Interval           time.Duration `koanf:"interval" validate:"required,gt=0"`
+				MinIdleTime        time.Duration `koanf:"min-idle-time" validate:"required,gt=0"`
+				MaxDeliveryAttempt int64         `koanf:"max-delivery-attempt" validate:"required,gt=0"`
+			} `koanf:"stealer"`
+			Reaper struct {
+				MinIdleTime time.Duration `koanf:"min-idle-time" validate:"required,gt=0"`
+			} `koanf:"reaper"`
+		} `koanf:"image-process-result"`
 	} `koanf:"streams"`
 }
 

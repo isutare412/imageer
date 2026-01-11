@@ -28,6 +28,21 @@ valkey:
     image-process-request:
       stream-key: imageer:local:image-process-request-stream
       stream-size: 100
+    image-process-result:
+      stream-key: imageer:local:image-process-result-stream
+      group-name: gateway
+      handler:
+        concurrency: 5
+        timeout: 30s
+      reader:
+        batch-size: 10
+        block-timeout: 30s
+      stealer:
+        interval: 30s
+        min-idle-time: 1m
+        max-delivery-attempt: 5
+      reaper:
+        min-idle-time: 1h
 
 auth:
   cookies:

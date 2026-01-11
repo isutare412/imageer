@@ -25,10 +25,11 @@ import (
 )
 
 type application struct {
-	webServer         *web.Server
-	imageUploadLister *sqs.ImageUploadListener
-	postgresClient    *postgres.Client
-	valkeyClient      *valkey.Client
+	webServer                 *web.Server
+	imageUploadListener       *sqs.ImageUploadListener
+	postgresClient            *postgres.Client
+	valkeyClient              *valkey.Client
+	imageProcessResultHandler *valkey.ImageProcessResultHandler
 
 	cfg config.Config
 }
@@ -102,6 +103,10 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create valkey image event queue")
 	imageEventQueue := valkey.NewImageEventQueue(cfg.ToValkeyImageEventQueueConfig(), valkeyClient)
 
+	slog.Info("Create valkey image process result handler")
+	imageProcessResultHandler := valkey.NewImageProcessResultHandler(
+		cfg.ToValkeyImageProcessResultHandlerConfig(), valkeyClient)
+
 	slog.Info("Create auth service")
 	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider,
 		aesCrypter, jwtSigner, jwtVerifier, userRepo)
@@ -126,11 +131,12 @@ func newApplication(cfg config.Config) (*application, error) {
 	}
 
 	return &application{
-		webServer:         webServer,
-		imageUploadLister: imageUploadListener,
-		postgresClient:    postgresClient,
-		valkeyClient:      valkeyClient,
-		cfg:               cfg,
+		webServer:                 webServer,
+		imageUploadListener:       imageUploadListener,
+		postgresClient:            postgresClient,
+		valkeyClient:              valkeyClient,
+		imageProcessResultHandler: imageProcessResultHandler,
+		cfg:                       cfg,
 	}, nil
 }
 
@@ -148,12 +154,20 @@ func (a *application) initialize() error {
 		return fmt.Errorf("migrating database schemas: %w", err)
 	}
 
+	slog.Info("Initialize image process result handler")
+	if err := a.imageProcessResultHandler.Initialize(ctx); err != nil {
+		return fmt.Errorf("initializing image process result handler: %w", err)
+	}
+
 	return nil
 }
 
 func (a *application) run() {
-	slog.Info("Run SQS image upload listener")
-	a.imageUploadLister.Run()
+	slog.Info("Run image upload listener")
+	a.imageUploadListener.Run()
+
+	slog.Info("Run image process result handler")
+	a.imageProcessResultHandler.Run()
 
 	slog.Info("Run web server")
 	webServerErrs := a.webServer.Run()
@@ -176,8 +190,11 @@ func (a *application) shutdown() {
 		slog.Error("Failed to shutdown web server", "error", err)
 	}
 
-	slog.Info("Shutdown SQS image upload listener")
-	a.imageUploadLister.Shutdown()
+	slog.Info("Shutdown image upload listener")
+	a.imageUploadListener.Shutdown()
+
+	slog.Info("Shutdown image process result handler")
+	a.imageProcessResultHandler.Shutdown()
 
 	slog.Info("Shutdown valkey client")
 	a.valkeyClient.Shutdown()
