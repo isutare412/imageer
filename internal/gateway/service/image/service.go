@@ -17,28 +17,31 @@ import (
 )
 
 type Service struct {
-	s3Presigner     port.S3Presigner
-	transactioner   port.Transactioner
-	imageRepo       port.ImageRepository
-	imageVarRepo    port.ImageVariantRepository
-	presetRepo      port.PresetRepository
-	imageEventQueue port.ImageEventQueue
+	s3Presigner      port.S3Presigner
+	transactioner    port.Transactioner
+	imageRepo        port.ImageRepository
+	imageVarRepo     port.ImageVariantRepository
+	imageProcLogRepo port.ImageProcessingLogRepository
+	presetRepo       port.PresetRepository
+	imageEventQueue  port.ImageEventQueue
 
 	cfg Config
 }
 
 func NewService(cfg Config, s3Presigner port.S3Presigner, transactioner port.Transactioner,
 	imageRepo port.ImageRepository, imageVarRepo port.ImageVariantRepository,
-	presetRepo port.PresetRepository, imageEventQueue port.ImageEventQueue,
+	imageProcLogRepo port.ImageProcessingLogRepository, presetRepo port.PresetRepository,
+	imageEventQueue port.ImageEventQueue,
 ) *Service {
 	return &Service{
-		s3Presigner:     s3Presigner,
-		transactioner:   transactioner,
-		imageRepo:       imageRepo,
-		imageVarRepo:    imageVarRepo,
-		presetRepo:      presetRepo,
-		imageEventQueue: imageEventQueue,
-		cfg:             cfg,
+		s3Presigner:      s3Presigner,
+		transactioner:    transactioner,
+		imageRepo:        imageRepo,
+		imageVarRepo:     imageVarRepo,
+		imageProcLogRepo: imageProcLogRepo,
+		presetRepo:       presetRepo,
+		imageEventQueue:  imageEventQueue,
+		cfg:              cfg,
 	}
 }
 
@@ -180,6 +183,39 @@ func (s *Service) StartImageProcessingOnUpload(ctx context.Context, s3Key string
 	}
 
 	slog.InfoContext(ctx, "Started image processing after client upload", "imageId", image.ID)
+
+	return nil
+}
+
+func (s *Service) ReceiveImageProcessResult(ctx context.Context, res *imageerv1.ImageProcessResult,
+) error {
+	// NOTE: We save image processing log outside transaction on purpose as we
+	// always want to keep the log.
+	procLog := domain.NewImageProcessingLog(res)
+	procLog, err := s.imageProcLogRepo.Create(ctx, procLog)
+	if err != nil {
+		return fmt.Errorf("creating image processing log: %w", err)
+	}
+
+	err = s.transactioner.WithTx(ctx, func(ctx context.Context) error {
+		variantState := images.VariantStateFailed
+		if procLog.IsSuccess {
+			variantState = images.VariantStateReady
+		}
+
+		_, err := s.imageVarRepo.Update(ctx, domain.UpdateImageVariantRequest{
+			ID:    res.ImageVariantId,
+			State: &variantState,
+		})
+		if err != nil {
+			return fmt.Errorf("updating image variant state: %w", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("during transaction: %w", err)
+	}
 
 	return nil
 }

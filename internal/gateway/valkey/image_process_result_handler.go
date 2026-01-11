@@ -8,16 +8,20 @@ import (
 	"sync"
 
 	"github.com/valkey-io/valkey-go"
+	"google.golang.org/protobuf/proto"
 
+	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/internal/gateway/valkey/csmgroup"
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/log"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 type ImageProcessResultHandler struct {
-	client  valkey.Client
-	reader  *csmgroup.Reader
-	stealer *csmgroup.Stealer
+	client   valkey.Client
+	reader   *csmgroup.Reader
+	stealer  *csmgroup.Stealer
+	imageSvc port.ImageService
 
 	messages chan csmgroup.Message
 
@@ -30,6 +34,7 @@ type ImageProcessResultHandler struct {
 }
 
 func NewImageProcessResultHandler(cfg ImageProcessResultHandlerConfig, c *Client,
+	imageSvc port.ImageService,
 ) *ImageProcessResultHandler {
 	consumerName := csmgroup.GenerateConsumerName(cfg.GroupName)
 
@@ -43,6 +48,7 @@ func NewImageProcessResultHandler(cfg ImageProcessResultHandlerConfig, c *Client
 		client:         c.client,
 		reader:         reader,
 		stealer:        stealer,
+		imageSvc:       imageSvc,
 		messages:       make(chan csmgroup.Message, 1),
 		cfg:            cfg,
 		consumerName:   consumerName,
@@ -138,7 +144,16 @@ func (h *ImageProcessResultHandler) handleMessage(msg csmgroup.Message) {
 }
 
 func (h *ImageProcessResultHandler) handleMessageData(ctx context.Context, data []byte) error {
-	slog.DebugContext(ctx, "Will handle image process result message", "data", string(data))
+	res := &imageerv1.ImageProcessResult{}
+	if err := proto.Unmarshal(data, res); err != nil {
+		return apperr.NewError(apperr.CodeBadRequest).
+			WithSummary("Failed to unmarshal image process result").
+			WithCause(err)
+	}
+
+	if err := h.imageSvc.ReceiveImageProcessResult(ctx, res); err != nil {
+		return fmt.Errorf("receive iamge process result: %w", err)
+	}
 
 	return nil
 }

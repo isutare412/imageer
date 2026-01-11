@@ -465,6 +465,45 @@ func (mr *MockImageVariantRepositoryMockRecorder) Update(arg0, arg1 any) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockImageVariantRepository)(nil).Update), arg0, arg1)
 }
 
+// MockImageProcessingLogRepository is a mock of ImageProcessingLogRepository interface.
+type MockImageProcessingLogRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockImageProcessingLogRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockImageProcessingLogRepositoryMockRecorder is the mock recorder for MockImageProcessingLogRepository.
+type MockImageProcessingLogRepositoryMockRecorder struct {
+	mock *MockImageProcessingLogRepository
+}
+
+// NewMockImageProcessingLogRepository creates a new mock instance.
+func NewMockImageProcessingLogRepository(ctrl *gomock.Controller) *MockImageProcessingLogRepository {
+	mock := &MockImageProcessingLogRepository{ctrl: ctrl}
+	mock.recorder = &MockImageProcessingLogRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockImageProcessingLogRepository) EXPECT() *MockImageProcessingLogRepositoryMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockImageProcessingLogRepository) Create(arg0 context.Context, arg1 domain.ImageProcessingLog) (domain.ImageProcessingLog, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", arg0, arg1)
+	ret0, _ := ret[0].(domain.ImageProcessingLog)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockImageProcessingLogRepositoryMockRecorder) Create(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockImageProcessingLogRepository)(nil).Create), arg0, arg1)
+}
+
 // MockPresetRepository is a mock of PresetRepository interface.
 type MockPresetRepository struct {
 	ctrl     *gomock.Controller

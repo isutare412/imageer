@@ -91,6 +91,9 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create image variant repository")
 	imageVarRepo := postgres.NewImageVariantRepository(postgresClient)
 
+	slog.Info("Create image processing log repository")
+	imageProcLogRepo := postgres.NewImageProcessingLogRepository(postgresClient)
+
 	slog.Info("Create preset repository")
 	presetRepo := postgres.NewPresetRepository(postgresClient)
 
@@ -103,10 +106,6 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create valkey image event queue")
 	imageEventQueue := valkey.NewImageEventQueue(cfg.ToValkeyImageEventQueueConfig(), valkeyClient)
 
-	slog.Info("Create valkey image process result handler")
-	imageProcessResultHandler := valkey.NewImageProcessResultHandler(
-		cfg.ToValkeyImageProcessResultHandlerConfig(), valkeyClient)
-
 	slog.Info("Create auth service")
 	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider,
 		aesCrypter, jwtSigner, jwtVerifier, userRepo)
@@ -118,7 +117,7 @@ func newApplication(cfg config.Config) (*application, error) {
 	projectSvc := project.NewService(projectRepo)
 
 	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, transactioner, imageRepo,
-		imageVarRepo, presetRepo, imageEventQueue)
+		imageVarRepo, imageProcLogRepo, presetRepo, imageEventQueue)
 
 	slog.Info("Create web server")
 	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, imageSvc)
@@ -129,6 +128,10 @@ func newApplication(cfg config.Config) (*application, error) {
 	if err != nil {
 		return nil, fmt.Errorf("creating SQS image upload listener: %w", err)
 	}
+
+	slog.Info("Create valkey image process result handler")
+	imageProcessResultHandler := valkey.NewImageProcessResultHandler(
+		cfg.ToValkeyImageProcessResultHandlerConfig(), valkeyClient, imageSvc)
 
 	return &application{
 		webServer:                 webServer,

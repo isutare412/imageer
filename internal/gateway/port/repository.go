@@ -47,6 +47,10 @@ type ImageVariantRepository interface {
 	Update(context.Context, domain.UpdateImageVariantRequest) (domain.ImageVariant, error)
 }
 
+type ImageProcessingLogRepository interface {
+	Create(context.Context, domain.ImageProcessingLog) (domain.ImageProcessingLog, error)
+}
+
 type PresetRepository interface {
 	FindByID(ctx context.Context, id string) (domain.Preset, error)
 	FindByName(ctx context.Context, projectID, name string) (domain.Preset, error)

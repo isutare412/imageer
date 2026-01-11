@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	domain "github.com/isutare412/imageer/internal/gateway/domain"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -334,6 +335,20 @@ func (m *MockImageService) CreateUploadURL(arg0 context.Context, arg1 domain.Cre
 func (mr *MockImageServiceMockRecorder) CreateUploadURL(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUploadURL", reflect.TypeOf((*MockImageService)(nil).CreateUploadURL), arg0, arg1)
+}
+
+// ReceiveImageProcessResult mocks base method.
+func (m *MockImageService) ReceiveImageProcessResult(arg0 context.Context, arg1 *imageerv1.ImageProcessResult) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReceiveImageProcessResult", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReceiveImageProcessResult indicates an expected call of ReceiveImageProcessResult.
+func (mr *MockImageServiceMockRecorder) ReceiveImageProcessResult(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReceiveImageProcessResult", reflect.TypeOf((*MockImageService)(nil).ReceiveImageProcessResult), arg0, arg1)
 }
 
 // StartImageProcessingOnUpload mocks base method.

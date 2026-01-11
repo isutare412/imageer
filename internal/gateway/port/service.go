@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
+	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 //go:generate sh -c "go tool mockgen -package $GOPACKAGE -source=$GOFILE -destination=$(basename $GOFILE .go)_mock.go"
@@ -34,4 +35,5 @@ type ProjectService interface {
 type ImageService interface {
 	CreateUploadURL(context.Context, domain.CreateUploadURLRequest) (domain.UploadURL, error)
 	StartImageProcessingOnUpload(ctx context.Context, s3Key string) error
+	ReceiveImageProcessResult(context.Context, *imageerv1.ImageProcessResult) error
 }

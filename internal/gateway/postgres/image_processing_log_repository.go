@@ -1,0 +1,33 @@
+package postgres
+
+import (
+	"context"
+
+	"gorm.io/gorm"
+
+	"github.com/isutare412/imageer/internal/gateway/domain"
+	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
+	"github.com/isutare412/imageer/pkg/dbhelpers"
+)
+
+type ImageProcessingLogRepository struct {
+	db *gorm.DB
+}
+
+func NewImageProcessingLogRepository(client *Client) *ImageProcessingLogRepository {
+	return &ImageProcessingLogRepository{
+		db: client.db,
+	}
+}
+
+func (r *ImageProcessingLogRepository) Create(ctx context.Context, log domain.ImageProcessingLog,
+) (domain.ImageProcessingLog, error) {
+	tx := GetTxOrDB(ctx, r.db)
+
+	procLog := entity.NewImageProcessingLog(log)
+	if err := gorm.G[entity.ImageProcessingLog](tx).Create(ctx, &procLog); err != nil {
+		return domain.ImageProcessingLog{}, dbhelpers.WrapError(err, "Failed to create image processing log")
+	}
+
+	return procLog.ToDomain(), nil
+}

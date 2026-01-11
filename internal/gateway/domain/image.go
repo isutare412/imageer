@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/isutare412/imageer/pkg/images"
@@ -50,6 +51,26 @@ type UpdateImageRequest struct {
 type ReprocessImagesRequest struct {
 	ImageIDs     []string
 	ReprocessAll bool
+}
+
+type ImageProcessingLog struct {
+	ID             int
+	CreatedAt      time.Time
+	IsSuccess      bool
+	ErrorCode      *int
+	ErrorMessage   *string
+	ElapsedTime    time.Duration
+	ImageVariantID string
+}
+
+func NewImageProcessingLog(res *imageerv1.ImageProcessResult) ImageProcessingLog {
+	return ImageProcessingLog{
+		IsSuccess:      res.IsSuccess,
+		ErrorCode:      lo.EmptyableToPtr(int(res.ErrorCode)),
+		ErrorMessage:   lo.EmptyableToPtr(res.ErrorMessage),
+		ElapsedTime:    res.ProcessingTime.AsDuration(),
+		ImageVariantID: res.ImageVariantId,
+	}
 }
 
 type UploadURL struct {
