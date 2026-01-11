@@ -31,4 +31,5 @@ services:
     ports:
       - ${VALKEY_PORT}:6379
     environment:
+      # LINK: https://github.com/valkey-io/valkey/blob/9.0/valkey.conf
       VALKEY_EXTRA_FLAGS: "--bind * -::* --user admin on allcommands allkeys allchannels >complex_password --maxmemory 2gb --maxmemory-policy allkeys-lru"
