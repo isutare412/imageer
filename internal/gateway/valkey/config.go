@@ -6,7 +6,7 @@ import (
 
 	"github.com/valkey-io/valkey-go"
 
-	"github.com/isutare412/imageer/internal/gateway/valkey/csmgroup"
+	"github.com/isutare412/imageer/pkg/dbhelpers/valkeystream"
 )
 
 type ClientConfig struct {
@@ -43,22 +43,44 @@ type ImageProcessResultHandlerConfig struct {
 	MaxDeliveryAttempt   int64
 }
 
-func (c ImageProcessResultHandlerConfig) ToReaderConfig(consumerName string) csmgroup.ReaderConfig {
-	return csmgroup.ReaderConfig{
-		Stream:           c.StreamKey,
-		Group:            c.GroupName,
-		Consumer:         consumerName,
+func (c ImageProcessResultHandlerConfig) ToConsumerConfig(consumerName string,
+) valkeystream.ConsumerConfig {
+	return valkeystream.ConsumerConfig{
+		Stream: c.StreamKey,
+		Group:  c.GroupName,
+		Name:   consumerName,
+	}
+}
+
+func (c ImageProcessResultHandlerConfig) ToInitializerConfig(consumerName string,
+) valkeystream.InitializerConfig {
+	return valkeystream.InitializerConfig{
+		Consumer: c.ToConsumerConfig(consumerName),
+	}
+}
+
+func (c ImageProcessResultHandlerConfig) ToReaperConfig() valkeystream.ReaperConfig {
+	return valkeystream.ReaperConfig{
+		Stream:            c.StreamKey,
+		Group:             c.GroupName,
+		IdleTimeThreshold: c.ReapConsumerIdleTime,
+	}
+}
+
+func (c ImageProcessResultHandlerConfig) ToReaderConfig(consumerName string,
+) valkeystream.ReaderConfig {
+	return valkeystream.ReaderConfig{
+		Consumer:         c.ToConsumerConfig(consumerName),
 		EntryFieldKey:    "msg",
 		ReadBlockTimeout: c.ReadBlockTimeout,
 		ReadBatchSize:    c.ReadBatchSize,
 	}
 }
 
-func (c ImageProcessResultHandlerConfig) ToStealerConfig(consumerName string) csmgroup.StealerConfig {
-	return csmgroup.StealerConfig{
-		Stream:             c.StreamKey,
-		Group:              c.GroupName,
-		Consumer:           consumerName,
+func (c ImageProcessResultHandlerConfig) ToStealerConfig(consumerName string,
+) valkeystream.StealerConfig {
+	return valkeystream.StealerConfig{
+		Consumer:           c.ToConsumerConfig(consumerName),
 		EntryFieldKey:      "msg",
 		StealInterval:      c.StealInterval,
 		StealMinIdleTime:   c.StealMinIdleTime,

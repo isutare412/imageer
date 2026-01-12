@@ -1,4 +1,4 @@
-package csmgroup
+package valkeystream
 
 type Message struct {
 	EntryID string

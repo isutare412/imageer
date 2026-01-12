@@ -1,4 +1,4 @@
-package csmgroup
+package valkeystream
 
 import (
 	"context"
@@ -14,6 +14,7 @@ import (
 	"github.com/isutare412/imageer/pkg/log"
 )
 
+// Reader reads messages from valkey stream as a consumer.
 type Reader struct {
 	client valkey.Client
 	cfg    ReaderConfig
@@ -42,7 +43,8 @@ func (r *Reader) Run() <-chan Message {
 		defer close(messageCh)
 
 		ctx := r.lifetimeCtx
-		log.AddArgs(ctx, "consumer", r.cfg.Consumer, "group", r.cfg.Group, "stream", r.cfg.Stream)
+		log.AddArgs(ctx, "consumer", r.cfg.Consumer.Name, "group", r.cfg.Consumer.Group,
+			"stream", r.cfg.Consumer.Stream)
 
 	READ_LOOP:
 		for {
@@ -80,11 +82,11 @@ func (r *Reader) Shutdown() {
 
 func (r *Reader) readMessages(ctx context.Context) ([]Message, error) {
 	resp := r.client.Do(ctx, r.client.B().Xreadgroup().
-		Group(r.cfg.Group, r.cfg.Consumer).
+		Group(r.cfg.Consumer.Group, r.cfg.Consumer.Name).
 		Count(r.cfg.ReadBatchSize).
 		Block(r.cfg.ReadBlockTimeout.Milliseconds()).
 		Streams().
-		Key(r.cfg.Stream).
+		Key(r.cfg.Consumer.Stream).
 		Id(">").
 		Build())
 	err := dbhelpers.WrapValkeyError(resp.Error(), "Failed to XREADGROUP")
@@ -100,7 +102,7 @@ func (r *Reader) readMessages(ctx context.Context) ([]Message, error) {
 		return nil, dbhelpers.WrapValkeyError(err, "Failed to parse xreadgroup response")
 	}
 
-	entries := results[r.cfg.Stream]
+	entries := results[r.cfg.Consumer.Stream]
 	messages := make([]Message, 0, len(entries))
 	for _, entry := range entries {
 		msg := []byte(entry.FieldValues[r.cfg.EntryFieldKey])
@@ -122,12 +124,12 @@ func (r *Reader) readMessages(ctx context.Context) ([]Message, error) {
 
 func (r *Reader) ackMessage(ctx context.Context, id string) (acked bool, err error) {
 	resp := r.client.Do(ctx, r.client.B().Xack().
-		Key(r.cfg.Stream).
-		Group(r.cfg.Group).
+		Key(r.cfg.Consumer.Stream).
+		Group(r.cfg.Consumer.Group).
 		Id(id).
 		Build())
 	if err := resp.Error(); err != nil {
-		return false, dbhelpers.WrapValkeyError(err, "Failed to XACK message %s in stream %s", id, r.cfg.Stream)
+		return false, dbhelpers.WrapValkeyError(err, "Failed to XACK message %s in stream %s", id, r.cfg.Consumer.Stream)
 	}
 
 	acked, err = resp.AsBool()

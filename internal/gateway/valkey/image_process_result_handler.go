@@ -11,19 +11,19 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/isutare412/imageer/internal/gateway/port"
-	"github.com/isutare412/imageer/internal/gateway/valkey/csmgroup"
 	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/dbhelpers/valkeystream"
 	"github.com/isutare412/imageer/pkg/log"
 	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
 type ImageProcessResultHandler struct {
 	client   valkey.Client
-	reader   *csmgroup.Reader
-	stealer  *csmgroup.Stealer
+	reader   *valkeystream.Reader
+	stealer  *valkeystream.Stealer
 	imageSvc port.ImageService
 
-	messages chan csmgroup.Message
+	messages chan valkeystream.Message
 
 	cfg          ImageProcessResultHandlerConfig
 	consumerName string
@@ -36,10 +36,10 @@ type ImageProcessResultHandler struct {
 func NewImageProcessResultHandler(cfg ImageProcessResultHandlerConfig, c *Client,
 	imageSvc port.ImageService,
 ) *ImageProcessResultHandler {
-	consumerName := csmgroup.GenerateConsumerName(cfg.GroupName)
+	consumerName := valkeystream.GenerateConsumerName(cfg.GroupName)
 
-	reader := csmgroup.NewReader(c.client, cfg.ToReaderConfig(consumerName))
-	stealer := csmgroup.NewStealer(c.client, cfg.ToStealerConfig(consumerName))
+	reader := valkeystream.NewReader(c.client, cfg.ToReaderConfig(consumerName))
+	stealer := valkeystream.NewStealer(c.client, cfg.ToStealerConfig(consumerName))
 
 	ctx, cancel := context.WithCancel(context.Background())
 	ctx = log.WithAttrContext(ctx)
@@ -49,7 +49,7 @@ func NewImageProcessResultHandler(cfg ImageProcessResultHandlerConfig, c *Client
 		reader:         reader,
 		stealer:        stealer,
 		imageSvc:       imageSvc,
-		messages:       make(chan csmgroup.Message, 1),
+		messages:       make(chan valkeystream.Message, 1),
 		cfg:            cfg,
 		consumerName:   consumerName,
 		lifetimeCtx:    ctx,
@@ -59,14 +59,12 @@ func NewImageProcessResultHandler(cfg ImageProcessResultHandlerConfig, c *Client
 }
 
 func (h *ImageProcessResultHandler) Initialize(ctx context.Context) error {
-	initializer := csmgroup.NewInitializer(h.client, h.cfg.StreamKey, h.cfg.GroupName,
-		h.consumerName)
+	initializer := valkeystream.NewInitializer(h.client, h.cfg.ToInitializerConfig(h.consumerName))
 	if err := initializer.Initialize(ctx); err != nil {
 		return fmt.Errorf("initializing consumer group: %w", err)
 	}
 
-	reaper := csmgroup.NewReaper(h.client, h.cfg.StreamKey, h.cfg.GroupName,
-		h.cfg.ReapConsumerIdleTime)
+	reaper := valkeystream.NewReaper(h.client, h.cfg.ToReaperConfig())
 	if err := reaper.ReapIdleConsumers(ctx); err != nil {
 		return fmt.Errorf("reaping idle consumers: %w", err)
 	}
@@ -121,7 +119,7 @@ func (h *ImageProcessResultHandler) Shutdown() {
 	h.workers.Wait()
 }
 
-func (h *ImageProcessResultHandler) handleMessage(msg csmgroup.Message) {
+func (h *ImageProcessResultHandler) handleMessage(msg valkeystream.Message) {
 	ctx, cancel := context.WithTimeout(context.Background(), h.cfg.HandleTimeout)
 	defer cancel()
 

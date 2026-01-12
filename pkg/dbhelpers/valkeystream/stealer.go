@@ -1,4 +1,4 @@
-package csmgroup
+package valkeystream
 
 import (
 	"context"
@@ -15,6 +15,8 @@ import (
 	"github.com/isutare412/imageer/pkg/log"
 )
 
+// Stealer steals pending messages from PEL of consumer groups. It also drops
+// messages that exceed max delivery attempt.
 type Stealer struct {
 	client valkey.Client
 	cfg    StealerConfig
@@ -43,7 +45,8 @@ func (s *Stealer) Run() <-chan Message {
 		defer close(messageCh)
 
 		ctx := s.lifetimeCtx
-		log.AddArgs(ctx, "consumer", s.cfg.Consumer, "group", s.cfg.Group, "stream", s.cfg.Stream)
+		log.AddArgs(ctx, "consumer", s.cfg.Consumer.Name, "group", s.cfg.Consumer.Group,
+			"stream", s.cfg.Consumer.Stream)
 
 		ticker := time.NewTicker(s.cfg.StealInterval)
 		defer ticker.Stop()
@@ -90,15 +93,16 @@ func (s *Stealer) Shutdown() {
 func (s *Stealer) stealMessages(ctx context.Context) ([]Message, error) {
 	// Claim idle messages
 	resp := s.client.Do(ctx, s.client.B().Xautoclaim().
-		Key(s.cfg.Stream).
-		Group(s.cfg.Group).
-		Consumer(s.cfg.Consumer).
+		Key(s.cfg.Consumer.Stream).
+		Group(s.cfg.Consumer.Group).
+		Consumer(s.cfg.Consumer.Name).
 		MinIdleTime(strconv.Itoa(int(s.cfg.StealMinIdleTime.Milliseconds()))).
 		Start("0-0").
 		Count(100).
 		Build())
 	if err := resp.Error(); err != nil {
-		return nil, dbhelpers.WrapValkeyError(err, "Failed to autoclaim from stream %s", s.cfg.Stream)
+		return nil, dbhelpers.WrapValkeyError(err, "Failed to autoclaim from stream %s",
+			s.cfg.Consumer.Stream)
 	}
 
 	results, err := resp.ToArray()
@@ -161,15 +165,15 @@ func (s *Stealer) tryDropMessage(ctx context.Context, entry valkey.XRangeEntry) 
 
 func (s *Stealer) checkDeliverCount(ctx context.Context, id string) (int64, error) {
 	resp := s.client.Do(ctx, s.client.B().Xpending().
-		Key(s.cfg.Stream).
-		Group(s.cfg.Group).
+		Key(s.cfg.Consumer.Stream).
+		Group(s.cfg.Consumer.Group).
 		Start(id).
 		End(id).
 		Count(1).
 		Build())
 	if err := resp.Error(); err != nil {
 		return 0, dbhelpers.WrapValkeyError(err,
-			"Failed to XPENDING for entry id %s in stream %s", id, s.cfg.Stream)
+			"Failed to XPENDING for entry id %s in stream %s", id, s.cfg.Consumer.Stream)
 	}
 
 	results, err := resp.ToArray()
@@ -178,7 +182,8 @@ func (s *Stealer) checkDeliverCount(ctx context.Context, id string) (int64, erro
 		return 0, dbhelpers.WrapValkeyError(err, "Failed to parse array")
 	case len(results) == 0:
 		return 0, apperr.NewError(apperr.CodeNotFound).
-			WithSummary("No pending message found for entry id %s in stream %s", id, s.cfg.Stream)
+			WithSummary("No pending message found for entry id %s in stream %s",
+				id, s.cfg.Consumer.Stream)
 	}
 
 	pending, err := results[0].ToArray()
@@ -196,13 +201,13 @@ func (s *Stealer) checkDeliverCount(ctx context.Context, id string) (int64, erro
 
 func (s *Stealer) ackMessage(ctx context.Context, id string) (acked bool, err error) {
 	resp := s.client.Do(ctx, s.client.B().Xack().
-		Key(s.cfg.Stream).
-		Group(s.cfg.Group).
+		Key(s.cfg.Consumer.Stream).
+		Group(s.cfg.Consumer.Group).
 		Id(id).
 		Build())
 	if err := resp.Error(); err != nil {
 		return false, dbhelpers.WrapValkeyError(err, "Failed to XACK message %s in stream %s",
-			id, s.cfg.Stream)
+			id, s.cfg.Consumer.Stream)
 	}
 
 	acked, err = resp.AsBool()

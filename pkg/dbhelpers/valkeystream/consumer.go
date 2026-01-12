@@ -1,4 +1,4 @@
-package csmgroup
+package valkeystream
 
 import (
 	"crypto/rand"
