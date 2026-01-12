@@ -10,6 +10,7 @@ import (
 	"github.com/valkey-io/valkey-go"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/isutare412/imageer/internal/processor/port"
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/dbhelpers/valkeystream"
 	"github.com/isutare412/imageer/pkg/log"
@@ -17,9 +18,10 @@ import (
 )
 
 type ImageProcessRequestHandler struct {
-	client  valkey.Client
-	reader  *valkeystream.Reader
-	stealer *valkeystream.Stealer
+	client   valkey.Client
+	reader   *valkeystream.Reader
+	stealer  *valkeystream.Stealer
+	imageSvc port.ImageService
 
 	messages chan valkeystream.Message
 
@@ -32,6 +34,7 @@ type ImageProcessRequestHandler struct {
 }
 
 func NewImageProcessRequestHandler(cfg ImageProcessRequestHandlerConfig, c *Client,
+	imageSvc port.ImageService,
 ) *ImageProcessRequestHandler {
 	consumerName := valkeystream.GenerateConsumerName(cfg.GroupName)
 
@@ -45,6 +48,7 @@ func NewImageProcessRequestHandler(cfg ImageProcessRequestHandlerConfig, c *Clie
 		client:         c.client,
 		reader:         reader,
 		stealer:        stealer,
+		imageSvc:       imageSvc,
 		messages:       make(chan valkeystream.Message, 1),
 		cfg:            cfg,
 		consumerName:   consumerName,
@@ -126,26 +130,31 @@ func (h *ImageProcessRequestHandler) handleMessage(msg valkeystream.Message) {
 	case apperr.IsErrorStatusCode(err, http.StatusNotFound):
 		entry.WarnContext(ctx, "Referenced resource not found, dropping message", "error", err)
 	case apperr.IsErrorStatusCode(err, http.StatusBadRequest):
-		entry.WarnContext(ctx, "Invalid image process result data, dropping message", "error", err)
+		entry.WarnContext(ctx, "Invalid image process request data, dropping message", "error", err)
 	case err != nil:
-		entry.ErrorContext(ctx, "Failed to handle image process result", "error", err)
+		entry.ErrorContext(ctx, "Failed to handle image process request", "error", err)
 		return
 	}
 
 	if err := msg.Ack(); err != nil {
-		entry.ErrorContext(ctx, "Failed to acknowledge image process result", "error", err)
+		entry.ErrorContext(ctx, "Failed to acknowledge image process request", "error", err)
 	}
 }
 
 func (h *ImageProcessRequestHandler) handleMessageData(ctx context.Context, data []byte) error {
-	res := &imageerv1.ImageProcessRequest{}
-	if err := proto.Unmarshal(data, res); err != nil {
+	req := &imageerv1.ImageProcessRequest{}
+	if err := proto.Unmarshal(data, req); err != nil {
 		return apperr.NewError(apperr.CodeBadRequest).
-			WithSummary("Failed to unmarshal image process result").
+			WithSummary("Failed to unmarshal image process request").
 			WithCause(err)
 	}
 
-	// TODO: implement actual handling logic
+	slog.InfoContext(ctx, "Received image process request", "imageId", req.Image.Id,
+		"variantId", req.Variant.Id, "presetId", req.Preset.Id)
+
+	if err := h.imageSvc.Process(ctx, req); err != nil {
+		return fmt.Errorf("processing image: %w", err)
+	}
 
 	return nil
 }

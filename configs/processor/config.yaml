@@ -1,0 +1,4 @@
+log:
+  format: text # pretty, text, json
+  level: debug # debug, info, warn, error
+  add-source: true
