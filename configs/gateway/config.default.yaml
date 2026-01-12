@@ -27,7 +27,7 @@ valkey:
   streams:
     image-process-request:
       stream-key: imageer:local:image-process-request-stream
-      stream-size: 100
+      stream-size: 1000
     image-process-result:
       stream-key: imageer:local:image-process-result-stream
       group-name: gateway
@@ -40,7 +40,7 @@ valkey:
       stealer:
         interval: 30s
         min-idle-time: 1m
-        max-delivery-attempt: 5
+        max-delivery-attempt: 3
       reaper:
         min-idle-time: 1h
 

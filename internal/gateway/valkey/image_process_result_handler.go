@@ -149,6 +149,9 @@ func (h *ImageProcessResultHandler) handleMessageData(ctx context.Context, data 
 			WithCause(err)
 	}
 
+	slog.InfoContext(ctx, "Received image process result", "imageId", res.ImageId,
+		"variantId", res.ImageVariantId, "presetId", res.PresetId)
+
 	if err := h.imageSvc.ReceiveImageProcessResult(ctx, res); err != nil {
 		return fmt.Errorf("receive iamge process result: %w", err)
 	}
