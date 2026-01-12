@@ -63,7 +63,10 @@ func Init(cfg Config) {
 		})
 	}
 
-	middlewares := []slogmulti.Middleware{newAttrContextMiddleware()}
+	middlewares := []slogmulti.Middleware{
+		newAttrContextMiddleware(),
+		newAttrErrorMiddleware(),
+	}
 	if attrs := cfg.ConstAttrs(); len(attrs) > 0 {
 		middlewares = append(middlewares, newAttrConstantMiddleware(attrs...))
 	}

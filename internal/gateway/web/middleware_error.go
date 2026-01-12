@@ -31,16 +31,12 @@ func respondError(next echo.HandlerFunc) echo.HandlerFunc {
 		)
 
 		var (
-			aerr       *apperr.Error
-			herr       *echo.HTTPError
-			stackTrace string
+			aerr *apperr.Error
+			herr *echo.HTTPError
 		)
 		switch {
 		// Override if *apperr.Error
 		case errors.As(err, &aerr):
-			if aerr.Stack != nil {
-				stackTrace = aerr.Stack.String()
-			}
 
 			statusCode = aerr.Code.HTTPStatusCode()
 			appCode = aerr.Code
@@ -66,14 +62,9 @@ func respondError(next echo.HandlerFunc) echo.HandlerFunc {
 
 		entry := slog.With(
 			"statusCode", statusCode,
-			"error", err.Error(),
-			"errorCodeId", int64(appCode.ID()),
-			"errorCodeName", appCode.Name(),
+			"error", err,
 			"clientMsg", msg,
 		)
-		if stackTrace != "" {
-			entry = entry.With("stackTrace", stackTrace)
-		}
 
 		switch {
 		case statusCode >= 400 && statusCode < 500:
