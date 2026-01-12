@@ -11,26 +11,25 @@ import (
 	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
 
-type ImageEventQueue struct {
+type ImageProcessRequestQueue struct {
 	client valkey.Client
-	cfg    ImageEventQueueConfig
+	cfg    ImageProcessRequestQueueConfig
 }
 
-func NewImageEventQueue(cfg ImageEventQueueConfig, c *Client) *ImageEventQueue {
-	return &ImageEventQueue{
+func NewImageProcessRequestQueue(cfg ImageProcessRequestQueueConfig, c *Client) *ImageProcessRequestQueue {
+	return &ImageProcessRequestQueue{
 		client: c.client,
 		cfg:    cfg,
 	}
 }
 
-func (q *ImageEventQueue) PushImageProcessRequest(ctx context.Context,
-	req *imageerv1.ImageProcessRequest,
+func (q *ImageProcessRequestQueue) Push(ctx context.Context, req *imageerv1.ImageProcessRequest,
 ) error {
 	reqBytes, err := proto.Marshal(req)
 	if err != nil {
 		return apperr.NewError(apperr.CodeInternalServerError).
 			WithCause(err).
-			WithSummary("Failed to marshal ImageProcessRequest")
+			WithSummary("Failed to marshal protobuf")
 	}
 
 	res := q.client.Do(ctx, q.client.B().Xadd().

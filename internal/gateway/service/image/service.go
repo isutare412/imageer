@@ -17,13 +17,13 @@ import (
 )
 
 type Service struct {
-	s3Presigner      port.S3Presigner
-	transactioner    port.Transactioner
-	imageRepo        port.ImageRepository
-	imageVarRepo     port.ImageVariantRepository
-	imageProcLogRepo port.ImageProcessingLogRepository
-	presetRepo       port.PresetRepository
-	imageEventQueue  port.ImageEventQueue
+	s3Presigner           port.S3Presigner
+	transactioner         port.Transactioner
+	imageRepo             port.ImageRepository
+	imageVarRepo          port.ImageVariantRepository
+	imageProcLogRepo      port.ImageProcessingLogRepository
+	presetRepo            port.PresetRepository
+	imageProcRequestQueue port.ImageProcessRequestQueue
 
 	cfg Config
 }
@@ -31,17 +31,17 @@ type Service struct {
 func NewService(cfg Config, s3Presigner port.S3Presigner, transactioner port.Transactioner,
 	imageRepo port.ImageRepository, imageVarRepo port.ImageVariantRepository,
 	imageProcLogRepo port.ImageProcessingLogRepository, presetRepo port.PresetRepository,
-	imageEventQueue port.ImageEventQueue,
+	imageProcRequestQueue port.ImageProcessRequestQueue,
 ) *Service {
 	return &Service{
-		s3Presigner:      s3Presigner,
-		transactioner:    transactioner,
-		imageRepo:        imageRepo,
-		imageVarRepo:     imageVarRepo,
-		imageProcLogRepo: imageProcLogRepo,
-		presetRepo:       presetRepo,
-		imageEventQueue:  imageEventQueue,
-		cfg:              cfg,
+		s3Presigner:           s3Presigner,
+		transactioner:         transactioner,
+		imageRepo:             imageRepo,
+		imageVarRepo:          imageVarRepo,
+		imageProcLogRepo:      imageProcLogRepo,
+		presetRepo:            presetRepo,
+		imageProcRequestQueue: imageProcRequestQueue,
+		cfg:                   cfg,
 	}
 }
 
@@ -177,7 +177,7 @@ func (s *Service) StartImageProcessingOnUpload(ctx context.Context, s3Key string
 	}
 
 	for _, req := range procRequests {
-		if err := s.imageEventQueue.PushImageProcessRequest(ctx, req); err != nil {
+		if err := s.imageProcRequestQueue.Push(ctx, req); err != nil {
 			return fmt.Errorf("enqueuing image process request: %w", err)
 		}
 	}

@@ -8,6 +8,6 @@ import (
 
 //go:generate sh -c "go tool mockgen -package $GOPACKAGE -source=$GOFILE -destination=$(basename $GOFILE .go)_mock.go"
 
-type ImageEventQueue interface {
-	PushImageProcessRequest(context.Context, *imageerv1.ImageProcessRequest) error
+type ImageProcessRequestQueue interface {
+	Push(context.Context, *imageerv1.ImageProcessRequest) error
 }

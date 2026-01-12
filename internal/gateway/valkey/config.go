@@ -21,12 +21,12 @@ func (c ClientConfig) applyToOption(opt *valkey.ClientOption) {
 	opt.Password = c.Password
 }
 
-type ImageEventQueueConfig struct {
+type ImageProcessRequestQueueConfig struct {
 	StreamKey  string
 	StreamSize int
 }
 
-func (c ImageEventQueueConfig) StreamSizeString() string {
+func (c ImageProcessRequestQueueConfig) StreamSizeString() string {
 	return strconv.Itoa(c.StreamSize)
 }
 

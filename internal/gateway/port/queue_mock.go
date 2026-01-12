@@ -17,40 +17,40 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockImageEventQueue is a mock of ImageEventQueue interface.
-type MockImageEventQueue struct {
+// MockImageProcessRequestQueue is a mock of ImageProcessRequestQueue interface.
+type MockImageProcessRequestQueue struct {
 	ctrl     *gomock.Controller
-	recorder *MockImageEventQueueMockRecorder
+	recorder *MockImageProcessRequestQueueMockRecorder
 	isgomock struct{}
 }
 
-// MockImageEventQueueMockRecorder is the mock recorder for MockImageEventQueue.
-type MockImageEventQueueMockRecorder struct {
-	mock *MockImageEventQueue
+// MockImageProcessRequestQueueMockRecorder is the mock recorder for MockImageProcessRequestQueue.
+type MockImageProcessRequestQueueMockRecorder struct {
+	mock *MockImageProcessRequestQueue
 }
 
-// NewMockImageEventQueue creates a new mock instance.
-func NewMockImageEventQueue(ctrl *gomock.Controller) *MockImageEventQueue {
-	mock := &MockImageEventQueue{ctrl: ctrl}
-	mock.recorder = &MockImageEventQueueMockRecorder{mock}
+// NewMockImageProcessRequestQueue creates a new mock instance.
+func NewMockImageProcessRequestQueue(ctrl *gomock.Controller) *MockImageProcessRequestQueue {
+	mock := &MockImageProcessRequestQueue{ctrl: ctrl}
+	mock.recorder = &MockImageProcessRequestQueueMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockImageEventQueue) EXPECT() *MockImageEventQueueMockRecorder {
+func (m *MockImageProcessRequestQueue) EXPECT() *MockImageProcessRequestQueueMockRecorder {
 	return m.recorder
 }
 
-// PushImageProcessRequest mocks base method.
-func (m *MockImageEventQueue) PushImageProcessRequest(arg0 context.Context, arg1 *imageerv1.ImageProcessRequest) error {
+// Push mocks base method.
+func (m *MockImageProcessRequestQueue) Push(arg0 context.Context, arg1 *imageerv1.ImageProcessRequest) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PushImageProcessRequest", arg0, arg1)
+	ret := m.ctrl.Call(m, "Push", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// PushImageProcessRequest indicates an expected call of PushImageProcessRequest.
-func (mr *MockImageEventQueueMockRecorder) PushImageProcessRequest(arg0, arg1 any) *gomock.Call {
+// Push indicates an expected call of Push.
+func (mr *MockImageProcessRequestQueueMockRecorder) Push(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushImageProcessRequest", reflect.TypeOf((*MockImageEventQueue)(nil).PushImageProcessRequest), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockImageProcessRequestQueue)(nil).Push), arg0, arg1)
 }

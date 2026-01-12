@@ -57,8 +57,8 @@ func (c *Config) ToValkeyClientConfig() valkey.ClientConfig {
 	}
 }
 
-func (c *Config) ToValkeyImageEventQueueConfig() valkey.ImageEventQueueConfig {
-	return valkey.ImageEventQueueConfig{
+func (c *Config) ToValkeyImageProcessRequestQueueConfig() valkey.ImageProcessRequestQueueConfig {
+	return valkey.ImageProcessRequestQueueConfig{
 		StreamKey:  c.Valkey.Streams.ImageProcessRequest.StreamKey,
 		StreamSize: c.Valkey.Streams.ImageProcessRequest.StreamSize,
 	}

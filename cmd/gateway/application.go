@@ -103,8 +103,9 @@ func newApplication(cfg config.Config) (*application, error) {
 		return nil, fmt.Errorf("creating valkey client: %w", err)
 	}
 
-	slog.Info("Create valkey image event queue")
-	imageEventQueue := valkey.NewImageEventQueue(cfg.ToValkeyImageEventQueueConfig(), valkeyClient)
+	slog.Info("Create valkey image process request queue")
+	imageProcRequestQueue := valkey.NewImageProcessRequestQueue(
+		cfg.ToValkeyImageProcessRequestQueueConfig(), valkeyClient)
 
 	slog.Info("Create auth service")
 	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider,
@@ -117,7 +118,7 @@ func newApplication(cfg config.Config) (*application, error) {
 	projectSvc := project.NewService(projectRepo)
 
 	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, transactioner, imageRepo,
-		imageVarRepo, imageProcLogRepo, presetRepo, imageEventQueue)
+		imageVarRepo, imageProcLogRepo, presetRepo, imageProcRequestQueue)
 
 	slog.Info("Create web server")
 	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, imageSvc)
