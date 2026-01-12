@@ -33,7 +33,7 @@ func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Pro
 		Preload(gen.Project.Presets.Name(), nil).
 		First(ctx)
 	if err != nil {
-		return domain.Project{}, dbhelpers.WrapError(err, "Failed to get project %s", id)
+		return domain.Project{}, dbhelpers.WrapGORMError(err, "Failed to get project %s", id)
 	}
 
 	return proj.ToDomain(), nil
@@ -53,7 +53,7 @@ func (r *ProjectRepository) List(
 		Preload(gen.Project.Presets.Name(), nil).
 		Find(ctx)
 	if err != nil {
-		return domain.Projects{}, dbhelpers.WrapError(err, "Failed to list projects")
+		return domain.Projects{}, dbhelpers.WrapGORMError(err, "Failed to list projects")
 	}
 
 	// Fetch total count
@@ -61,7 +61,7 @@ func (r *ProjectRepository) List(
 	q = applyProjectSearchFilter(q, params.SearchFilter)
 	totalCount, err := q.Count(ctx, "COUNT(1)")
 	if err != nil {
-		return domain.Projects{}, dbhelpers.WrapError(err, "Failed to count projects")
+		return domain.Projects{}, dbhelpers.WrapGORMError(err, "Failed to count projects")
 	}
 
 	return domain.Projects{
@@ -77,7 +77,7 @@ func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (dom
 
 	proj := entity.NewProject(req)
 	if err := gorm.G[entity.Project](tx).Create(ctx, &proj); err != nil {
-		return domain.Project{}, dbhelpers.WrapError(err, "Failed to create project")
+		return domain.Project{}, dbhelpers.WrapGORMError(err, "Failed to create project")
 	}
 
 	return proj.ToDomain(), nil
@@ -100,7 +100,7 @@ func (r *ProjectRepository) Update(
 			Set(append(assigners, gen.Project.UpdatedAt.Set(time.Now()))...).
 			Update(ctx)
 		if err != nil {
-			return domain.Project{}, dbhelpers.WrapError(err, "Failed to update project %s", req.ID)
+			return domain.Project{}, dbhelpers.WrapGORMError(err, "Failed to update project %s", req.ID)
 		}
 	}
 
@@ -111,7 +111,7 @@ func (r *ProjectRepository) Update(
 		First(ctx)
 	if err != nil {
 		return domain.Project{},
-			dbhelpers.WrapError(err, "Failed to fetch updated project %s", req.ID)
+			dbhelpers.WrapGORMError(err, "Failed to fetch updated project %s", req.ID)
 	}
 
 	return proj.ToDomain(), nil
@@ -124,7 +124,7 @@ func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
 		Where(gen.Project.ID.Eq(id)).
 		Delete(ctx)
 	if err != nil {
-		return dbhelpers.WrapError(err, "Failed to delete project %s", id)
+		return dbhelpers.WrapGORMError(err, "Failed to delete project %s", id)
 	}
 	return nil
 }
@@ -155,7 +155,7 @@ func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 			Set(append(assigners, gen.Preset.UpdatedAt.Set(time.Now()))...).
 			Update(ctx)
 		if err != nil {
-			return dbhelpers.WrapError(err, "Failed to update preset %s", *t.ID)
+			return dbhelpers.WrapGORMError(err, "Failed to update preset %s", *t.ID)
 		} else if count == 0 {
 			return apperr.NewError(apperr.CodeNotFound).
 				WithSummary("Preset %s not found", *t.ID)
@@ -166,7 +166,7 @@ func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 	err := gorm.G[entity.Preset](tx).
 		CreateInBatches(ctx, &presetsToCreate, 10)
 	if err != nil {
-		return dbhelpers.WrapError(err, "Failed to create presets")
+		return dbhelpers.WrapGORMError(err, "Failed to create presets")
 	}
 
 	presetIDs := make([]string, 0, len(presetsToUpdate)+len(presetsToCreate))
@@ -182,7 +182,7 @@ func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 		Where(gen.Preset.ID.NotIn(presetIDs...)).
 		Delete(ctx)
 	if err != nil {
-		return dbhelpers.WrapError(err, "Failed to drop presets not in the upsert list")
+		return dbhelpers.WrapGORMError(err, "Failed to drop presets not in the upsert list")
 	}
 
 	return nil

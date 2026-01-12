@@ -13,7 +13,7 @@ import (
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
-func WrapError(err error, msg string, args ...any) error {
+func WrapGORMError(err error, msg string, args ...any) error {
 	if err == nil {
 		return nil
 	}

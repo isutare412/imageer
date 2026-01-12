@@ -10,7 +10,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
-	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/awshelpers"
 )
 
 type Presigner struct {
@@ -41,9 +41,7 @@ func (p *Presigner) PresignPutObject(ctx context.Context, req domain.PresignPutO
 		ContentType: lo.EmptyableToPtr(req.ContentType),
 	}, s3.WithPresignExpires(p.cfg.Expiry))
 	if err != nil {
-		return domain.PresignPutObjectResponse{}, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to presign")
+		return domain.PresignPutObjectResponse{}, awshelpers.WrapS3Error(err, "Failed to presign")
 	}
 
 	return domain.PresignPutObjectResponse{

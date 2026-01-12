@@ -11,6 +11,7 @@ import (
 	"github.com/valkey-io/valkey-go"
 
 	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 	"github.com/isutare412/imageer/pkg/log"
 )
 
@@ -97,23 +98,17 @@ func (s *Stealer) stealMessages(ctx context.Context) ([]Message, error) {
 		Count(100).
 		Build())
 	if err := resp.Error(); err != nil {
-		return nil, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to autoclaim from stream %s", s.cfg.Stream)
+		return nil, dbhelpers.WrapValkeyError(err, "Failed to autoclaim from stream %s", s.cfg.Stream)
 	}
 
 	results, err := resp.ToArray()
 	if err != nil {
-		return nil, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to parse array")
+		return nil, dbhelpers.WrapValkeyError(err, "Failed to parse array")
 	}
 
 	entries, err := results[1].AsXRange()
 	if err != nil {
-		return nil, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to parse xrange format")
+		return nil, dbhelpers.WrapValkeyError(err, "Failed to parse xrange format")
 	}
 
 	messages := make([]Message, 0, len(entries))
@@ -133,7 +128,8 @@ func (s *Stealer) stealMessages(ctx context.Context) ([]Message, error) {
 
 		msg := []byte(entry.FieldValues["msg"])
 		messages = append(messages, Message{
-			Data: msg,
+			EntryID: entry.ID,
+			Data:    msg,
 			Ack: func() error {
 				if _, err := s.ackMessage(context.Background(), entry.ID); err != nil {
 					return err
@@ -172,36 +168,27 @@ func (s *Stealer) checkDeliverCount(ctx context.Context, id string) (int64, erro
 		Count(1).
 		Build())
 	if err := resp.Error(); err != nil {
-		return 0, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to get pending message info for entry id %s in stream %s",
-				id, s.cfg.Stream)
+		return 0, dbhelpers.WrapValkeyError(err,
+			"Failed to XPENDING for entry id %s in stream %s", id, s.cfg.Stream)
 	}
 
 	results, err := resp.ToArray()
 	switch {
 	case err != nil:
-		return 0, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to parse array")
+		return 0, dbhelpers.WrapValkeyError(err, "Failed to parse array")
 	case len(results) == 0:
 		return 0, apperr.NewError(apperr.CodeNotFound).
-			WithSummary("No pending message found for entry id %s in stream %s",
-				id, s.cfg.Stream)
+			WithSummary("No pending message found for entry id %s in stream %s", id, s.cfg.Stream)
 	}
 
 	pending, err := results[0].ToArray()
 	if err != nil {
-		return 0, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to parse pending array")
+		return 0, dbhelpers.WrapValkeyError(err, "Failed to parse pending array")
 	}
 
 	count, err := pending[3].AsInt64()
 	if err != nil {
-		return 0, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to parse retry count")
+		return 0, dbhelpers.WrapValkeyError(err, "Failed to parse retry count")
 	}
 
 	return count, nil
@@ -214,16 +201,13 @@ func (s *Stealer) ackMessage(ctx context.Context, id string) (acked bool, err er
 		Id(id).
 		Build())
 	if err := resp.Error(); err != nil {
-		return false, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to ack message %s in stream %s", id, s.cfg.Stream)
+		return false, dbhelpers.WrapValkeyError(err, "Failed to XACK message %s in stream %s",
+			id, s.cfg.Stream)
 	}
 
 	acked, err = resp.AsBool()
 	if err != nil {
-		return false, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to parse bool")
+		return false, dbhelpers.WrapValkeyError(err, "Failed to parse bool")
 	}
 
 	return acked, nil

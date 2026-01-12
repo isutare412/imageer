@@ -3,10 +3,12 @@ package csmgroup
 import (
 	"context"
 	"log/slog"
+	"net/http"
 
 	"github.com/valkey-io/valkey-go"
 
 	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 )
 
 type Initializer struct {
@@ -33,13 +35,12 @@ func (i *Initializer) Initialize(ctx context.Context) error {
 		Id("0").
 		Mkstream().
 		Build())
-	err := resp.Error()
+	err := dbhelpers.WrapValkeyError(resp.Error(), "Failed to create consumer group %s", i.group)
 	switch {
-	case valkey.IsValkeyBusyGroup(err):
+	case apperr.IsErrorStatusCode(err, http.StatusConflict):
+		// Skip if group already exists
 	case err != nil:
-		return apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to create consumer group %s", i.group)
+		return err
 	}
 
 	// Create consumer in the group
@@ -49,9 +50,7 @@ func (i *Initializer) Initialize(ctx context.Context) error {
 		Consumer(i.consumer).
 		Build())
 	if err := resp.Error(); err != nil {
-		return apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to create consumer %s in group %s", i.consumer, i.group)
+		return dbhelpers.WrapValkeyError(err, "Failed to create consumer %s in group %s", i.consumer, i.group)
 	}
 
 	slog.InfoContext(ctx, "Created valkey consumer",

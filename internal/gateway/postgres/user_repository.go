@@ -29,7 +29,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (domain.User, 
 		Where(gen.User.ID.Eq(id)).
 		First(ctx)
 	if err != nil {
-		return domain.User{}, dbhelpers.WrapError(err, "Failed to find user %s", id)
+		return domain.User{}, dbhelpers.WrapGORMError(err, "Failed to find user %s", id)
 	}
 
 	return user.ToDomain(), nil
@@ -50,14 +50,14 @@ func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (domain.U
 			}),
 		}).
 		Create(ctx, &usr); err != nil {
-		return domain.User{}, dbhelpers.WrapError(err, "Failed to upsert user")
+		return domain.User{}, dbhelpers.WrapGORMError(err, "Failed to upsert user")
 	}
 
 	usr, err := gorm.G[entity.User](tx).
 		Where(gen.User.Email.Eq(usr.Email)).
 		First(ctx)
 	if err != nil {
-		return domain.User{}, dbhelpers.WrapError(err, "Failed to fetch upserted user")
+		return domain.User{}, dbhelpers.WrapGORMError(err, "Failed to fetch upserted user")
 	}
 
 	return usr.ToDomain(), nil

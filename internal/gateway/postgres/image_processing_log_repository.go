@@ -26,7 +26,7 @@ func (r *ImageProcessingLogRepository) Create(ctx context.Context, log domain.Im
 
 	procLog := entity.NewImageProcessingLog(log)
 	if err := gorm.G[entity.ImageProcessingLog](tx).Create(ctx, &procLog); err != nil {
-		return domain.ImageProcessingLog{}, dbhelpers.WrapError(err, "Failed to create image processing log")
+		return domain.ImageProcessingLog{}, dbhelpers.WrapGORMError(err, "Failed to create image processing log")
 	}
 
 	return procLog.ToDomain(), nil

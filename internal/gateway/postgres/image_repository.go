@@ -42,11 +42,11 @@ func (r *ImageRepository) Create(ctx context.Context, image domain.Image) (domai
 		Where(gen.Project.ID.Eq(img.ProjectID)).
 		First(ctx)
 	if err != nil {
-		return domain.Image{}, dbhelpers.WrapError(err, "Failed to get project %s", img.ProjectID)
+		return domain.Image{}, dbhelpers.WrapGORMError(err, "Failed to get project %s", img.ProjectID)
 	}
 
 	if err := gorm.G[entity.Image](tx).Create(ctx, &img); err != nil {
-		return domain.Image{}, dbhelpers.WrapError(err, "Failed to create image")
+		return domain.Image{}, dbhelpers.WrapGORMError(err, "Failed to create image")
 	}
 
 	img, err = r.get(ctx, tx, img.ID)
@@ -67,7 +67,7 @@ func (r *ImageRepository) Update(ctx context.Context, req domain.UpdateImageRequ
 		Set(append(assigners, gen.Image.UpdatedAt.Set(time.Now()))...).
 		Update(ctx)
 	if err != nil {
-		return domain.Image{}, dbhelpers.WrapError(err, "Failed to update image %s", req.ID)
+		return domain.Image{}, dbhelpers.WrapGORMError(err, "Failed to update image %s", req.ID)
 	}
 
 	img, err := r.get(ctx, tx, req.ID)
@@ -86,7 +86,7 @@ func (r *ImageRepository) get(ctx context.Context, tx *gorm.DB, id string) (enti
 		Preload(gen.Image.Variants.Name()+"."+gen.ImageVariant.Preset.Name(), nil).
 		First(ctx)
 	if err != nil {
-		return entity.Image{}, dbhelpers.WrapError(err, "Failed to fetch created image %s", id)
+		return entity.Image{}, dbhelpers.WrapGORMError(err, "Failed to fetch created image %s", id)
 	}
 	return img, nil
 }

@@ -8,7 +8,7 @@ import (
 
 	"github.com/valkey-io/valkey-go"
 
-	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 )
 
 type Reaper struct {
@@ -35,9 +35,7 @@ func (r *Reaper) ReapIdleConsumers(ctx context.Context) error {
 		Group(r.group).
 		Build())
 	if err := resp.Error(); err != nil {
-		return apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to get consumers info for group %s", r.group)
+		return dbhelpers.WrapValkeyError(err, "Failed to get consumers info for group %s", r.group)
 	}
 
 	consumersToReap, err := findConsumersToReap(resp, r.idleTimeThreshold)
@@ -53,9 +51,7 @@ func (r *Reaper) ReapIdleConsumers(ctx context.Context) error {
 			Consumername(name).
 			Build())
 		if err := resp.Error(); err != nil {
-			return apperr.NewError(apperr.CodeInternalServerError).
-				WithCause(err).
-				WithSummary("Failed to delete consumer %s from group %s", name, r.group)
+			return dbhelpers.WrapValkeyError(err, "Failed to delete consumer %s from group %s", name, r.group)
 		}
 
 		slog.InfoContext(ctx, "Reaped idle valkey consumer",

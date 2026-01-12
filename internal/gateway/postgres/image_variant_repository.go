@@ -33,7 +33,7 @@ func (r *ImageVariantRepository) Create(
 		Where(gen.Image.ID.Eq(iv.ImageID)).
 		First(ctx)
 	if err != nil {
-		return domain.ImageVariant{}, dbhelpers.WrapError(err, "Failed to get image %s", iv.ImageID)
+		return domain.ImageVariant{}, dbhelpers.WrapGORMError(err, "Failed to get image %s", iv.ImageID)
 	}
 
 	_, err = gorm.G[entity.Preset](tx).
@@ -41,11 +41,11 @@ func (r *ImageVariantRepository) Create(
 		First(ctx)
 	if err != nil {
 		return domain.ImageVariant{},
-			dbhelpers.WrapError(err, "Failed to get preset %s", iv.PresetID)
+			dbhelpers.WrapGORMError(err, "Failed to get preset %s", iv.PresetID)
 	}
 
 	if err := gorm.G[entity.ImageVariant](tx).Create(ctx, &iv); err != nil {
-		return domain.ImageVariant{}, dbhelpers.WrapError(err, "Failed to create image variant")
+		return domain.ImageVariant{}, dbhelpers.WrapGORMError(err, "Failed to create image variant")
 	}
 
 	iv, err = r.get(ctx, tx, iv.ID)
@@ -66,7 +66,7 @@ func (r *ImageVariantRepository) Update(ctx context.Context, req domain.UpdateIm
 		Set(append(assigners, gen.ImageVariant.UpdatedAt.Set(time.Now()))...).
 		Update(ctx)
 	if err != nil {
-		return domain.ImageVariant{}, dbhelpers.WrapError(err,
+		return domain.ImageVariant{}, dbhelpers.WrapGORMError(err,
 			"Failed to update image variant %s", req.ID)
 	}
 
@@ -86,7 +86,7 @@ func (r *ImageVariantRepository) get(ctx context.Context, tx *gorm.DB, id string
 		First(ctx)
 	if err != nil {
 		return entity.ImageVariant{},
-			dbhelpers.WrapError(err, "Failed to get image variant %s", id)
+			dbhelpers.WrapGORMError(err, "Failed to get image variant %s", id)
 	}
 
 	return variant, nil

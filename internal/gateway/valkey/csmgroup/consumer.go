@@ -9,7 +9,7 @@ import (
 
 	"github.com/valkey-io/valkey-go"
 
-	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 )
 
 func GenerateConsumerName(prefix string) string {
@@ -25,26 +25,20 @@ func findConsumersToReap(xinfoResult valkey.ValkeyResult, idleTimeThreshold time
 ) ([]string, error) {
 	consumers, err := xinfoResult.ToArray()
 	if err != nil {
-		return nil, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to parse consumers list")
+		return nil, dbhelpers.WrapValkeyError(err, "Failed to parse consumers array")
 	}
 
 	var names []string
 	for _, consumer := range consumers {
 		info, err := consumer.AsMap()
 		if err != nil {
-			return nil, apperr.NewError(apperr.CodeInternalServerError).
-				WithCause(err).
-				WithSummary("Failed to parse consumer map")
+			return nil, dbhelpers.WrapValkeyError(err, "Failed to parse consumer map")
 		}
 
 		msg := info["pending"]
 		pending, err := msg.AsInt64()
 		if err != nil {
-			return nil, apperr.NewError(apperr.CodeInternalServerError).
-				WithCause(err).
-				WithSummary("Failed to parse pending message count")
+			return nil, dbhelpers.WrapValkeyError(err, "Failed to parse pending message count")
 		}
 
 		if pending > 0 {
@@ -54,9 +48,7 @@ func findConsumersToReap(xinfoResult valkey.ValkeyResult, idleTimeThreshold time
 		msg = info["idle"]
 		idleMs, err := msg.AsInt64()
 		if err != nil {
-			return nil, apperr.NewError(apperr.CodeInternalServerError).
-				WithCause(err).
-				WithSummary("Failed to parse idle time")
+			return nil, dbhelpers.WrapValkeyError(err, "Failed to parse idle time")
 		}
 
 		idleTime := time.Millisecond * time.Duration(idleMs)
@@ -67,9 +59,7 @@ func findConsumersToReap(xinfoResult valkey.ValkeyResult, idleTimeThreshold time
 		msg = info["name"]
 		consumer, err := msg.ToString()
 		if err != nil {
-			return nil, apperr.NewError(apperr.CodeInternalServerError).
-				WithCause(err).
-				WithSummary("Failed to parse consumer name")
+			return nil, dbhelpers.WrapValkeyError(err, "Failed to parse consumer name")
 		}
 
 		names = append(names, consumer)

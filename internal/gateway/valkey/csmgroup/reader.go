@@ -3,12 +3,14 @@ package csmgroup
 import (
 	"context"
 	"log/slog"
+	"net/http"
 	"sync"
 	"time"
 
 	"github.com/valkey-io/valkey-go"
 
 	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 	"github.com/isutare412/imageer/pkg/log"
 )
 
@@ -85,21 +87,17 @@ func (r *Reader) readMessages(ctx context.Context) ([]Message, error) {
 		Key(r.cfg.Stream).
 		Id(">").
 		Build())
-	err := resp.Error()
+	err := dbhelpers.WrapValkeyError(resp.Error(), "Failed to XREADGROUP")
 	switch {
-	case valkey.IsValkeyNil(err):
+	case apperr.IsErrorStatusCode(err, http.StatusNotFound):
 		return nil, nil // No messages
 	case err != nil:
-		return nil, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to read messages from stream %s", r.cfg.Stream)
+		return nil, err
 	}
 
 	results, err := resp.AsXRead()
 	if err != nil {
-		return nil, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to parse xreadgroup response")
+		return nil, dbhelpers.WrapValkeyError(err, "Failed to parse xreadgroup response")
 	}
 
 	entries := results[r.cfg.Stream]
@@ -108,7 +106,8 @@ func (r *Reader) readMessages(ctx context.Context) ([]Message, error) {
 		msg := []byte(entry.FieldValues[r.cfg.EntryFieldKey])
 
 		messages = append(messages, Message{
-			Data: msg,
+			EntryID: entry.ID,
+			Data:    msg,
 			Ack: func() error {
 				if _, err := r.ackMessage(context.Background(), entry.ID); err != nil {
 					return err
@@ -128,16 +127,12 @@ func (r *Reader) ackMessage(ctx context.Context, id string) (acked bool, err err
 		Id(id).
 		Build())
 	if err := resp.Error(); err != nil {
-		return false, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to ack message %s in stream %s", id, r.cfg.Stream)
+		return false, dbhelpers.WrapValkeyError(err, "Failed to XACK message %s in stream %s", id, r.cfg.Stream)
 	}
 
 	acked, err = resp.AsBool()
 	if err != nil {
-		return false, apperr.NewError(apperr.CodeInternalServerError).
-			WithCause(err).
-			WithSummary("Failed to parse bool")
+		return false, dbhelpers.WrapValkeyError(err, "Failed to parse XACK response as bool")
 	}
 
 	return acked, nil

@@ -29,7 +29,7 @@ func (r *PresetRepository) FindByID(ctx context.Context, id string) (domain.Pres
 		Where(gen.Preset.ID.Eq(id)).
 		First(ctx)
 	if err != nil {
-		return domain.Preset{}, dbhelpers.WrapError(err, "Failed to find preset %s", id)
+		return domain.Preset{}, dbhelpers.WrapGORMError(err, "Failed to find preset %s", id)
 	}
 
 	return preset.ToDomain(), nil
@@ -44,7 +44,7 @@ func (r *PresetRepository) FindByName(ctx context.Context, projectID, name strin
 		Where(gen.Preset.Name.Eq(name)).
 		First(ctx)
 	if err != nil {
-		return domain.Preset{}, dbhelpers.WrapError(err, "Failed to find preset %s", name)
+		return domain.Preset{}, dbhelpers.WrapGORMError(err, "Failed to find preset %s", name)
 	}
 
 	return preset.ToDomain(), nil
@@ -60,7 +60,7 @@ func (r *PresetRepository) List(ctx context.Context, params domain.ListPresetsPa
 	q = applyPagination(q, params.LimitOrDefault(), params.OffsetOrDefault())
 	presets, err := q.Find(ctx)
 	if err != nil {
-		return nil, dbhelpers.WrapError(err, "Failed to list presets")
+		return nil, dbhelpers.WrapGORMError(err, "Failed to list presets")
 	}
 
 	return lo.Map(presets, func(p entity.Preset, _ int) domain.Preset {

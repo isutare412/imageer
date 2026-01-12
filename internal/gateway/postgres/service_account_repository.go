@@ -34,7 +34,7 @@ func (r *ServiceAccountRepository) FindByID(
 		First(ctx)
 	if err != nil {
 		return domain.ServiceAccount{},
-			dbhelpers.WrapError(err, "Failed to fetch service account %s", id)
+			dbhelpers.WrapGORMError(err, "Failed to fetch service account %s", id)
 	}
 
 	return sa.ToDomain(), nil
@@ -51,7 +51,7 @@ func (r *ServiceAccountRepository) FindByAPIKeyHash(
 		First(ctx)
 	if err != nil {
 		return domain.ServiceAccount{},
-			dbhelpers.WrapError(err, "Failed to fetch service account with API key hash")
+			dbhelpers.WrapGORMError(err, "Failed to fetch service account with API key hash")
 	}
 
 	return sa.ToDomain(), nil
@@ -71,7 +71,7 @@ func (r *ServiceAccountRepository) List(
 		Preload(gen.ServiceAccount.Projects.Name(), nil).
 		Find(ctx)
 	if err != nil {
-		return domain.ServiceAccounts{}, dbhelpers.WrapError(err, "Failed to list service accounts")
+		return domain.ServiceAccounts{}, dbhelpers.WrapGORMError(err, "Failed to list service accounts")
 	}
 
 	// Fetch total count
@@ -80,7 +80,7 @@ func (r *ServiceAccountRepository) List(
 	count, err := q.Count(ctx, "COUNT(1)")
 	if err != nil {
 		return domain.ServiceAccounts{},
-			dbhelpers.WrapError(err, "Failed to count service accounts")
+			dbhelpers.WrapGORMError(err, "Failed to count service accounts")
 	}
 
 	return domain.ServiceAccounts{
@@ -99,7 +99,7 @@ func (r *ServiceAccountRepository) Create(
 	// Create service account record
 	sa := entity.NewServiceAccount(req)
 	if err := gorm.G[entity.ServiceAccount](tx).Create(ctx, &sa); err != nil {
-		return domain.ServiceAccount{}, dbhelpers.WrapError(err, "Failed to create service account")
+		return domain.ServiceAccount{}, dbhelpers.WrapGORMError(err, "Failed to create service account")
 	}
 
 	// Associate service account to projects
@@ -114,7 +114,7 @@ func (r *ServiceAccountRepository) Create(
 		if err := gorm.G[entity.ServiceAccountProject](tx).
 			CreateInBatches(ctx, &saProjects, 10); err != nil {
 			return domain.ServiceAccount{},
-				dbhelpers.WrapError(err, "Failed to associate service account to projects")
+				dbhelpers.WrapGORMError(err, "Failed to associate service account to projects")
 		}
 	}
 
@@ -125,7 +125,7 @@ func (r *ServiceAccountRepository) Create(
 		First(ctx)
 	if err != nil {
 		return domain.ServiceAccount{},
-			dbhelpers.WrapError(err, "Failed to fetch service account after creation")
+			dbhelpers.WrapGORMError(err, "Failed to fetch service account after creation")
 	}
 
 	return sa.ToDomain(), nil
@@ -144,7 +144,7 @@ func (r *ServiceAccountRepository) Update(
 		Update(ctx)
 	if err != nil {
 		return domain.ServiceAccount{},
-			dbhelpers.WrapError(err, "Failed to update service account %s", req.ID)
+			dbhelpers.WrapGORMError(err, "Failed to update service account %s", req.ID)
 	}
 
 	// Delete existing project associations
@@ -153,7 +153,7 @@ func (r *ServiceAccountRepository) Update(
 		Delete(ctx)
 	if err != nil {
 		return domain.ServiceAccount{},
-			dbhelpers.WrapError(err,
+			dbhelpers.WrapGORMError(err,
 				"Failed to clear existing project associations of service account %s", req.ID)
 	}
 
@@ -168,7 +168,7 @@ func (r *ServiceAccountRepository) Update(
 		if err := gorm.G[entity.ServiceAccountProject](tx).
 			CreateInBatches(ctx, &saProjects, 10); err != nil {
 			return domain.ServiceAccount{},
-				dbhelpers.WrapError(err,
+				dbhelpers.WrapGORMError(err,
 					"Failed to associate service account to projects of service account %s", req.ID)
 		}
 	}
@@ -180,7 +180,7 @@ func (r *ServiceAccountRepository) Update(
 		First(ctx)
 	if err != nil {
 		return domain.ServiceAccount{},
-			dbhelpers.WrapError(err, "Failed to fetch service account %s after update", req.ID)
+			dbhelpers.WrapGORMError(err, "Failed to fetch service account %s after update", req.ID)
 	}
 
 	return sa.ToDomain(), nil
@@ -192,7 +192,7 @@ func (r *ServiceAccountRepository) Delete(ctx context.Context, id string) error 
 	if _, err := gorm.G[entity.ServiceAccount](tx).
 		Where(gen.ServiceAccount.ID.Eq(id)).
 		Delete(ctx); err != nil {
-		return dbhelpers.WrapError(err, "Failed to delete service account %s", id)
+		return dbhelpers.WrapGORMError(err, "Failed to delete service account %s", id)
 	}
 	return nil
 }
