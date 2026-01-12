@@ -33,6 +33,19 @@ var (
 	_ sql.Scanner   = (*Fit)(nil)
 )
 
+func NewFitFromProto(f imageerv1.ImageFit) Fit {
+	switch f {
+	case imageerv1.ImageFit_IMAGE_FIT_COVER:
+		return FitCover
+	case imageerv1.ImageFit_IMAGE_FIT_CONTAIN:
+		return FitContain
+	case imageerv1.ImageFit_IMAGE_FIT_FILL:
+		return FitFill
+	default:
+		return ""
+	}
+}
+
 func (f *Fit) GetOrDefault() Fit {
 	return lo.FromPtrOr(f, FitCover)
 }

@@ -28,6 +28,25 @@ var (
 	_ sql.Scanner   = (*Anchor)(nil)
 )
 
+func NewAnchorFromProto(a imageerv1.ImageAnchor) Anchor {
+	switch a {
+	case imageerv1.ImageAnchor_IMAGE_ANCHOR_SMART:
+		return AnchorSmart
+	case imageerv1.ImageAnchor_IMAGE_ANCHOR_CENTER:
+		return AnchorCenter
+	case imageerv1.ImageAnchor_IMAGE_ANCHOR_NORTH:
+		return AnchorNorth
+	case imageerv1.ImageAnchor_IMAGE_ANCHOR_SOUTH:
+		return AnchorSouth
+	case imageerv1.ImageAnchor_IMAGE_ANCHOR_EAST:
+		return AnchorEast
+	case imageerv1.ImageAnchor_IMAGE_ANCHOR_WEST:
+		return AnchorWest
+	default:
+		return ""
+	}
+}
+
 func (a *Anchor) GetOrDefault() Anchor {
 	return lo.FromPtrOr(a, AnchorSmart)
 }

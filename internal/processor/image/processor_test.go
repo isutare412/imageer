@@ -46,8 +46,8 @@ func TestProcessor_Process(t *testing.T) {
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitCover),
 				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int64](400),
-				Height:  lo.ToPtr[int64](400),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](400),
 			},
 		},
 		{
@@ -64,7 +64,7 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Width:   lo.ToPtr[int64](400),
+				Width:   lo.ToPtr[int32](400),
 			},
 		},
 		{
@@ -98,8 +98,8 @@ func TestProcessor_Process(t *testing.T) {
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitFill),
-				Width:   lo.ToPtr[int64](400),
-				Height:  lo.ToPtr[int64](400),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](400),
 			},
 		},
 		{
@@ -117,8 +117,8 @@ func TestProcessor_Process(t *testing.T) {
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitContain),
-				Width:   lo.ToPtr[int64](400),
-				Height:  lo.ToPtr[int64](400),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](400),
 			},
 		},
 		{
@@ -137,8 +137,8 @@ func TestProcessor_Process(t *testing.T) {
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitCover),
 				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int64](400),
-				Height:  lo.ToPtr[int64](400),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](400),
 			},
 		},
 		{
@@ -156,8 +156,8 @@ func TestProcessor_Process(t *testing.T) {
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitFill),
-				Width:   lo.ToPtr[int64](400),
-				Height:  lo.ToPtr[int64](400),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](400),
 			},
 		},
 		{
@@ -175,8 +175,8 @@ func TestProcessor_Process(t *testing.T) {
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitContain),
-				Width:   lo.ToPtr[int64](400),
-				Height:  lo.ToPtr[int64](400),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](400),
 			},
 		},
 		{
@@ -195,8 +195,8 @@ func TestProcessor_Process(t *testing.T) {
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitCover),
 				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int64](800),
-				Height:  lo.ToPtr[int64](800),
+				Width:   lo.ToPtr[int32](800),
+				Height:  lo.ToPtr[int32](800),
 			},
 		},
 		{
@@ -215,8 +215,8 @@ func TestProcessor_Process(t *testing.T) {
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitCover),
 				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int64](400),
-				Height:  lo.ToPtr[int64](300),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](300),
 			},
 		},
 		{
@@ -234,8 +234,8 @@ func TestProcessor_Process(t *testing.T) {
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitContain),
-				Width:   lo.ToPtr[int64](400),
-				Height:  lo.ToPtr[int64](300),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](300),
 			},
 		},
 		{
@@ -253,8 +253,8 @@ func TestProcessor_Process(t *testing.T) {
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
 				Fit:     lo.ToPtr(images.FitFill),
-				Width:   lo.ToPtr[int64](400),
-				Height:  lo.ToPtr[int64](300),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](300),
 			},
 		},
 	}

@@ -27,6 +27,23 @@ var (
 	_ sql.Scanner   = (*Format)(nil)
 )
 
+func NewFormatFromProto(f imageerv1.ImageFormat) Format {
+	switch f {
+	case imageerv1.ImageFormat_IMAGE_FORMAT_JPEG:
+		return FormatJPEG
+	case imageerv1.ImageFormat_IMAGE_FORMAT_PNG:
+		return FormatPNG
+	case imageerv1.ImageFormat_IMAGE_FORMAT_WEBP:
+		return FormatWebp
+	case imageerv1.ImageFormat_IMAGE_FORMAT_AVIF:
+		return FormatAVIF
+	case imageerv1.ImageFormat_IMAGE_FORMAT_HEIC:
+		return FormatHEIC
+	default:
+		return ""
+	}
+}
+
 func (f *Format) GetOrDefault() Format {
 	return lo.FromPtrOr(f, FormatWebp)
 }
