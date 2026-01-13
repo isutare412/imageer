@@ -87,11 +87,13 @@ func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadUR
 
 		// Create image variant records
 		for _, preset := range presets {
+			variantID := uuid.NewString()
 			variant := domain.ImageVariant{
+				ID:      variantID,
 				Format:  preset.Format,
 				State:   images.VariantStateWaitingUpload,
-				S3Key:   s.imageVariantS3Key(req.ProjectID, imageID, preset.ID, preset.Format),
-				URL:     s.imageVariantPublicURL(req.ProjectID, imageID, preset.ID, preset.Format),
+				S3Key:   s.imageVariantS3Key(req.ProjectID, imageID, variantID, preset.Format),
+				URL:     s.imageVariantPublicURL(req.ProjectID, imageID, variantID, preset.Format),
 				ImageID: imageID,
 				Preset:  domain.PresetReference{ID: preset.ID},
 			}

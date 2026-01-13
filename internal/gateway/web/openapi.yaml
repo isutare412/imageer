@@ -487,7 +487,7 @@ components:
           - COVER: Scale the image to cover the target dimensions. Some parts may be cropped.
           - CONTAIN: Scale the image to fit within the target dimensions. No cropping occurs. Empty areas may be filled with background color.
           - FILL: Scale the image to fill the target dimensions. The image may be distorted.
-      example: COVER
+      example: CONTAIN
       x-go-type: images.Fit
       x-go-import:
         path: github.com/isutare412/imageer/pkg/images

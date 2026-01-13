@@ -27,16 +27,16 @@ func (s *Service) imagePublicURL(projectID, imageID string, format images.Format
 		format.Extension())
 }
 
-func (s *Service) imageVariantS3Key(projectID, imageID, presetID string, format images.Format,
+func (s *Service) imageVariantS3Key(projectID, imageID, variantID string, format images.Format,
 ) string {
 	base := s.imageS3BasePath(projectID, imageID)
-	return fmt.Sprintf("%s/variants/%s.%s", base, presetID, format.Extension())
+	return fmt.Sprintf("%s/variants/%s.%s", base, variantID, format.Extension())
 }
 
-func (s *Service) imageVariantPublicURL(projectID, imageID, presetID string, format images.Format,
+func (s *Service) imageVariantPublicURL(projectID, imageID, variantID string, format images.Format,
 ) string {
 	return fmt.Sprintf("%s/%s/variants/%s.%s", s.cfg.CDNDomain, imageBasePath(projectID, imageID),
-		presetID, format.Extension())
+		variantID, format.Extension())
 }
 
 func parseImageS3Key(key string) (projectID, imageID string, ok bool) {

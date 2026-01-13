@@ -37,7 +37,6 @@ func respondError(next echo.HandlerFunc) echo.HandlerFunc {
 		switch {
 		// Override if *apperr.Error
 		case errors.As(err, &aerr):
-
 			statusCode = aerr.Code.HTTPStatusCode()
 			appCode = aerr.Code
 			msg = cmp.Or(aerr.ClientMessage(), msg)

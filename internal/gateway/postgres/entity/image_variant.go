@@ -26,6 +26,7 @@ type ImageVariant struct {
 
 func NewImageVariant(iv domain.ImageVariant) ImageVariant {
 	return ImageVariant{
+		ID:       iv.ID,
 		Format:   iv.Format,
 		State:    iv.State,
 		S3Key:    iv.S3Key,
