@@ -1,11 +1,14 @@
 package web
 
 import (
+	"context"
 	"log/slog"
 	"time"
 
 	"github.com/labstack/echo/v4"
 
+	"github.com/isutare412/imageer/internal/gateway/contextbag"
+	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/pkg/log"
 )
 
@@ -31,7 +34,7 @@ func accessLog(next echo.HandlerFunc) echo.HandlerFunc {
 		resp := ctx.Response()
 		rctx := req.Context()
 
-		slog.With(
+		entry := slog.With(
 			slog.Int("status", resp.Status),
 			slog.String("method", req.Method),
 			slog.String("path", req.URL.Path),
@@ -40,8 +43,44 @@ func accessLog(next echo.HandlerFunc) echo.HandlerFunc {
 			slog.Duration("elapsedTime", time.Since(before)),
 			slog.Int64("requestContentLength", req.ContentLength),
 			slog.Int64("responseSize", resp.Size),
-		).Log(rctx, log.SlogLevelAccess, "Handle HTTP request")
+		)
+
+		entry = attachAuthenticationInfo(rctx, entry)
+		entry.Log(rctx, log.SlogLevelAccess, "Handle HTTP request")
 
 		return err
 	}
+}
+
+func attachAuthenticationInfo(ctx context.Context, entry *slog.Logger) *slog.Logger {
+	bag, ok := contextbag.BagFromContext(ctx)
+	if !ok {
+		return entry
+	}
+
+	switch pp := bag.Passport.(type) {
+	case domain.UserTokenPassport:
+		entry = entry.With(
+			"authenticated", true,
+			"authenticationMethod", "userToken",
+			slog.Group("user",
+				"id", pp.Payload.UserID,
+				"nickname", pp.Payload.Nickname,
+				"role", pp.Payload.Role,
+			),
+		)
+
+	case domain.ServiceAccountPassport:
+		entry = entry.With(
+			"authenticated", true,
+			"authenticationMethod", "serviceAccount",
+			slog.Group("serviceAccount",
+				"id", pp.ServiceAccount.ID,
+				"name", pp.ServiceAccount.Name,
+				"accessScope", pp.ServiceAccount.AccessScope,
+			),
+		)
+	}
+
+	return entry
 }
