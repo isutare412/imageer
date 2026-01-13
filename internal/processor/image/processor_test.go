@@ -257,6 +257,46 @@ func TestProcessor_Process(t *testing.T) {
 				Height:  lo.ToPtr[int32](300),
 			},
 		},
+		{
+			name:     "heic-noodle-cover",
+			fileName: "testdata/heic-noodle-4032x3024.heic",
+			prepareInput: func(t *testing.T, tt testSet) domain.RawImage {
+				buf, err := testFS.ReadFile(tt.fileName)
+				require.NoError(t, err)
+				return domain.RawImage{
+					Data:   buf,
+					Format: images.FormatHEIC,
+				}
+			},
+			preset: domain.Preset{
+				Format:  images.FormatWebp,
+				Quality: images.Quality(90),
+				Fit:     lo.ToPtr(images.FitCover),
+				Anchor:  lo.ToPtr(images.AnchorSmart),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](400),
+			},
+		},
+		{
+			name:     "heic-noodle-contain",
+			fileName: "testdata/heic-noodle-4032x3024.heic",
+			prepareInput: func(t *testing.T, tt testSet) domain.RawImage {
+				buf, err := testFS.ReadFile(tt.fileName)
+				require.NoError(t, err)
+				return domain.RawImage{
+					Data:   buf,
+					Format: images.FormatHEIC,
+				}
+			},
+			preset: domain.Preset{
+				Format:  images.FormatWebp,
+				Quality: images.Quality(90),
+				Fit:     lo.ToPtr(images.FitContain),
+				Anchor:  lo.ToPtr(images.AnchorSmart),
+				Width:   lo.ToPtr[int32](400),
+				Height:  lo.ToPtr[int32](400),
+			},
+		},
 	}
 
 	cleanUpTestOutputs(t)
