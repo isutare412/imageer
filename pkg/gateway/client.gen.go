@@ -108,7 +108,7 @@ type Image struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	// Format The content type of the image.
-	Format *ImageFormat `json:"format,omitempty"`
+	Format ImageFormat `json:"format"`
 
 	// ID The unique identifier of the image.
 	ID string `json:"id"`
@@ -120,7 +120,7 @@ type Image struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 
 	// URL The URL of the original image.
-	URL *string `json:"url,omitempty"`
+	URL string `json:"url"`
 
 	// Variants List of image variants with applied presets.
 	Variants []ImageVariant `json:"variants,omitempty"`
@@ -147,7 +147,7 @@ type ImageVariant struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	// Format The content type of the image.
-	Format *ImageFormat `json:"format,omitempty"`
+	Format ImageFormat `json:"format"`
 
 	// ID The unique identifier of the image variant.
 	ID string `json:"id"`
@@ -165,7 +165,7 @@ type ImageVariant struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 
 	// URL The URL of the image with the applied preset.
-	URL *string `json:"url,omitempty"`
+	URL string `json:"url"`
 }
 
 // ImageVariantState The current state of the image variant.

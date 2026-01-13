@@ -16,13 +16,14 @@ type Immigration struct {
 }
 
 func New(serviceAccountSvc port.ServiceAccountService, projectSvc port.ProjectService,
+	imageSvc port.ImageService,
 ) *Immigration {
 	return &Immigration{
 		permissionInspectors: []permissionInspector{
 			newAdminPermissionInspector(),
 			newProjectPermissionInspector(),
 		},
-		resourceInspectors: newResourceInspector(serviceAccountSvc, projectSvc),
+		resourceInspectors: newResourceInspector(serviceAccountSvc, projectSvc, imageSvc),
 	}
 }
 

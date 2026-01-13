@@ -45,6 +45,14 @@ func NewService(cfg Config, s3Presigner port.S3Presigner, transactioner port.Tra
 	}
 }
 
+func (s *Service) Get(ctx context.Context, imageID string) (domain.Image, error) {
+	image, err := s.imageRepo.FindByID(ctx, imageID)
+	if err != nil {
+		return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
+	}
+	return image, nil
+}
+
 func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadURLRequest,
 ) (domain.UploadURL, error) {
 	if err := validation.Validate(req); err != nil {

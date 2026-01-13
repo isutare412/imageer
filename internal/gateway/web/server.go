@@ -33,7 +33,7 @@ func NewServer(
 	passportIssuer := immigration.NewPassportIssuer(cfg.APIKeyHeader, cfg.UserCookieName,
 		authSvc, serviceAccountSvc)
 
-	immigration := immigration.New(serviceAccountSvc, projectSvc)
+	immigration := immigration.New(serviceAccountSvc, projectSvc, imageSvc)
 
 	e := echo.New()
 	e.HidePort = true

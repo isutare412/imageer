@@ -31,6 +31,12 @@ func (h *handler) CreateUploadURL(ctx echo.Context, projectID ProjectIDPath) err
 
 // GetImage gets image details
 func (h *handler) GetImage(ctx echo.Context, projectID ProjectIDPath, imageID ImageIDPath) error {
-	return apperr.NewError(apperr.CodeNotImplemented).
-		WithSummary("Method not implemented")
+	rctx := ctx.Request().Context()
+
+	image, err := h.imageSvc.Get(rctx, string(imageID))
+	if err != nil {
+		return fmt.Errorf("getting image: %w", err)
+	}
+
+	return ctx.JSON(http.StatusOK, ImageToWeb(image))
 }

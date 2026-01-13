@@ -927,6 +927,8 @@ components:
         - createdAt
         - updatedAt
         - state
+        - url
+        - format
 
     Images:
       type: object
@@ -984,6 +986,8 @@ components:
         - presetId
         - presetName
         - state
+        - url
+        - format
 
     ServiceAccount:
       type: object
