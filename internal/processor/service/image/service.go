@@ -60,7 +60,7 @@ func (s *Service) Process(ctx context.Context, req *imageerv1.ImageProcessReques
 
 	slog.InfoContext(ctx, "Send image process result", "imageId", result.ImageId,
 		"variantId", result.ImageVariantId, "presetId", result.PresetId,
-		"isSuccess", result.IsSuccess, "processingTime", result.ProcessingTime)
+		"isSuccess", result.IsSuccess, "processingTime", result.ProcessingTime.AsDuration())
 
 	return nil
 }
