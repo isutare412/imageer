@@ -79,10 +79,8 @@ func (a *application) run() {
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	select {
-	case sig := <-signals:
-		slog.Info("Received signal; shutdown application", "signal", sig)
-	}
+	sig := <-signals
+	slog.Info("Received signal; shutdown application", "signal", sig)
 }
 
 func (a *application) shutdown() {
