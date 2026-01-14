@@ -1,6 +1,8 @@
 package dbhelpers
 
 import (
+	"errors"
+
 	"github.com/valkey-io/valkey-go"
 
 	"github.com/isutare412/imageer/pkg/apperr"
@@ -25,6 +27,11 @@ func WrapValkeyError(err error, msg string, args ...any) error {
 	case valkey.IsParseErr(err):
 		return apperr.NewError(apperr.CodeInternalServerError).
 			WithSummary("Invalid parsing detected").
+			WithDetail(msg, args...).
+			WithCause(err)
+	case errors.Is(err, valkey.ErrClosing):
+		return apperr.NewError(apperr.CodeInternalServerError).
+			WithSummary("Client is closing").
 			WithDetail(msg, args...).
 			WithCause(err)
 	default:
