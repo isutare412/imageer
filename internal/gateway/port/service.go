@@ -15,6 +15,10 @@ type AuthService interface {
 	VerifyUserToken(ctx context.Context, userToken string) (domain.UserTokenPayload, error)
 }
 
+type UserService interface {
+	GetByID(ctx context.Context, id string) (domain.User, error)
+}
+
 type ServiceAccountService interface {
 	GetByID(ctx context.Context, id string) (domain.ServiceAccount, error)
 	GetByAPIKey(ctx context.Context, key string) (domain.ServiceAccount, error)

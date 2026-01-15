@@ -1,8 +1,13 @@
 package web
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 
+	"github.com/isutare412/imageer/internal/gateway/contextbag"
+	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
@@ -10,6 +15,24 @@ import (
 
 // GetCurrentUser gets current user details
 func (h *handler) GetCurrentUser(ctx echo.Context) error {
-	return apperr.NewError(apperr.CodeNotImplemented).
-		WithSummary("Method not implemented")
+	rctx := ctx.Request().Context()
+
+	bag, ok := contextbag.BagFromContext(rctx)
+	if !ok || bag.Passport == nil {
+		return apperr.NewError(apperr.CodeUnauthorized).
+			WithSummary("No authentication provided")
+	}
+
+	passport, ok := bag.Passport.(domain.UserTokenPassport)
+	if !ok {
+		return apperr.NewError(apperr.CodeForbidden).
+			WithSummary("Must be user token authentication")
+	}
+
+	user, err := h.userSvc.GetByID(rctx, passport.Payload.UserID)
+	if err != nil {
+		return fmt.Errorf("getting user by id: %w", err)
+	}
+
+	return ctx.JSON(http.StatusOK, UserToWeb(user))
 }

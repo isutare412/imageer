@@ -56,3 +56,9 @@ func (h *handler) GetImage(ctx echo.Context, projectID ProjectIDPath, imageID Im
 
 	return ctx.JSON(http.StatusOK, ImageToWeb(image))
 }
+
+// ReprocessImagesAdmin reprocesses multiple images in a project (admin endpoint)
+func (h *handler) ReprocessImagesAdmin(ctx echo.Context, projectID ProjectIDPath) error {
+	return apperr.NewError(apperr.CodeNotImplemented).
+		WithSummary("Method not implemented")
+}

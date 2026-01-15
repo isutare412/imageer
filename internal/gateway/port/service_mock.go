@@ -87,6 +87,45 @@ func (mr *MockAuthServiceMockRecorder) VerifyUserToken(ctx, userToken any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyUserToken", reflect.TypeOf((*MockAuthService)(nil).VerifyUserToken), ctx, userToken)
 }
 
+// MockUserService is a mock of UserService interface.
+type MockUserService struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserServiceMockRecorder
+	isgomock struct{}
+}
+
+// MockUserServiceMockRecorder is the mock recorder for MockUserService.
+type MockUserServiceMockRecorder struct {
+	mock *MockUserService
+}
+
+// NewMockUserService creates a new mock instance.
+func NewMockUserService(ctrl *gomock.Controller) *MockUserService {
+	mock := &MockUserService{ctrl: ctrl}
+	mock.recorder = &MockUserServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
+	return m.recorder
+}
+
+// GetByID mocks base method.
+func (m *MockUserService) GetByID(ctx context.Context, id string) (domain.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByID", ctx, id)
+	ret0, _ := ret[0].(domain.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByID indicates an expected call of GetByID.
+func (mr *MockUserServiceMockRecorder) GetByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUserService)(nil).GetByID), ctx, id)
+}
+
 // MockServiceAccountService is a mock of ServiceAccountService interface.
 type MockServiceAccountService struct {
 	ctrl     *gomock.Controller

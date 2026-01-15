@@ -19,6 +19,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/service/image"
 	"github.com/isutare412/imageer/internal/gateway/service/project"
 	"github.com/isutare412/imageer/internal/gateway/service/serviceaccount"
+	"github.com/isutare412/imageer/internal/gateway/service/user"
 	"github.com/isutare412/imageer/internal/gateway/sqs"
 	"github.com/isutare412/imageer/internal/gateway/valkey"
 	"github.com/isutare412/imageer/internal/gateway/web"
@@ -125,12 +126,17 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create project service")
 	projectSvc := project.NewService(projectRepo)
 
+	slog.Info("Create user service")
+	userSvc := user.NewService(userRepo)
+
+	slog.Info("Create image service")
 	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, transactioner, imageRepo,
 		imageVarRepo, imageProcLogRepo, presetRepo, imageProcRequestQueue, imageProcDonePublisher,
 		imageProcDoneSubscriber)
 
 	slog.Info("Create web server")
-	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, imageSvc)
+	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, userSvc,
+		imageSvc)
 
 	slog.Info("Create SQS image upload listener")
 	imageUploadListener, err := sqs.NewImageUploadListener(cfg.ToSQSImageUploadListenerConfig(),

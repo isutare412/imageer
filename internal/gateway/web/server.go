@@ -26,9 +26,9 @@ type Server struct {
 
 func NewServer(
 	cfg Config, authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService,
-	projectSvc port.ProjectService, imageSvc port.ImageService,
+	projectSvc port.ProjectService, userSvc port.UserService, imageSvc port.ImageService,
 ) *Server {
-	handler := newHandler(authSvc, serviceAccountSvc, projectSvc, imageSvc)
+	handler := newHandler(authSvc, serviceAccountSvc, projectSvc, userSvc, imageSvc)
 
 	passportIssuer := immigration.NewPassportIssuer(cfg.APIKeyHeader, cfg.UserCookieName,
 		authSvc, serviceAccountSvc)

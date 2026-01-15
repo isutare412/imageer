@@ -7,17 +7,19 @@ type handler struct {
 	authSvc           port.AuthService
 	serviceAccountSvc port.ServiceAccountService
 	projectSvc        port.ProjectService
+	userSvc           port.UserService
 	imageSvc          port.ImageService
 }
 
 // newHandler creates a new Handler instance
 func newHandler(authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService,
-	projectSvc port.ProjectService, imageSvc port.ImageService,
+	projectSvc port.ProjectService, userSvc port.UserService, imageSvc port.ImageService,
 ) *handler {
 	return &handler{
 		authSvc:           authSvc,
 		serviceAccountSvc: serviceAccountSvc,
 		projectSvc:        projectSvc,
+		userSvc:           userSvc,
 		imageSvc:          imageSvc,
 	}
 }

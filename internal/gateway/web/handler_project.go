@@ -95,9 +95,3 @@ func (h *handler) DeleteProjectAdmin(ctx echo.Context, projectID ProjectIDPath) 
 	}
 	return ctx.NoContent(http.StatusOK)
 }
-
-// ReprocessImagesAdmin reprocesses multiple images in a project (admin endpoint)
-func (h *handler) ReprocessImagesAdmin(ctx echo.Context, projectID ProjectIDPath) error {
-	return apperr.NewError(apperr.CodeNotImplemented).
-		WithSummary("Method not implemented")
-}
