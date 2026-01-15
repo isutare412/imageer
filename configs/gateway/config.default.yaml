@@ -12,6 +12,22 @@ web:
   read-timeout: 60s
   read-header-timeout: 10s
 
+kubernetes:
+  enabled: true
+
+  config:
+    use-in-cluster: true
+    kubeconfig:
+      path: "" # "" means ~/.kube/config
+      context: test-cluster # "" means current-context
+
+  leader-election:
+    lease-name: imageer-gateway
+    lease-namespace: imageer
+    lease-duration: 15s
+    renew-deadline: 10s
+    retry-period: 2s
+
 database:
   use-in-memory: false
   trace-log: false
@@ -139,3 +155,4 @@ aws:
 service:
   image:
     process-done-wait-timeout: 30s
+    expire-check-interval: 1m

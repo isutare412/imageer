@@ -7,6 +7,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/crypt"
 	"github.com/isutare412/imageer/internal/gateway/jwt"
+	"github.com/isutare412/imageer/internal/gateway/kubernetes"
 	"github.com/isutare412/imageer/internal/gateway/oidc"
 	"github.com/isutare412/imageer/internal/gateway/postgres"
 	"github.com/isutare412/imageer/internal/gateway/s3"
@@ -37,6 +38,24 @@ func (c *Config) ToWebConfig() web.Config {
 		WriteTimeout:      c.Web.WriteTimeout,
 		ReadTimeout:       c.Web.ReadTimeout,
 		ReadHeaderTimeout: c.Web.ReadHeaderTimeout,
+	}
+}
+
+func (c *Config) ToKubernetesClientConfig() kubernetes.ClientConfig {
+	return kubernetes.ClientConfig{
+		UseInClusterConfig: c.Kubernetes.Config.UseInCluster,
+		KubeConfigPath:     c.Kubernetes.Config.Kubeconfig.Path,
+		KubeConfigContext:  c.Kubernetes.Config.Kubeconfig.Context,
+	}
+}
+
+func (c *Config) ToKubernetesLeaderElectorConfig() kubernetes.LeaderElectorConfig {
+	return kubernetes.LeaderElectorConfig{
+		LeaseName:      c.Kubernetes.LeaderElection.LeaseName,
+		LeaseNamespace: c.Kubernetes.LeaderElection.LeaseNamespace,
+		LeaseDuration:  c.Kubernetes.LeaderElection.LeaseDuration,
+		RenewDeadline:  c.Kubernetes.LeaderElection.RenewDeadline,
+		RetryPeriod:    c.Kubernetes.LeaderElection.RetryPeriod,
 	}
 }
 
@@ -152,6 +171,13 @@ func (c *Config) ToImageServiceConfig() image.Config {
 		CDNDomain:              c.AWS.CloudFront.Images.DistributionDomain,
 		S3KeyPrefix:            c.AWS.S3.Prefix.Image,
 		ProcessDoneWaitTimeout: c.Service.Image.ProcessDoneWaitTimeout,
+	}
+}
+
+func (c *Config) ToImageCloserConfig() image.CloserConfig {
+	return image.CloserConfig{
+		CheckInterval:  c.Service.Image.ExpireCheckInterval,
+		CloseThreshold: c.AWS.S3.Presign.Expiry,
 	}
 }
 

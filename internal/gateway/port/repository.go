@@ -16,28 +16,29 @@ type Transactioner interface {
 
 type UserRepository interface {
 	FindByID(ctx context.Context, id string) (domain.User, error)
-	Upsert(ctx context.Context, user domain.User) (domain.User, error)
+	Upsert(context.Context, domain.User) (domain.User, error)
 }
 
 type ProjectRepository interface {
 	FindByID(ctx context.Context, id string) (domain.Project, error)
-	List(ctx context.Context, params domain.ListProjectsParams) (domain.Projects, error)
-	Create(ctx context.Context, proj domain.Project) (domain.Project, error)
-	Update(ctx context.Context, req domain.UpdateProjectRequest) (domain.Project, error)
+	List(context.Context, domain.ListProjectsParams) (domain.Projects, error)
+	Create(context.Context, domain.Project) (domain.Project, error)
+	Update(context.Context, domain.UpdateProjectRequest) (domain.Project, error)
 	Delete(ctx context.Context, id string) error
 }
 
 type ServiceAccountRepository interface {
 	FindByID(ctx context.Context, id string) (domain.ServiceAccount, error)
 	FindByAPIKeyHash(ctx context.Context, hash string) (domain.ServiceAccount, error)
-	List(ctx context.Context, params domain.ListServiceAccountsParams) (domain.ServiceAccounts, error)
-	Create(ctx context.Context, sa domain.ServiceAccount) (domain.ServiceAccount, error)
-	Update(ctx context.Context, req domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error)
+	List(context.Context, domain.ListServiceAccountsParams) (domain.ServiceAccounts, error)
+	Create(context.Context, domain.ServiceAccount) (domain.ServiceAccount, error)
+	Update(context.Context, domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error)
 	Delete(ctx context.Context, id string) error
 }
 
 type ImageRepository interface {
 	FindByID(ctx context.Context, id string) (domain.Image, error)
+	List(context.Context, domain.ListImagesParams) (domain.Images, error)
 	Create(context.Context, domain.Image) (domain.Image, error)
 	Update(context.Context, domain.UpdateImageRequest) (domain.Image, error)
 }

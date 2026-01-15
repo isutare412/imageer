@@ -450,7 +450,8 @@ components:
     ImageState:
       type: string
       enum:
-        - WAITING_UPLOAD
+        - UPLOAD_PENDING
+        - UPLOAD_EXPIRED
         - READY
         - FAILED
       description: The current state of the image.
@@ -462,7 +463,8 @@ components:
     ImageVariantState:
       type: string
       enum:
-        - WAITING_UPLOAD
+        - UPLOAD_PENDING
+        - UPLOAD_EXPIRED
         - PROCESSING
         - READY
         - FAILED

@@ -12,7 +12,8 @@ import (
 type VariantState string
 
 const (
-	VariantStateWaitingUpload VariantState = "WAITING_UPLOAD"
+	VariantStateUploadPending VariantState = "UPLOAD_PENDING"
+	VariantStateUploadExpired VariantState = "UPLOAD_EXPIRED"
 	VariantStateProcessing    VariantState = "PROCESSING"
 	VariantStateFailed        VariantState = "FAILED"
 	VariantStateReady         VariantState = "READY"
@@ -26,6 +27,8 @@ var (
 
 func (s VariantState) Validate() error {
 	switch s {
+	case VariantStateUploadPending:
+	case VariantStateUploadExpired:
 	case VariantStateProcessing:
 	case VariantStateFailed:
 	case VariantStateReady:
@@ -37,6 +40,10 @@ func (s VariantState) Validate() error {
 
 func (s VariantState) ToProto() imageerv1.ImageVariantState {
 	switch s {
+	case VariantStateUploadPending:
+		return imageerv1.ImageVariantState_IMAGE_VARIANT_STATE_UPLOAD_PENDING
+	case VariantStateUploadExpired:
+		return imageerv1.ImageVariantState_IMAGE_VARIANT_STATE_UPLOAD_EXPIRED
 	case VariantStateProcessing:
 		return imageerv1.ImageVariantState_IMAGE_VARIANT_STATE_PROCESSING
 	case VariantStateFailed:

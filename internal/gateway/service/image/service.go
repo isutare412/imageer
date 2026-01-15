@@ -65,7 +65,7 @@ func (s *Service) GetWaitUntilProcessed(ctx context.Context, imageID string) (do
 		return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
 	}
 
-	if image.State != images.StateWaitingUpload {
+	if image.State != images.StateUploadPending {
 		return image, nil
 	}
 
@@ -104,7 +104,7 @@ func (s *Service) GetWaitUntilProcessed(ctx context.Context, imageID string) (do
 			return
 		}
 
-		if img.State != images.StateWaitingUpload {
+		if img.State != images.StateUploadPending {
 			imageRecheckCh <- img
 			close(imageRecheckCh)
 		}
@@ -158,7 +158,7 @@ func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadUR
 			ID:       imageID,
 			FileName: req.FileName,
 			Format:   req.Format,
-			State:    images.StateWaitingUpload,
+			State:    images.StateUploadPending,
 			S3Key:    s.imageS3Key(req.ProjectID, imageID, req.Format),
 			URL:      s.imagePublicURL(req.ProjectID, imageID, req.Format),
 			Project:  domain.ProjectReference{ID: req.ProjectID},
@@ -174,7 +174,7 @@ func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadUR
 			variant := domain.ImageVariant{
 				ID:      variantID,
 				Format:  preset.Format,
-				State:   images.VariantStateWaitingUpload,
+				State:   images.VariantStateUploadPending,
 				S3Key:   s.imageVariantS3Key(req.ProjectID, imageID, variantID, preset.Format),
 				URL:     s.imageVariantPublicURL(req.ProjectID, imageID, variantID, preset.Format),
 				ImageID: imageID,

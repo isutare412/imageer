@@ -83,6 +83,93 @@ func TestImageRepository_FindByID(t *testing.T) {
 	}
 }
 
+func TestImageRepository_List(t *testing.T) {
+	type testSet struct {
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		imageRepo     *postgres.ImageRepository
+		mock          sqlmock.Sqlmock
+
+		req     domain.ListImagesParams
+		setup   func(t *testing.T, tt *testSet)
+		wantErr bool
+	}
+
+	updatedAtBefore := time.Now().Add(-10 * time.Minute)
+
+	tests := []testSet{
+		{
+			name: "normal case",
+			req: domain.ListImagesParams{
+				Offset: lo.ToPtr(10),
+				Limit:  lo.ToPtr(20),
+				SearchFilter: domain.ImageSearchFilter{
+					State:           lo.ToPtr(images.StateUploadPending),
+					UpdatedAtBefore: &updatedAtBefore,
+				},
+				SortFilter: domain.ImageSortFilter{
+					UpdatedAt: true,
+					Direction: dbhelpers.SortDirectionDesc,
+				},
+			},
+			setup: func(t *testing.T, tt *testSet) {
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
+				tt.imageRepo = postgres.NewImageRepository(postgresClient)
+				tt.mock = mock
+
+				mock.ExpectBegin()
+				mock.ExpectQuery(
+					`SELECT * FROM "images" WHERE "state" = $1 AND "updated_at" < $2 `+
+						`ORDER BY "updated_at" DESC `+
+						`LIMIT $3 OFFSET $4`).
+					WithArgs(images.StateUploadPending, updatedAtBefore, 20, 10).
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Image]()).
+						AddRow("image-1", time.Now(), time.Now(), "file-1.jpg", images.FormatJPEG,
+							images.StateUploadPending, "s3-key-1", "url-1", "project-1"))
+				mock.ExpectQuery(`SELECT * FROM "projects" WHERE "projects"."id" = $1`).
+					WithArgs("project-1").
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
+						AddRow("project-1", time.Now(), time.Now(), "project-1"))
+				mock.ExpectQuery(`SELECT * FROM "image_variants" WHERE "image_variants"."image_id" = $1`).
+					WithArgs("image-1").
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.ImageVariant]()).
+						AddRow("variant-1", time.Now(), time.Now(), images.FormatWebp,
+							images.VariantStateReady, "s3-key-1", "url-1", "image-1", "preset-1"))
+				mock.ExpectQuery(`SELECT * FROM "presets" WHERE "presets"."id" = $1`).
+					WithArgs("preset-1").
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Preset]()).
+						AddRow("preset-1", time.Now(), time.Now(), "preset-name-1", false,
+							images.FormatWebp, images.Quality(90), nil, nil, nil, nil, "project-1"))
+				mock.ExpectQuery(
+					`SELECT COUNT(1) FROM "images" WHERE "state" = $1 AND "updated_at" < $2`).
+					WithArgs(images.StateUploadPending, updatedAtBefore).
+					WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(5))
+				mock.ExpectCommit()
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup(t, &tt)
+
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				_, err := tt.imageRepo.List(ctx, tt.req)
+				return err
+			})
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			err = tt.mock.ExpectationsWereMet()
+			require.NoError(t, err)
+		})
+	}
+}
+
 func TestImageRepository_Create(t *testing.T) {
 	type testSet struct {
 		name          string // description of this test case

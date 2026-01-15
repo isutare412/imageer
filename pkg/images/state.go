@@ -12,7 +12,8 @@ import (
 type State string
 
 const (
-	StateWaitingUpload State = "WAITING_UPLOAD"
+	StateUploadPending State = "UPLOAD_PENDING"
+	StateUploadExpired State = "UPLOAD_EXPIRED"
 	StateFailed        State = "FAILED"
 	StateReady         State = "READY"
 )
@@ -25,7 +26,8 @@ var (
 
 func (s State) Validate() error {
 	switch s {
-	case StateWaitingUpload:
+	case StateUploadPending:
+	case StateUploadExpired:
 	case StateFailed:
 	case StateReady:
 	default:
@@ -36,8 +38,10 @@ func (s State) Validate() error {
 
 func (s State) ToProto() imageerv1.ImageState {
 	switch s {
-	case StateWaitingUpload:
-		return imageerv1.ImageState_IMAGE_STATE_WAITING_UPLOAD
+	case StateUploadPending:
+		return imageerv1.ImageState_IMAGE_STATE_UPLOAD_PENDING
+	case StateUploadExpired:
+		return imageerv1.ImageState_IMAGE_STATE_UPLOAD_EXPIRED
 	case StateFailed:
 		return imageerv1.ImageState_IMAGE_STATE_FAILED
 	case StateReady:

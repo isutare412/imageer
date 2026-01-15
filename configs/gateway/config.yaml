@@ -7,6 +7,9 @@ web:
   show-banner: true
   show-openapi-docs: true
 
+kubernetes:
+  enabled: false
+
 database:
   use-in-memory: true
   postgres:

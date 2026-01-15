@@ -7,3 +7,8 @@ type Config struct {
 	S3KeyPrefix            string
 	ProcessDoneWaitTimeout time.Duration
 }
+
+type CloserConfig struct {
+	CheckInterval  time.Duration
+	CloseThreshold time.Duration
+}

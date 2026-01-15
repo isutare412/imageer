@@ -7,6 +7,7 @@ import (
 	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 	"github.com/isutare412/imageer/pkg/images"
 	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
 )
@@ -41,6 +42,33 @@ func (i Image) ToProto() *imageerv1.Image {
 type Images struct {
 	Items []Image
 	Total int64
+}
+
+type ListImagesParams struct {
+	Offset *int `validate:"omitempty,min=0"`
+	Limit  *int `validate:"omitempty,min=1,max=100"`
+
+	SearchFilter ImageSearchFilter
+	SortFilter   ImageSortFilter
+}
+
+func (p ListImagesParams) OffsetOrDefault() int {
+	return lo.FromPtrOr(p.Offset, -1)
+}
+
+func (p ListImagesParams) LimitOrDefault() int {
+	return lo.FromPtrOr(p.Limit, -1)
+}
+
+type ImageSearchFilter struct {
+	State           *images.State
+	UpdatedAtBefore *time.Time
+}
+
+type ImageSortFilter struct {
+	CreatedAt bool
+	UpdatedAt bool
+	Direction dbhelpers.SortDirection
 }
 
 type UpdateImageRequest struct {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -32,6 +33,40 @@ func (r *ImageRepository) FindByID(ctx context.Context, id string) (domain.Image
 	}
 
 	return img.ToDomain(), nil
+}
+
+func (r *ImageRepository) List(ctx context.Context, params domain.ListImagesParams,
+) (domain.Images, error) {
+	tx := GetTxOrDB(ctx, r.db)
+
+	// Fetch images
+	q := gorm.G[entity.Image](tx).Scopes()
+	q = applyImageSearchFilter(q, params.SearchFilter)
+	q = applyImageSortFilter(q, params.SortFilter)
+	q = applyPagination(q, params.LimitOrDefault(), params.OffsetOrDefault())
+	images, err := q.
+		Preload(gen.Image.Project.Name(), nil).
+		Preload(gen.Image.Variants.Name(), nil).
+		Preload(gen.Image.Variants.Name()+"."+gen.ImageVariant.Preset.Name(), nil).
+		Find(ctx)
+	if err != nil {
+		return domain.Images{}, dbhelpers.WrapGORMError(err, "Failed to list images")
+	}
+
+	// Fetch total count
+	q = gorm.G[entity.Image](tx).Scopes()
+	q = applyImageSearchFilter(q, params.SearchFilter)
+	totalCount, err := q.Count(ctx, "COUNT(1)")
+	if err != nil {
+		return domain.Images{}, dbhelpers.WrapGORMError(err, "Failed to count images")
+	}
+
+	return domain.Images{
+		Items: lo.Map(images, func(img entity.Image, _ int) domain.Image {
+			return img.ToDomain()
+		}),
+		Total: totalCount,
+	}, nil
 }
 
 func (r *ImageRepository) Create(ctx context.Context, image domain.Image) (domain.Image, error) {

@@ -7,14 +7,15 @@ import (
 )
 
 type Config struct {
-	Log      LogConfig      `koanf:"log"`
-	Web      WebConfig      `koanf:"web"`
-	Database DatabaseConfig `koanf:"database"`
-	Valkey   ValkeyConfig   `koanf:"valkey"`
-	Auth     AuthConfig     `koanf:"auth"`
-	Crypt    CryptConfig    `koanf:"crypt"`
-	AWS      AWSConfig      `koanf:"aws"`
-	Service  ServiceConfig  `koanf:"service"`
+	Log        LogConfig        `koanf:"log"`
+	Web        WebConfig        `koanf:"web"`
+	Kubernetes KubernetesConfig `koanf:"kubernetes"`
+	Database   DatabaseConfig   `koanf:"database"`
+	Valkey     ValkeyConfig     `koanf:"valkey"`
+	Auth       AuthConfig       `koanf:"auth"`
+	Crypt      CryptConfig      `koanf:"crypt"`
+	AWS        AWSConfig        `koanf:"aws"`
+	Service    ServiceConfig    `koanf:"service"`
 }
 
 type LogConfig struct {
@@ -31,6 +32,26 @@ type WebConfig struct {
 	WriteTimeout      time.Duration `koanf:"write-timeout" validate:"omitempty,gt=0"`
 	ReadTimeout       time.Duration `koanf:"read-timeout" validate:"omitempty,gt=0"`
 	ReadHeaderTimeout time.Duration `koanf:"read-header-timeout" validate:"omitempty,gt=0"`
+}
+
+type KubernetesConfig struct {
+	Enabled bool `koanf:"enabled"`
+
+	Config struct {
+		UseInCluster bool `koanf:"use-in-cluster"`
+		Kubeconfig   struct {
+			Path    string `koanf:"path"`
+			Context string `koanf:"context"`
+		} `koanf:"kubeconfig"`
+	} `koanf:"config"`
+
+	LeaderElection struct {
+		LeaseName      string        `koanf:"lease-name" validate:"required"`
+		LeaseNamespace string        `koanf:"lease-namespace" validate:"required"`
+		LeaseDuration  time.Duration `koanf:"lease-duration" validate:"required,gt=0"`
+		RenewDeadline  time.Duration `koanf:"renew-deadline" validate:"required,gt=0"`
+		RetryPeriod    time.Duration `koanf:"retry-period" validate:"required,gt=0"`
+	} `koanf:"leader-election"`
 }
 
 type DatabaseConfig struct {
@@ -163,5 +184,6 @@ type SQSConfig struct {
 type ServiceConfig struct {
 	Image struct {
 		ProcessDoneWaitTimeout time.Duration `koanf:"process-done-wait-timeout" validate:"required,gt=0"`
+		ExpireCheckInterval    time.Duration `koanf:"expire-check-interval" validate:"required,gt=0"`
 	} `koanf:"image"`
 }

@@ -12,7 +12,9 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/config"
 	"github.com/isutare412/imageer/internal/gateway/crypt"
 	"github.com/isutare412/imageer/internal/gateway/jwt"
+	"github.com/isutare412/imageer/internal/gateway/kubernetes"
 	"github.com/isutare412/imageer/internal/gateway/oidc"
+	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/internal/gateway/postgres"
 	"github.com/isutare412/imageer/internal/gateway/s3"
 	"github.com/isutare412/imageer/internal/gateway/service/auth"
@@ -31,6 +33,7 @@ type application struct {
 	postgresClient            *postgres.Client
 	valkeyClient              *valkey.Client
 	imageProcessResultHandler *valkey.ImageProcessResultHandler
+	leaderElector             leaderElector
 
 	cfg config.Config
 }
@@ -149,12 +152,38 @@ func newApplication(cfg config.Config) (*application, error) {
 	imageProcessResultHandler := valkey.NewImageProcessResultHandler(
 		cfg.ToValkeyImageProcessResultHandlerConfig(), valkeyClient, imageSvc)
 
+	slog.Info("Create image closer")
+	imageCloser := image.NewCloser(cfg.ToImageCloserConfig(), transactioner, imageRepo,
+		imageVarRepo)
+
+	handlers := []port.LeaderHandler{imageCloser}
+
+	var elector leaderElector
+	if cfg.Kubernetes.Enabled {
+		slog.Info("Create kubernetes client")
+		k8sClient, err := kubernetes.NewClient(cfg.ToKubernetesClientConfig())
+		if err != nil {
+			return nil, fmt.Errorf("creating kubernetes client: %w", err)
+		}
+
+		slog.Info("Create kubernetes leader elector")
+		elector, err = kubernetes.NewLeaderElector(cfg.ToKubernetesLeaderElectorConfig(),
+			k8sClient, handlers)
+		if err != nil {
+			return nil, fmt.Errorf("creating kubernetes leader elector: %w", err)
+		}
+	} else {
+		slog.Info("Create standalone elector")
+		elector = kubernetes.NewStandaloneElector(handlers)
+	}
+
 	return &application{
 		webServer:                 webServer,
 		imageUploadListener:       imageUploadListener,
 		postgresClient:            postgresClient,
 		valkeyClient:              valkeyClient,
 		imageProcessResultHandler: imageProcessResultHandler,
+		leaderElector:             elector,
 		cfg:                       cfg,
 	}, nil
 }
@@ -188,6 +217,9 @@ func (a *application) run() {
 	slog.Info("Run image process result handler")
 	a.imageProcessResultHandler.Run()
 
+	slog.Info("Run kubernetes leader elector")
+	a.leaderElector.Run()
+
 	slog.Info("Run web server")
 	webServerErrs := a.webServer.Run()
 
@@ -208,6 +240,9 @@ func (a *application) shutdown() {
 	if err := a.webServer.Shutdown(); err != nil {
 		slog.Error("Failed to shutdown web server", "error", err)
 	}
+
+	slog.Info("Shutdown kubernetes leader elector")
+	a.leaderElector.Shutdown()
 
 	slog.Info("Shutdown image upload listener")
 	a.imageUploadListener.Shutdown()
