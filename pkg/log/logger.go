@@ -71,11 +71,9 @@ func Init(cfg Config) {
 		middlewares = append(middlewares, newAttrConstantMiddleware(attrs...))
 	}
 
-	logger := slog.New(
-		slogmulti.
-			Pipe(middlewares...).
-			Handler(handler),
-	)
+	handler = slogmulti.Pipe(middlewares...).Handler(handler)
+	adaptKlog(handler)
 
+	logger := slog.New(handler)
 	slog.SetDefault(logger)
 }
