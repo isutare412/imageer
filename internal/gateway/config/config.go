@@ -75,6 +75,12 @@ type ValkeyConfig struct {
 			} `koanf:"reaper"`
 		} `koanf:"image-process-result"`
 	} `koanf:"streams"`
+
+	PubSub struct {
+		ImageProcessDone struct {
+			ChannelPrefix string `koanf:"channel-prefix" validate:"required"`
+		} `koanf:"image-process-done"`
+	} `koanf:"pubsub"`
 }
 
 type AuthConfig struct {

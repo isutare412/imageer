@@ -87,3 +87,11 @@ func (c ImageProcessResultHandlerConfig) ToStealerConfig(consumerName string,
 		MaxDeliveryAttempt: c.MaxDeliveryAttempt,
 	}
 }
+
+type ImageProcessDoneSubscriberConfig struct {
+	ChannelPrefix string
+}
+
+type ImageProcessDonePublisherConfig struct {
+	ChannelPrefix string
+}

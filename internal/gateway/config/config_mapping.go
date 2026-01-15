@@ -79,6 +79,18 @@ func (c *Config) ToValkeyImageProcessResultHandlerConfig() valkey.ImageProcessRe
 	}
 }
 
+func (c *Config) ToValkeyImageProcessDonePublisherConfig() valkey.ImageProcessDonePublisherConfig {
+	return valkey.ImageProcessDonePublisherConfig{
+		ChannelPrefix: c.Valkey.PubSub.ImageProcessDone.ChannelPrefix,
+	}
+}
+
+func (c *Config) ToValkeyImageProcessDoneSubscriberConfig() valkey.ImageProcessDoneSubscriberConfig {
+	return valkey.ImageProcessDoneSubscriberConfig{
+		ChannelPrefix: c.Valkey.PubSub.ImageProcessDone.ChannelPrefix,
+	}
+}
+
 func (c *Config) ToAuthServiceConfig() auth.ServiceConfig {
 	return auth.ServiceConfig{
 		StateCookieName: c.Auth.Cookies.OIDCState.Name,

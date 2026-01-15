@@ -44,6 +44,10 @@ valkey:
       reaper:
         min-idle-time: 1h
 
+  pubsub:
+    image-process-done:
+      channel-prefix: "imageer:local:image-process-done:"
+
 auth:
   cookies:
     oidc-state:
