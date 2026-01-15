@@ -345,6 +345,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/ProjectIdPath'
         - $ref: '#/components/parameters/ImageIdPath'
+        - $ref: '#/components/parameters/WaitUntilProcessedQuery'
       responses:
         '200':
           description: Successfully retrieved image details
@@ -421,6 +422,15 @@ components:
         type: integer
         format: int64
         example: 10
+
+    WaitUntilProcessedQuery:
+      name: waitUntilProcessed
+      in: query
+      description: Wait until the image processing is completed
+      schema:
+        type: boolean
+        default: false
+        example: false
 
   responses:
     ###

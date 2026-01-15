@@ -107,6 +107,14 @@ func newApplication(cfg config.Config) (*application, error) {
 	imageProcRequestQueue := valkey.NewImageProcessRequestQueue(
 		cfg.ToValkeyImageProcessRequestQueueConfig(), valkeyClient)
 
+	slog.Info("Create valkey image process done publisher")
+	imageProcDonePublisher := valkey.NewImageProcessDonePublisher(
+		cfg.ToValkeyImageProcessDonePublisherConfig(), valkeyClient)
+
+	slog.Info("Create valkey image process done subscriber")
+	imageProcDoneSubscriber := valkey.NewImageProcessDoneSubscriber(
+		cfg.ToValkeyImageProcessDoneSubscriberConfig(), valkeyClient)
+
 	slog.Info("Create auth service")
 	authSvc := auth.NewService(cfg.ToAuthServiceConfig(), oidcProvider,
 		aesCrypter, jwtSigner, jwtVerifier, userRepo)
@@ -118,7 +126,8 @@ func newApplication(cfg config.Config) (*application, error) {
 	projectSvc := project.NewService(projectRepo)
 
 	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, transactioner, imageRepo,
-		imageVarRepo, imageProcLogRepo, presetRepo, imageProcRequestQueue)
+		imageVarRepo, imageProcLogRepo, presetRepo, imageProcRequestQueue, imageProcDonePublisher,
+		imageProcDoneSubscriber)
 
 	slog.Info("Create web server")
 	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, imageSvc)

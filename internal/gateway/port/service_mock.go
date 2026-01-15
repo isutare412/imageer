@@ -352,6 +352,21 @@ func (mr *MockImageServiceMockRecorder) Get(ctx, imageID any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockImageService)(nil).Get), ctx, imageID)
 }
 
+// GetWaitUntilProcessed mocks base method.
+func (m *MockImageService) GetWaitUntilProcessed(ctx context.Context, imageID string) (domain.Image, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetWaitUntilProcessed", ctx, imageID)
+	ret0, _ := ret[0].(domain.Image)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetWaitUntilProcessed indicates an expected call of GetWaitUntilProcessed.
+func (mr *MockImageServiceMockRecorder) GetWaitUntilProcessed(ctx, imageID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWaitUntilProcessed", reflect.TypeOf((*MockImageService)(nil).GetWaitUntilProcessed), ctx, imageID)
+}
+
 // ReceiveImageProcessResult mocks base method.
 func (m *MockImageService) ReceiveImageProcessResult(arg0 context.Context, arg1 *imageerv1.ImageProcessResult) error {
 	m.ctrl.T.Helper()

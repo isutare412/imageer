@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
@@ -17,13 +18,15 @@ import (
 )
 
 type Service struct {
-	s3Presigner           port.S3Presigner
-	transactioner         port.Transactioner
-	imageRepo             port.ImageRepository
-	imageVarRepo          port.ImageVariantRepository
-	imageProcLogRepo      port.ImageProcessingLogRepository
-	presetRepo            port.PresetRepository
-	imageProcRequestQueue port.ImageProcessRequestQueue
+	s3Presigner             port.S3Presigner
+	transactioner           port.Transactioner
+	imageRepo               port.ImageRepository
+	imageVarRepo            port.ImageVariantRepository
+	imageProcLogRepo        port.ImageProcessingLogRepository
+	presetRepo              port.PresetRepository
+	imageProcRequestQueue   port.ImageProcessRequestQueue
+	imageProcDonePublisher  port.ImageProcessDonePublisher
+	imageProcDoneSubscriber port.ImageProcessDoneSubscriber
 
 	cfg Config
 }
@@ -32,16 +35,20 @@ func NewService(cfg Config, s3Presigner port.S3Presigner, transactioner port.Tra
 	imageRepo port.ImageRepository, imageVarRepo port.ImageVariantRepository,
 	imageProcLogRepo port.ImageProcessingLogRepository, presetRepo port.PresetRepository,
 	imageProcRequestQueue port.ImageProcessRequestQueue,
+	imageProcDonePublisher port.ImageProcessDonePublisher,
+	imageProcDoneSubscriber port.ImageProcessDoneSubscriber,
 ) *Service {
 	return &Service{
-		s3Presigner:           s3Presigner,
-		transactioner:         transactioner,
-		imageRepo:             imageRepo,
-		imageVarRepo:          imageVarRepo,
-		imageProcLogRepo:      imageProcLogRepo,
-		presetRepo:            presetRepo,
-		imageProcRequestQueue: imageProcRequestQueue,
-		cfg:                   cfg,
+		s3Presigner:             s3Presigner,
+		transactioner:           transactioner,
+		imageRepo:               imageRepo,
+		imageVarRepo:            imageVarRepo,
+		imageProcLogRepo:        imageProcLogRepo,
+		presetRepo:              presetRepo,
+		imageProcRequestQueue:   imageProcRequestQueue,
+		imageProcDonePublisher:  imageProcDonePublisher,
+		imageProcDoneSubscriber: imageProcDoneSubscriber,
+		cfg:                     cfg,
 	}
 }
 
@@ -50,6 +57,75 @@ func (s *Service) Get(ctx context.Context, imageID string) (domain.Image, error)
 	if err != nil {
 		return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
 	}
+	return image, nil
+}
+
+func (s *Service) GetWaitUntilProcessed(ctx context.Context, imageID string) (domain.Image, error) {
+	image, err := s.imageRepo.FindByID(ctx, imageID)
+	if err != nil {
+		return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
+	}
+
+	if image.State != images.StateWaitingUpload {
+		return image, nil
+	}
+
+	var (
+		imageWaitCh    = make(chan domain.Image, 1)
+		imageRecheckCh = make(chan domain.Image, 1)
+		errorCh        = make(chan error, 1)
+	)
+
+	jobCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	// Wait for image processing done notification
+	go func() {
+		if err := s.imageProcDoneSubscriber.Wait(jobCtx, imageID); err != nil {
+			errorCh <- fmt.Errorf("waiting for image process done: %w", err)
+			return
+		}
+
+		img, err := s.imageRepo.FindByID(jobCtx, imageID)
+		if err != nil {
+			errorCh <- fmt.Errorf("finding image by ID: %w", err)
+			return
+		}
+
+		imageWaitCh <- img
+		close(imageWaitCh)
+	}()
+
+	// Recheck image state in case the notification is published before we start
+	// waiting
+	go func() {
+		img, err := s.imageRepo.FindByID(jobCtx, imageID)
+		if err != nil {
+			errorCh <- fmt.Errorf("finding image by ID: %w", err)
+			return
+		}
+
+		if img.State != images.StateWaitingUpload {
+			imageRecheckCh <- img
+			close(imageRecheckCh)
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return domain.Image{}, ctx.Err()
+	case err := <-errorCh:
+		if jobCtx.Err() != nil {
+			// If the job context timed out, fallback to returning upload waiting image
+			return image, nil
+		}
+		return domain.Image{}, err
+	case img := <-imageWaitCh:
+		image = img
+	case img := <-imageRecheckCh:
+		image = img
+	}
+
 	return image, nil
 }
 
@@ -225,6 +301,10 @@ func (s *Service) ReceiveImageProcessResult(ctx context.Context, res *imageerv1.
 	})
 	if err != nil {
 		return fmt.Errorf("during transaction: %w", err)
+	}
+
+	if _, err := s.imageProcDonePublisher.Publish(ctx, res.ImageId); err != nil {
+		return fmt.Errorf("publishing image process done notification: %w", err)
 	}
 
 	return nil

@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
@@ -17,7 +18,9 @@ func (h *handler) CreateUploadURL(ctx echo.Context, projectID ProjectIDPath) err
 
 	var req CreateUploadURLRequest
 	if err := ctx.Bind(&req); err != nil {
-		return apperr.NewError(apperr.CodeBadRequest).WithCause(err).WithSummary("Failed to parse request body")
+		return apperr.NewError(apperr.CodeBadRequest).
+			WithCause(err).
+			WithSummary("Failed to parse request body")
 	}
 
 	uploadURL, err := h.imageSvc.CreateUploadURL(rctx,
@@ -30,12 +33,25 @@ func (h *handler) CreateUploadURL(ctx echo.Context, projectID ProjectIDPath) err
 }
 
 // GetImage gets image details
-func (h *handler) GetImage(ctx echo.Context, projectID ProjectIDPath, imageID ImageIDPath) error {
+func (h *handler) GetImage(ctx echo.Context, projectID ProjectIDPath, imageID ImageIDPath,
+	params GetImageParams,
+) error {
 	rctx := ctx.Request().Context()
 
-	image, err := h.imageSvc.Get(rctx, string(imageID))
-	if err != nil {
-		return fmt.Errorf("getting image: %w", err)
+	var (
+		image domain.Image
+		err   error
+	)
+	if params.WaitUntilProcessed != nil && *params.WaitUntilProcessed {
+		image, err = h.imageSvc.GetWaitUntilProcessed(rctx, imageID)
+		if err != nil {
+			return fmt.Errorf("getting image with wait until processed: %w", err)
+		}
+	} else {
+		image, err = h.imageSvc.Get(rctx, string(imageID))
+		if err != nil {
+			return fmt.Errorf("getting image: %w", err)
+		}
 	}
 
 	return ctx.JSON(http.StatusOK, ImageToWeb(image))

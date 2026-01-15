@@ -34,6 +34,7 @@ type ProjectService interface {
 
 type ImageService interface {
 	Get(ctx context.Context, imageID string) (domain.Image, error)
+	GetWaitUntilProcessed(ctx context.Context, imageID string) (domain.Image, error)
 	CreateUploadURL(context.Context, domain.CreateUploadURLRequest) (domain.UploadURL, error)
 	StartImageProcessingOnUpload(ctx context.Context, s3Key string) error
 	ReceiveImageProcessResult(context.Context, *imageerv1.ImageProcessResult) error

@@ -438,6 +438,9 @@ type ProjectIDPath = string
 // ServiceAccountIDPath defines model for ServiceAccountIdPath.
 type ServiceAccountIDPath = string
 
+// WaitUntilProcessedQuery defines model for WaitUntilProcessedQuery.
+type WaitUntilProcessedQuery = bool
+
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse = AppError
 
@@ -466,6 +469,12 @@ type FinishGoogleSignInParams struct {
 
 	// State The state parameter to prevent CSRF attacks.
 	State string `form:"state" json:"state"`
+}
+
+// GetImageParams defines parameters for GetImage.
+type GetImageParams struct {
+	// WaitUntilProcessed Wait until the image processing is completed
+	WaitUntilProcessed *WaitUntilProcessedQuery `form:"waitUntilProcessed,omitempty" json:"waitUntilProcessed,omitempty"`
 }
 
 // CreateProjectAdminJSONRequestBody defines body for CreateProjectAdmin for application/json ContentType.
@@ -617,7 +626,7 @@ type ClientInterface interface {
 	CreateUploadURL(ctx context.Context, projectID ProjectIDPath, body CreateUploadURLJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetImage request
-	GetImage(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetImage(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, params *GetImageParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetCurrentUser request
 	GetCurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -875,8 +884,8 @@ func (c *Client) CreateUploadURL(ctx context.Context, projectID ProjectIDPath, b
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetImage(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetImageRequest(c.Server, projectID, imageID)
+func (c *Client) GetImage(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, params *GetImageParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetImageRequest(c.Server, projectID, imageID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1552,7 +1561,7 @@ func NewCreateUploadURLRequestWithBody(server string, projectID ProjectIDPath, c
 }
 
 // NewGetImageRequest generates requests for GetImage
-func NewGetImageRequest(server string, projectID ProjectIDPath, imageID ImageIDPath) (*http.Request, error) {
+func NewGetImageRequest(server string, projectID ProjectIDPath, imageID ImageIDPath, params *GetImageParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1582,6 +1591,28 @@ func NewGetImageRequest(server string, projectID ProjectIDPath, imageID ImageIDP
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.WaitUntilProcessed != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "waitUntilProcessed", runtime.ParamLocationQuery, *params.WaitUntilProcessed); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -1720,7 +1751,7 @@ type ClientWithResponsesInterface interface {
 	CreateUploadURLWithResponse(ctx context.Context, projectID ProjectIDPath, body CreateUploadURLJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateUploadURLResponse, error)
 
 	// GetImageWithResponse request
-	GetImageWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*GetImageResponse, error)
+	GetImageWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, params *GetImageParams, reqEditors ...RequestEditorFn) (*GetImageResponse, error)
 
 	// GetCurrentUserWithResponse request
 	GetCurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCurrentUserResponse, error)
@@ -2297,8 +2328,8 @@ func (c *ClientWithResponses) CreateUploadURLWithResponse(ctx context.Context, p
 }
 
 // GetImageWithResponse request returning *GetImageResponse
-func (c *ClientWithResponses) GetImageWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*GetImageResponse, error) {
-	rsp, err := c.GetImage(ctx, projectID, imageID, reqEditors...)
+func (c *ClientWithResponses) GetImageWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, params *GetImageParams, reqEditors ...RequestEditorFn) (*GetImageResponse, error) {
+	rsp, err := c.GetImage(ctx, projectID, imageID, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

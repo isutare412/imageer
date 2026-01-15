@@ -282,9 +282,9 @@ func (mr *MockClientInterfaceMockRecorder) GetCurrentUser(ctx any, reqEditors ..
 }
 
 // GetImage mocks base method.
-func (m *MockClientInterface) GetImage(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (m *MockClientInterface) GetImage(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, params *GetImageParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, imageID}
+	varargs := []any{ctx, projectID, imageID, params}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -295,9 +295,9 @@ func (m *MockClientInterface) GetImage(ctx context.Context, projectID ProjectIDP
 }
 
 // GetImage indicates an expected call of GetImage.
-func (mr *MockClientInterfaceMockRecorder) GetImage(ctx, projectID, imageID any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetImage(ctx, projectID, imageID, params any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, imageID}, reqEditors...)
+	varargs := append([]any{ctx, projectID, imageID, params}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetImage", reflect.TypeOf((*MockClientInterface)(nil).GetImage), varargs...)
 }
 
@@ -766,9 +766,9 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) GetCurrentUserWithRespon
 }
 
 // GetImageWithResponse mocks base method.
-func (m *MockClientWithResponsesInterface) GetImageWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*GetImageResponse, error) {
+func (m *MockClientWithResponsesInterface) GetImageWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, params *GetImageParams, reqEditors ...RequestEditorFn) (*GetImageResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx, projectID, imageID}
+	varargs := []any{ctx, projectID, imageID, params}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -779,9 +779,9 @@ func (m *MockClientWithResponsesInterface) GetImageWithResponse(ctx context.Cont
 }
 
 // GetImageWithResponse indicates an expected call of GetImageWithResponse.
-func (mr *MockClientWithResponsesInterfaceMockRecorder) GetImageWithResponse(ctx, projectID, imageID any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientWithResponsesInterfaceMockRecorder) GetImageWithResponse(ctx, projectID, imageID, params any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx, projectID, imageID}, reqEditors...)
+	varargs := append([]any{ctx, projectID, imageID, params}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetImageWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).GetImageWithResponse), varargs...)
 }
 
