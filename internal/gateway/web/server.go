@@ -39,6 +39,9 @@ func NewServer(
 	e.HidePort = true
 	e.HideBanner = !cfg.ShowBanner
 	e.IPExtractor = echo.ExtractIPFromXFFHeader()
+	e.Server.WriteTimeout = cfg.WriteTimeout
+	e.Server.ReadTimeout = cfg.ReadTimeout
+	e.Server.ReadHeaderTimeout = cfg.ReadHeaderTimeout
 	e.Use(
 		withContextBag,
 		withLogAttrContext,

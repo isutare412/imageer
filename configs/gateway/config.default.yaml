@@ -8,6 +8,9 @@ web:
   port: 8080
   show-banner: false
   show-openapi-docs: false
+  write-timeout: 60s
+  read-timeout: 60s
+  read-header-timeout: 10s
 
 database:
   use-in-memory: false
@@ -132,3 +135,7 @@ aws:
       visibility-timeout: 30s
       batch-handle-timeout: 25s
       handle-timeout: 20s
+
+service:
+  image:
+    process-done-wait-timeout: 30s

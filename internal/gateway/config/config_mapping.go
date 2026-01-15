@@ -29,11 +29,14 @@ func (c *Config) ToLogConfig() log.Config {
 
 func (c *Config) ToWebConfig() web.Config {
 	return web.Config{
-		Port:            c.Web.Port,
-		ShowBanner:      c.Web.ShowBanner,
-		ShowOpenAPIDocs: c.Web.ShowOpenAPIDocs,
-		APIKeyHeader:    c.Auth.ServiceAccount.APIKeyHeader,
-		UserCookieName:  c.Auth.Cookies.User.Name,
+		Port:              c.Web.Port,
+		ShowBanner:        c.Web.ShowBanner,
+		ShowOpenAPIDocs:   c.Web.ShowOpenAPIDocs,
+		APIKeyHeader:      c.Auth.ServiceAccount.APIKeyHeader,
+		UserCookieName:    c.Auth.Cookies.User.Name,
+		WriteTimeout:      c.Web.WriteTimeout,
+		ReadTimeout:       c.Web.ReadTimeout,
+		ReadHeaderTimeout: c.Web.ReadHeaderTimeout,
 	}
 }
 
@@ -146,8 +149,9 @@ func (c *Config) ToSQSImageUploadListenerConfig() sqs.ImageUploadListenerConfig 
 
 func (c *Config) ToImageServiceConfig() image.Config {
 	return image.Config{
-		CDNDomain:   c.AWS.CloudFront.Images.DistributionDomain,
-		S3KeyPrefix: c.AWS.S3.Prefix.Image,
+		CDNDomain:              c.AWS.CloudFront.Images.DistributionDomain,
+		S3KeyPrefix:            c.AWS.S3.Prefix.Image,
+		ProcessDoneWaitTimeout: c.Service.Image.ProcessDoneWaitTimeout,
 	}
 }
 

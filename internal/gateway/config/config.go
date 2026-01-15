@@ -14,6 +14,7 @@ type Config struct {
 	Auth     AuthConfig     `koanf:"auth"`
 	Crypt    CryptConfig    `koanf:"crypt"`
 	AWS      AWSConfig      `koanf:"aws"`
+	Service  ServiceConfig  `koanf:"service"`
 }
 
 type LogConfig struct {
@@ -24,9 +25,12 @@ type LogConfig struct {
 }
 
 type WebConfig struct {
-	Port            int  `koanf:"port" validate:"required,gt=0,lte=65535"`
-	ShowBanner      bool `koanf:"show-banner"`
-	ShowOpenAPIDocs bool `koanf:"show-openapi-docs"`
+	Port              int           `koanf:"port" validate:"required,gt=0,lte=65535"`
+	ShowBanner        bool          `koanf:"show-banner"`
+	ShowOpenAPIDocs   bool          `koanf:"show-openapi-docs"`
+	WriteTimeout      time.Duration `koanf:"write-timeout" validate:"omitempty,gt=0"`
+	ReadTimeout       time.Duration `koanf:"read-timeout" validate:"omitempty,gt=0"`
+	ReadHeaderTimeout time.Duration `koanf:"read-header-timeout" validate:"omitempty,gt=0"`
 }
 
 type DatabaseConfig struct {
@@ -154,4 +158,10 @@ type SQSConfig struct {
 		BatchHandleTimeout time.Duration `koanf:"batch-handle-timeout" validate:"required,gt=0,lte=10m"`
 		HandleTimeout      time.Duration `koanf:"handle-timeout" validate:"required,gt=0,lte=10m"`
 	} `koanf:"image-upload-event-queue"`
+}
+
+type ServiceConfig struct {
+	Image struct {
+		ProcessDoneWaitTimeout time.Duration `koanf:"process-done-wait-timeout" validate:"required,gt=0"`
+	} `koanf:"image"`
 }

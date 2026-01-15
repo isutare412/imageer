@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
@@ -76,7 +75,7 @@ func (s *Service) GetWaitUntilProcessed(ctx context.Context, imageID string) (do
 		errorCh        = make(chan error, 1)
 	)
 
-	jobCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	jobCtx, cancel := context.WithTimeout(ctx, s.cfg.ProcessDoneWaitTimeout)
 	defer cancel()
 
 	// Wait for image processing done notification
