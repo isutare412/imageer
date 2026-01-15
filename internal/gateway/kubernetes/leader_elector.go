@@ -58,24 +58,26 @@ func (e *LeaderElector) Run() {
 		},
 	}
 
-	for {
-		select {
-		case <-e.lifetimeCtx.Done():
-			return
-		default:
-		}
+	go func() {
+		for {
+			select {
+			case <-e.lifetimeCtx.Done():
+				return
+			default:
+			}
 
-		leaderelection.RunOrDie(e.lifetimeCtx, leaderelection.LeaderElectionConfig{
-			Lock:          lock,
-			LeaseDuration: e.cfg.LeaseDuration,
-			RenewDeadline: e.cfg.RenewDeadline,
-			RetryPeriod:   e.cfg.RetryPeriod,
-			Callbacks: leaderelection.LeaderCallbacks{
-				OnStartedLeading: e.onStartedLeading,
-				OnStoppedLeading: e.onStoppedLeading,
-			},
-		})
-	}
+			leaderelection.RunOrDie(e.lifetimeCtx, leaderelection.LeaderElectionConfig{
+				Lock:          lock,
+				LeaseDuration: e.cfg.LeaseDuration,
+				RenewDeadline: e.cfg.RenewDeadline,
+				RetryPeriod:   e.cfg.RetryPeriod,
+				Callbacks: leaderelection.LeaderCallbacks{
+					OnStartedLeading: e.onStartedLeading,
+					OnStoppedLeading: e.onStoppedLeading,
+				},
+			})
+		}
+	}()
 }
 
 func (e *LeaderElector) Shutdown() {
