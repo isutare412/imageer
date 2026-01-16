@@ -35,4 +35,5 @@ COPY configs/gateway/config.default.yaml ./configs/
 
 EXPOSE 8080
 
-CMD ["./gateway", "-configs", "configs"]
+ENTRYPOINT [ "./gateway" ]
+CMD ["-configs", "configs"]

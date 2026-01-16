@@ -39,4 +39,5 @@ COPY --from=builder /app/processor .
 # Copy config file
 COPY configs/processor/config.default.yaml ./configs/
 
-CMD ["./processor", "-configs", "configs"]
+ENTRYPOINT [ "./processor" ]
+CMD ["-configs", "configs"]
