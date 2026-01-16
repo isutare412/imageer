@@ -1,6 +1,7 @@
 import createClient, { type Middleware } from 'openapi-fetch';
 import type { paths, components } from './schema';
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { toastStore } from '$lib/stores/toast.svelte';
 
 export type ApiClient = ReturnType<typeof createClient<paths>>;
 
@@ -62,7 +63,29 @@ export function createApiClient(options: ClientOptions = {}): ApiClient {
     },
   };
 
+  // Add middleware for error toast notifications (browser only)
+  const errorToastMiddleware: Middleware = {
+    async onResponse({ response }) {
+      if (typeof window !== 'undefined' && !response.ok) {
+        const status = response.status;
+        const body: AppError | null = await response
+          .clone()
+          .json()
+          .catch(() => null);
+        const message = body?.message ?? response.statusText;
+
+        if (status >= 500) {
+          toastStore.error(message);
+        } else if (status >= 400) {
+          toastStore.warning(message);
+        }
+      }
+      return response;
+    },
+  };
+
   client.use(credentialsMiddleware);
+  client.use(errorToastMiddleware);
 
   return client;
 }
