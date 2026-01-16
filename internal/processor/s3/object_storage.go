@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/samber/lo"
 
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/awshelpers"
@@ -50,11 +51,14 @@ func (s *ObjectStorage) Get(ctx context.Context, key string) ([]byte, error) {
 	return bodyBytes, nil
 }
 
-func (s *ObjectStorage) Put(ctx context.Context, key string, data []byte) error {
+func (s *ObjectStorage) Put(ctx context.Context, key string, data []byte,
+	contentType string,
+) error {
 	_, err := s.client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: &s.cfg.Bucket,
-		Key:    &key,
-		Body:   bytes.NewReader(data),
+		Bucket:      &s.cfg.Bucket,
+		Key:         &key,
+		Body:        bytes.NewReader(data),
+		ContentType: lo.EmptyableToPtr(contentType),
 	})
 	if err != nil {
 		return awshelpers.WrapS3Error(err, "Failed to put object %s", key)

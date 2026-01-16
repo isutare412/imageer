@@ -82,7 +82,8 @@ func (s *Service) processImage(ctx context.Context, req *imageerv1.ImageProcessR
 		return fmt.Errorf("processing image: %w", err)
 	}
 
-	if err := s.objectStorage.Put(ctx, req.Variant.S3Key, variant.Data); err != nil {
+	if err := s.objectStorage.Put(ctx, req.Variant.S3Key, variant.Data,
+		variant.Format.ContentType()); err != nil {
 		return fmt.Errorf("putting image variant: %w", err)
 	}
 

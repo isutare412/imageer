@@ -56,15 +56,15 @@ func (mr *MockObjectStorageMockRecorder) Get(ctx, key any) *gomock.Call {
 }
 
 // Put mocks base method.
-func (m *MockObjectStorage) Put(ctx context.Context, key string, data []byte) error {
+func (m *MockObjectStorage) Put(ctx context.Context, key string, data []byte, contentType string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Put", ctx, key, data)
+	ret := m.ctrl.Call(m, "Put", ctx, key, data, contentType)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Put indicates an expected call of Put.
-func (mr *MockObjectStorageMockRecorder) Put(ctx, key, data any) *gomock.Call {
+func (mr *MockObjectStorageMockRecorder) Put(ctx, key, data, contentType any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Put", reflect.TypeOf((*MockObjectStorage)(nil).Put), ctx, key, data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Put", reflect.TypeOf((*MockObjectStorage)(nil).Put), ctx, key, data, contentType)
 }
