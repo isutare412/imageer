@@ -12,13 +12,12 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "format": "prettier --write .",
     "lint": "prettier --check . && eslint .",
-    "generate:api": "openapi-typescript ../internal/gateway/web/openapi.yaml -o src/lib/api/schema.d.ts",
-    "postinstall": "pnpm run generate:api"
+    "generate:api": "openapi-typescript ../internal/gateway/web/openapi.yaml -o src/lib/api/schema.d.ts"
   },
   "devDependencies": {
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.39.1",
-    "@sveltejs/adapter-auto": "^7.0.0",
+    "@sveltejs/adapter-node": "^5.5.1",
     "@sveltejs/kit": "^2.49.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@tailwindcss/vite": "^4.1.17",
