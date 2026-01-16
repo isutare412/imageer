@@ -15,6 +15,12 @@ export const load: LayoutLoad = async ({ fetch, url }) => {
 
   const user = unwrap(result);
 
+  // Only admins can access the admin panel
+  if (user.role !== 'ADMIN') {
+    const loginUrl = '/login?error=unauthorized';
+    redirect(307, loginUrl);
+  }
+
   return {
     user,
   };

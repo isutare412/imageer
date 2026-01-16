@@ -1,5 +1,6 @@
 <script lang="ts">
   // Dashboard page - shown after login
+  let { data } = $props();
 </script>
 
 <div class="space-y-6">
@@ -11,24 +12,28 @@
 
   <!-- Stats cards -->
   <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-    <div class="card bg-base-100 shadow-sm">
+    <a href="/projects" class="card bg-base-100 shadow-sm transition-shadow hover:shadow-md">
       <div class="card-body">
         <h2 class="card-title text-base-content/70 text-base font-medium">Projects</h2>
-        <p class="text-3xl font-bold">-</p>
+        <p class="text-3xl font-bold">{data.stats.projects}</p>
       </div>
-    </div>
+    </a>
 
-    <div class="card bg-base-100 shadow-sm">
+    <a
+      href="/service-accounts"
+      class="card bg-base-100 shadow-sm transition-shadow hover:shadow-md"
+    >
       <div class="card-body">
         <h2 class="card-title text-base-content/70 text-base font-medium">Service Accounts</h2>
-        <p class="text-3xl font-bold">-</p>
+        <p class="text-3xl font-bold">{data.stats.serviceAccounts}</p>
       </div>
-    </div>
+    </a>
 
     <div class="card bg-base-100 shadow-sm">
       <div class="card-body">
         <h2 class="card-title text-base-content/70 text-base font-medium">Total Images</h2>
-        <p class="text-3xl font-bold">-</p>
+        <p class="text-base-content/40 text-3xl font-bold">-</p>
+        <p class="text-base-content/50 text-xs">Coming soon</p>
       </div>
     </div>
   </div>
@@ -38,7 +43,7 @@
     <div class="card-body">
       <h2 class="card-title text-lg">Quick Actions</h2>
       <div class="mt-2 flex flex-wrap gap-2">
-        <a href="/projects" class="btn btn-primary btn-sm">
+        <a href="/projects/new" class="btn btn-primary btn-sm">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"
@@ -55,7 +60,7 @@
           </svg>
           New Project
         </a>
-        <a href="/service-accounts" class="btn btn-outline btn-sm">
+        <a href="/service-accounts/new" class="btn btn-outline btn-sm">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"

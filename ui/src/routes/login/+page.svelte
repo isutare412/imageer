@@ -1,11 +1,23 @@
 <script lang="ts">
   import { page } from '$app/state';
+  import { goto } from '$app/navigation';
   import { PUBLIC_API_BASE_URL } from '$env/static/public';
+  import { toastStore } from '$lib';
 
   const signInUrl = $derived.by(() => {
     const redirect = page.url.searchParams.get('redirect');
     const base = `${PUBLIC_API_BASE_URL}/api/v1/auth/google/sign-in`;
     return redirect ? `${base}?redirect=${encodeURIComponent(redirect)}` : base;
+  });
+
+  // Show error toast if redirected with error
+  $effect(() => {
+    const error = page.url.searchParams.get('error');
+    if (error === 'unauthorized') {
+      toastStore.error('Access denied. Admin privileges are required.');
+      // Clear the error param from URL without navigation
+      goto('/login', { replaceState: true });
+    }
   });
 </script>
 
