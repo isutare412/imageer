@@ -179,6 +179,7 @@ func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 
 	// Delete removed presets
 	_, err = gorm.G[entity.Preset](tx).
+		Where(gen.Preset.ProjectID.Eq(projectID)).
 		Where(gen.Preset.ID.NotIn(presetIDs...)).
 		Delete(ctx)
 	if err != nil {

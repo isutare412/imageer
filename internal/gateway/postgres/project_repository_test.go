@@ -279,7 +279,8 @@ func TestProjectRepository_Update(t *testing.T) {
 						`($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
-					`DELETE FROM "presets" WHERE "id" NOT IN ($1,$2)`).
+					`DELETE FROM "presets" WHERE "project_id" = $1 AND "id" NOT IN ($2,$3)`).
+					WithArgs("project-1", sqlmock.AnyArg(), sqlmock.AnyArg()).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
 					`UPDATE "projects" SET "name"=$1,"updated_at"=$2 WHERE "id" = $3`).
