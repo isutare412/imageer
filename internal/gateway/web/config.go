@@ -11,4 +11,13 @@ type Config struct {
 	WriteTimeout      time.Duration
 	ReadTimeout       time.Duration
 	ReadHeaderTimeout time.Duration
+	CORS              CORSConfig
+}
+
+type CORSConfig struct {
+	AllowOrigins     []string
+	AllowHeaders     []string
+	AllowMethods     []string
+	AllowCredentials bool
+	MaxAge           time.Duration
 }

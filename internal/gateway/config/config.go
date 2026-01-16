@@ -32,6 +32,13 @@ type WebConfig struct {
 	WriteTimeout      time.Duration `koanf:"write-timeout" validate:"omitempty,gt=0"`
 	ReadTimeout       time.Duration `koanf:"read-timeout" validate:"omitempty,gt=0"`
 	ReadHeaderTimeout time.Duration `koanf:"read-header-timeout" validate:"omitempty,gt=0"`
+	CORS              struct {
+		AllowOrigins     string        `koanf:"allow-origins" validate:"required"`
+		AllowHeaders     string        `koanf:"allow-headers" validate:"required"`
+		AllowMethods     string        `koanf:"allow-methods" validate:"required"`
+		AllowCredentials bool          `koanf:"allow-credentials"`
+		MaxAge           time.Duration `koanf:"max-age" validate:"required,gt=0"`
+	} `koanf:"cors"`
 }
 
 type KubernetesConfig struct {

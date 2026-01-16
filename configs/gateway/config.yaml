@@ -6,6 +6,10 @@ log:
 web:
   show-banner: true
   show-openapi-docs: true
+  cors:
+    allow-origins: http://localhost:5173
+    allow-credentials: true
+    max-age: 3h
 
 kubernetes:
   enabled: false

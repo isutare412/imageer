@@ -38,6 +38,13 @@ func (c *Config) ToWebConfig() web.Config {
 		WriteTimeout:      c.Web.WriteTimeout,
 		ReadTimeout:       c.Web.ReadTimeout,
 		ReadHeaderTimeout: c.Web.ReadHeaderTimeout,
+		CORS: web.CORSConfig{
+			AllowOrigins:     parseCSV(c.Web.CORS.AllowOrigins, ","),
+			AllowHeaders:     parseCSV(c.Web.CORS.AllowHeaders, ","),
+			AllowMethods:     parseCSV(c.Web.CORS.AllowMethods, ","),
+			AllowCredentials: c.Web.CORS.AllowCredentials,
+			MaxAge:           c.Web.CORS.MaxAge,
+		},
 	}
 }
 

@@ -51,6 +51,13 @@ func NewServer(
 		accessLog,
 		respondError,
 		recoverPanic,
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     cfg.CORS.AllowOrigins,
+			AllowHeaders:     cfg.CORS.AllowHeaders,
+			AllowMethods:     cfg.CORS.AllowMethods,
+			AllowCredentials: cfg.CORS.AllowCredentials,
+			MaxAge:           int(cfg.CORS.MaxAge.Seconds()),
+		}),
 		openAPIValidator(),
 		passportIssuer.IssuePassport,
 		immigration.Immigrate,
