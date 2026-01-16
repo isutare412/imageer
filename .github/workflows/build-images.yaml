@@ -27,7 +27,9 @@ jobs:
           platforms: linux/amd64
           file: deployment/gateway.Dockerfile
           context: .
-          tags: redshoore/imageer-gateway:${{ github.ref_name }}
+          tags: |
+            redshoore/imageer-gateway:${{ github.ref_name }}
+            redshoore/imageer-gateway:latest
 
   build-processor:
     runs-on: ubuntu-24.04
@@ -50,7 +52,9 @@ jobs:
           platforms: linux/amd64
           file: deployment/processor.Dockerfile
           context: .
-          tags: redshoore/imageer-processor:${{ github.ref_name }}
+          tags: |
+            redshoore/imageer-processor:${{ github.ref_name }}
+            redshoore/imageer-processor:latest
 
   build-ui:
     runs-on: ubuntu-24.04
@@ -73,4 +77,6 @@ jobs:
           platforms: linux/amd64
           file: deployment/ui.Dockerfile
           context: ui
-          tags: redshoore/imageer-ui:${{ github.ref_name }}
+          tags: |
+            redshoore/imageer-ui:${{ github.ref_name }}
+            redshoore/imageer-ui:latest
