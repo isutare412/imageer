@@ -1,0 +1,291 @@
+# Default values for imageer-gateway.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: redshoore/imageer-gateway
+  # This sets the pull policy for images.
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set, a name is generated using the fullname template
+  name: ""
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: &port 8080
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe: {}
+  # httpGet:
+  #   path: /
+  #   port: http
+readinessProbe: {}
+  # httpGet:
+  #   path: /
+  #   port: http
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  horizontal:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80 # 0 to disable
+    targetMemoryUtilizationPercentage: 0 # 0 to disable
+  vertical:
+    enabled: false
+    updatePolicy:
+      updateMode: InPlaceOrRecreate
+      minReplicas: 2
+    resourcePolicy:
+      containerPolicies:
+        - containerName: '*'
+          controlledResources:
+            - memory
+            # - cpu
+          minAllowed:
+            memory: 100Mi
+            # cpu: 100m
+          maxAllowed:
+            memory: 1Gi
+            # cpu: 1
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+# Environment variables for the container.
+envs: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+config:
+  log:
+    format: json # pretty, text, json
+    level: info # debug, info, warn, error
+    add-source: false
+    component: imageer-gateway
+
+  web:
+    port: *port
+    show-banner: false
+    show-openapi-docs: false
+    write-timeout: 60s
+    read-timeout: 60s
+    read-header-timeout: 10s
+    cors:
+      allow-origins: "*"
+      allow-headers: Content-Type,Authorization
+      allow-methods: GET,POST,PUT,DELETE,OPTIONS
+      allow-credentials: false
+      max-age: 3h
+
+  kubernetes:
+    enabled: true
+
+    config:
+      use-in-cluster: true
+      kubeconfig:
+        path: "" # "" means ~/.kube/config
+        context: "" # "" means current-context
+
+    leader-election:
+      lease-name: imageer-gateway
+      lease-namespace: imageer
+      lease-duration: 15s
+      renew-deadline: 10s
+      retry-period: 2s
+
+  database:
+    use-in-memory: false
+    trace-log: false
+    postgres:
+      host: localhost
+      port: 5432
+      user: user
+      password: password
+      database: database_name
+
+  valkey:
+    addresses: localhost:6379
+    username: admin
+    password: complex_password
+
+    streams:
+      image-process-request:
+        stream-key: imageer:prod:image-process-request-stream
+        stream-size: 1000
+      image-process-result:
+        stream-key: imageer:prod:image-process-result-stream
+        group-name: gateway
+        handler:
+          concurrency: 5
+          timeout: 30s
+        reader:
+          batch-size: 10
+          block-timeout: 30s
+        stealer:
+          interval: 30s
+          min-idle-time: 1m
+          max-delivery-attempt: 3
+        reaper:
+          min-idle-time: 1h
+
+    pubsub:
+      image-process-done:
+        channel-prefix: "imageer:prod:image-process-done:"
+
+  auth:
+    cookies:
+      oidc-state:
+        name: OIDC_STATE
+        ttl: 5m
+      user:
+        name: USER
+        ttl: 720h
+
+    service-account:
+      api-key-header: X-API-KEY
+
+    jwt:
+      active-key-pair-name: 'example-key-pair'
+      key-pairs:
+        example-key-pair: # This key pair is for example NEVER use it in production
+          private: |
+            -----BEGIN RSA PRIVATE KEY-----
+            MIIEogIBAAKCAQEAoA4gTWFJPErSTxnVmEBaQylyG3lE9yB4AS1oIeZmBqpMMitS
+            LVV/9I3QXA5v4RqTpwLx1xhFQpZd3mdtDyrM4mTXasNo2dZedAiKrJp8opP/Xoj7
+            sWfUOj6rc2LrGmhBaOgKbHWSdm+rdoBfpz/27Ylsal5lYWQPBIi5xPxR5+v/E+7B
+            lI+fjig8dBNoLky07yzXSdIwm2Ee1IY97ykxseH4YYzMotaCVzaAWueTE57r8+Yf
+            /TY2tYf3AAgzf0pc+M1sf5XmAjNOiEWF9yJ4gYmo9luwfZGfvjl28LEg6nh2FCKs
+            hnuicYbgGc0iHpjphD7Yg3VwQSWmb6HAfMnzTwIDAQABAoIBACIvojqk4u2b1ZvL
+            mtGwPRdHTPYNSuu15avqtOk4uuYFjczRb/X64x+rAqwG8WKVOKBdgqY8qt50G4yb
+            brHkpGpeu5w0LLsKjJYgFO6U+LYJAmyAubHEyZG/PQOiRzEWv5HWrhNIcYYWh/sB
+            pGymvukxhxSZIPJSWtrPEU6/zgbJDPLUNCKXQr++I/68BYmaIfdRqZExzTxtWIQM
+            M4ILsHS2WlQuhCQc9Gv6NsBH3+mC/jnW3NiJ88GfbuOOEoVws2nRsxgsuGRju41/
+            zGw2AT2La1DpheBsjfFLJHh2DNZRfPi5V7ZRFsoU3nr60yK6wrj2rLnfBEiWNWx0
+            TDFKn1ECgYEAzHMJUjCmu0kXZhDV511w1/cEbbJSyI709RqsBgfC9RAYNc+udR/2
+            TVTTS88Guy2/UktMp0Ue8/2r5bAv4n6Bw6GMT/+egob7v+qwzjexMXwzv/kloqju
+            wsCtXJSjuRCMISDnQrnnbBUChp9NiHE1KYHELQux6sMWh3odHvZNKnsCgYEAyGl/
+            g9J0lwnCPTBJ5c+VrjKmlfGPmh4my+Gie9J+AKOQyoiiwKhYyl8Ppp60LgK3Qs91
+            6BHDIQCWvtmcldlnnmD//Pkck6Hpr7tBp1MhlkENnnCYW46VgY0zVfNAL9h9oJY2
+            P3x2IEjFl41GZG4KcJtYEu7mDAdSfrRhUpm2PD0CgYAM2LWfOntfjUoxGaG3NgHf
+            MCBRHEFjZMgzlod0oYw4hdhfmTsnFOkPFuNoAgw0Or2o2B5q7Ebzod7pQdbgbn6M
+            4lvEsxUssnqjJoYRjyJNL7a4u1kIDYFjL2Q1Swm2mTmU41JkuPW3ruJHvz7J8gMb
+            JpJDGlcFn1iNDrlBtsxGfQKBgDoARlZJV1LLETsSOaDYBhLHN+0XXx8UcNf6skKx
+            taPLssDa8HdfgWr4PhhTwAO853rffdkvItDvUbFkW2wG4nU0z4FQO1QCvRYN1L9v
+            UL4ij6V2IrIEvwIicmQCpWXzetA6CPMwuyM2zHDDA0dXjY/vdXrtRwjeKaLf43a7
+            Y8FlAoGARTd3fr/ZMWzim3dhB8VvbWAlYaSmfi4YEn82KOn/ug8vtaXs5au2mgYy
+            1RTwong6C6tzRtNq10xHnXc/pHdaX+rgrCWHJJ7O7cThvxa/OzuHUD47+nMeEZ6J
+            PNKwvj1x+XUpwIeUvtyd03PFDIdmn8nqdoBmtKYWvmYe3bWi+9s=
+            -----END RSA PRIVATE KEY-----
+          public: |
+            -----BEGIN PUBLIC KEY-----
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoA4gTWFJPErSTxnVmEBa
+            QylyG3lE9yB4AS1oIeZmBqpMMitSLVV/9I3QXA5v4RqTpwLx1xhFQpZd3mdtDyrM
+            4mTXasNo2dZedAiKrJp8opP/Xoj7sWfUOj6rc2LrGmhBaOgKbHWSdm+rdoBfpz/2
+            7Ylsal5lYWQPBIi5xPxR5+v/E+7BlI+fjig8dBNoLky07yzXSdIwm2Ee1IY97ykx
+            seH4YYzMotaCVzaAWueTE57r8+Yf/TY2tYf3AAgzf0pc+M1sf5XmAjNOiEWF9yJ4
+            gYmo9luwfZGfvjl28LEg6nh2FCKshnuicYbgGc0iHpjphD7Yg3VwQSWmb6HAfMnz
+            TwIDAQAB
+            -----END PUBLIC KEY-----
+
+    google:
+      client-id: <your-google-client-id>
+      client-secret: <your-google-client-secret>
+      callback-path: /api/v1/auth/google/sign-in/callback
+
+  crypt:
+    aes:
+      key: <random-length-complex-string>
+
+  aws:
+    s3:
+      bucket: imageer
+      prefix:
+        image: production/images
+      presign:
+        expiry: 10m
+
+    cloudfront:
+      images:
+        distribution-domain: https://example.cloudfront.net
+
+    sqs:
+      image-upload-event-queue:
+        queue-url: https://sqs.us-east-1.amazonaws.com/123456789012/queue-name
+        batch-count: 10
+        polling-wait-timeout: 20s
+        visibility-timeout: 30s
+        batch-handle-timeout: 25s
+        handle-timeout: 20s
+
+  service:
+    image:
+      process-done-wait-timeout: 30s
+      expire-check-interval: 1m
