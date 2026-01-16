@@ -39,8 +39,8 @@ export type UpdateServiceAccountRequest = Schemas['UpdateServiceAccountAdminRequ
 export type ReprocessImagesRequest = Schemas['ReprocessImagesAdminRequest'];
 
 export interface ClientOptions {
-	baseUrl?: string;
-	fetch?: typeof fetch;
+  baseUrl?: string;
+  fetch?: typeof fetch;
 }
 
 /**
@@ -48,23 +48,23 @@ export interface ClientOptions {
  * In SvelteKit, pass the `fetch` from load functions for proper SSR handling.
  */
 export function createApiClient(options: ClientOptions = {}): ApiClient {
-	const { baseUrl = '', fetch: customFetch } = options;
+  const { baseUrl = '', fetch: customFetch } = options;
 
-	const client = createClient<paths>({
-		baseUrl,
-		fetch: customFetch
-	});
+  const client = createClient<paths>({
+    baseUrl,
+    fetch: customFetch,
+  });
 
-	// Add middleware for handling credentials
-	const credentialsMiddleware: Middleware = {
-		async onRequest({ request }) {
-			return new Request(request, { credentials: 'include' });
-		}
-	};
+  // Add middleware for handling credentials
+  const credentialsMiddleware: Middleware = {
+    async onRequest({ request }) {
+      return new Request(request, { credentials: 'include' });
+    },
+  };
 
-	client.use(credentialsMiddleware);
+  client.use(credentialsMiddleware);
 
-	return client;
+  return client;
 }
 
 // Default client for browser usage
@@ -75,13 +75,15 @@ let browserClient: ApiClient | null = null;
  * Only use this in browser context, not in SSR.
  */
 export function getApiClient(): ApiClient {
-	if (typeof window === 'undefined') {
-		throw new Error('getApiClient() should only be called in browser context. Use createApiClient() with fetch in SSR.');
-	}
+  if (typeof window === 'undefined') {
+    throw new Error(
+      'getApiClient() should only be called in browser context. Use createApiClient() with fetch in SSR.'
+    );
+  }
 
-	if (!browserClient) {
-		browserClient = createApiClient({ baseUrl: PUBLIC_API_BASE_URL });
-	}
+  if (!browserClient) {
+    browserClient = createApiClient({ baseUrl: PUBLIC_API_BASE_URL });
+  }
 
-	return browserClient;
+  return browserClient;
 }
