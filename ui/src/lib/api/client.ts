@@ -1,5 +1,6 @@
 import createClient, { type Middleware } from 'openapi-fetch';
 import type { paths, components } from './schema';
+import { PUBLIC_API_BASE_URL } from '$env/static/public';
 
 export type ApiClient = ReturnType<typeof createClient<paths>>;
 
@@ -79,7 +80,7 @@ export function getApiClient(): ApiClient {
 	}
 
 	if (!browserClient) {
-		browserClient = createApiClient();
+		browserClient = createApiClient({ baseUrl: PUBLIC_API_BASE_URL });
 	}
 
 	return browserClient;

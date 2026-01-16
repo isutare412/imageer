@@ -146,6 +146,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/sign-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign out the current user */
+        post: operations["signOut"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{projectId}": {
         parameters: {
             query?: never;
@@ -721,6 +738,8 @@ export interface components {
         LimitQuery: number;
         /** @description Wait until the image processing is completed */
         WaitUntilProcessedQuery: boolean;
+        /** @description The path to redirect to after successful sign-in. Defaults to root path if not provided. */
+        RedirectQuery: string;
     };
     requestBodies: never;
     headers: never;
@@ -1029,7 +1048,10 @@ export interface operations {
     };
     startGoogleSignIn: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description The path to redirect to after successful sign-in. Defaults to root path if not provided. */
+                redirect?: components["parameters"]["RedirectQuery"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1067,6 +1089,25 @@ export interface operations {
                 headers: {
                     /** @description The URL to redirect the user to after signing in */
                     Location?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["ErrorResponse"];
+        };
+    };
+    signOut: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully signed out */
+            200: {
+                headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
