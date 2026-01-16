@@ -1,6 +1,6 @@
 import createClient, { type Middleware } from 'openapi-fetch';
 import type { paths, components } from './schema';
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 import { toastStore } from '$lib/stores/toast.svelte';
 
 export type ApiClient = ReturnType<typeof createClient<paths>>;
@@ -105,7 +105,7 @@ export function getApiClient(): ApiClient {
   }
 
   if (!browserClient) {
-    browserClient = createApiClient({ baseUrl: PUBLIC_API_BASE_URL });
+    browserClient = createApiClient({ baseUrl: env.PUBLIC_API_BASE_URL ?? '' });
   }
 
   return browserClient;

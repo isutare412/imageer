@@ -1,12 +1,12 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
-  import { PUBLIC_API_BASE_URL } from '$env/static/public';
+  import { env } from '$env/dynamic/public';
   import { toastStore } from '$lib';
 
   const signInUrl = $derived.by(() => {
     const redirect = page.url.searchParams.get('redirect');
-    const base = `${PUBLIC_API_BASE_URL}/api/v1/auth/google/sign-in`;
+    const base = `${env.PUBLIC_API_BASE_URL}/api/v1/auth/google/sign-in`;
     return redirect ? `${base}?redirect=${encodeURIComponent(redirect)}` : base;
   });
 
