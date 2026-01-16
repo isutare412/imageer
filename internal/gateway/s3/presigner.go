@@ -44,9 +44,15 @@ func (p *Presigner) PresignPutObject(ctx context.Context, req domain.PresignPutO
 		return domain.PresignPutObjectResponse{}, awshelpers.WrapS3Error(err, "Failed to presign")
 	}
 
+	// Ensure Content-Type is included in the header for the client to send
+	header := resp.SignedHeader
+	if req.ContentType != "" {
+		header.Set("Content-Type", req.ContentType)
+	}
+
 	return domain.PresignPutObjectResponse{
 		URL:      resp.URL,
-		Header:   resp.SignedHeader,
+		Header:   header,
 		ExpireAt: time.Now().UTC().Add(p.cfg.Expiry - 5*time.Second), // Subtract 5 seconds as buffer
 	}, nil
 }
