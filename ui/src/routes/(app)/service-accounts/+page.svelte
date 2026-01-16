@@ -60,6 +60,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Service Accounts | Imageer</title>
+</svelte:head>
+
 <div class="space-y-6">
   <!-- Page header -->
   <div class="flex items-center justify-between">

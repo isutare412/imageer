@@ -101,6 +101,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>New Project | Imageer</title>
+</svelte:head>
+
 <div class="space-y-6">
   <!-- Page header -->
   <div>

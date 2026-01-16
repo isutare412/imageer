@@ -21,6 +21,10 @@
   });
 </script>
 
+<svelte:head>
+  <title>Login | Imageer</title>
+</svelte:head>
+
 <div class="bg-base-200 flex min-h-screen items-center justify-center">
   <div class="card bg-base-100 w-full max-w-sm shadow-xl">
     <div class="card-body items-center text-center">

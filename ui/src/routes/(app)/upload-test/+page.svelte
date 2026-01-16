@@ -215,6 +215,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Upload Test | Imageer</title>
+</svelte:head>
+
 <div class="space-y-6">
   <!-- Page header -->
   <div>

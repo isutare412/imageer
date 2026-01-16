@@ -117,6 +117,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>{data.serviceAccount.name} | Imageer</title>
+</svelte:head>
+
 <div class="space-y-6">
   <!-- Page header -->
   <div class="flex items-start justify-between">

@@ -173,6 +173,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>{data.project.name} | Imageer</title>
+</svelte:head>
+
 <div class="space-y-6">
   <!-- Page header -->
   <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
