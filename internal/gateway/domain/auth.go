@@ -41,11 +41,12 @@ func (p UserTokenPayload) IsAdmin() bool {
 }
 
 type OIDCState struct {
-	OriginURL string `json:"originUrl"`
+	RedirectURL string `json:"redirectUrl"`
 }
 
 type StartGoogleSignInRequest struct {
-	HTTPReq *http.Request
+	HTTPReq      *http.Request
+	RedirectPath string
 }
 
 type StartGoogleSignInResponse struct {

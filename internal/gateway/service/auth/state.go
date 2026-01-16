@@ -10,9 +10,9 @@ import (
 	"github.com/isutare412/imageer/pkg/apperr"
 )
 
-func (s *Service) createOIDCState(r *http.Request) (string, error) {
+func (s *Service) createOIDCState(r *http.Request, redirectPath string) (string, error) {
 	state := domain.OIDCState{
-		OriginURL: httpReferer(r),
+		RedirectURL: httpRedirectURL(r, redirectPath),
 	}
 
 	stateBytes, err := json.Marshal(state)

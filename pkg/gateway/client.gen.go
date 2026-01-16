@@ -435,6 +435,9 @@ type OffsetQuery = int64
 // ProjectIDPath defines model for ProjectIdPath.
 type ProjectIDPath = string
 
+// RedirectQuery defines model for RedirectQuery.
+type RedirectQuery = string
+
 // ServiceAccountIDPath defines model for ServiceAccountIdPath.
 type ServiceAccountIDPath = string
 
@@ -460,6 +463,12 @@ type ListServiceAccountsAdminParams struct {
 
 	// Limit Limit for pagination
 	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// StartGoogleSignInParams defines parameters for StartGoogleSignIn.
+type StartGoogleSignInParams struct {
+	// Redirect The path to redirect to after successful sign-in. Defaults to root path if not provided.
+	Redirect *RedirectQuery `form:"redirect,omitempty" json:"redirect,omitempty"`
 }
 
 // FinishGoogleSignInParams defines parameters for FinishGoogleSignIn.
@@ -612,7 +621,7 @@ type ClientInterface interface {
 	UpdateServiceAccountAdmin(ctx context.Context, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// StartGoogleSignIn request
-	StartGoogleSignIn(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	StartGoogleSignIn(ctx context.Context, params *StartGoogleSignInParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// FinishGoogleSignIn request
 	FinishGoogleSignIn(ctx context.Context, params *FinishGoogleSignInParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -827,8 +836,8 @@ func (c *Client) UpdateServiceAccountAdmin(ctx context.Context, serviceAccountID
 	return c.Client.Do(req)
 }
 
-func (c *Client) StartGoogleSignIn(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewStartGoogleSignInRequest(c.Server)
+func (c *Client) StartGoogleSignIn(ctx context.Context, params *StartGoogleSignInParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewStartGoogleSignInRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1411,7 +1420,7 @@ func NewUpdateServiceAccountAdminRequestWithBody(server string, serviceAccountID
 }
 
 // NewStartGoogleSignInRequest generates requests for StartGoogleSignIn
-func NewStartGoogleSignInRequest(server string) (*http.Request, error) {
+func NewStartGoogleSignInRequest(server string, params *StartGoogleSignInParams) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1427,6 +1436,28 @@ func NewStartGoogleSignInRequest(server string) (*http.Request, error) {
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Redirect != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "redirect", runtime.ParamLocationQuery, *params.Redirect); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -1779,7 +1810,7 @@ type ClientWithResponsesInterface interface {
 	UpdateServiceAccountAdminWithResponse(ctx context.Context, serviceAccountID ServiceAccountIDPath, body UpdateServiceAccountAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountAdminResponse, error)
 
 	// StartGoogleSignInWithResponse request
-	StartGoogleSignInWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*StartGoogleSignInResponse, error)
+	StartGoogleSignInWithResponse(ctx context.Context, params *StartGoogleSignInParams, reqEditors ...RequestEditorFn) (*StartGoogleSignInResponse, error)
 
 	// FinishGoogleSignInWithResponse request
 	FinishGoogleSignInWithResponse(ctx context.Context, params *FinishGoogleSignInParams, reqEditors ...RequestEditorFn) (*FinishGoogleSignInResponse, error)
@@ -2351,8 +2382,8 @@ func (c *ClientWithResponses) UpdateServiceAccountAdminWithResponse(ctx context.
 }
 
 // StartGoogleSignInWithResponse request returning *StartGoogleSignInResponse
-func (c *ClientWithResponses) StartGoogleSignInWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*StartGoogleSignInResponse, error) {
-	rsp, err := c.StartGoogleSignIn(ctx, reqEditors...)
+func (c *ClientWithResponses) StartGoogleSignInWithResponse(ctx context.Context, params *StartGoogleSignInParams, reqEditors ...RequestEditorFn) (*StartGoogleSignInResponse, error) {
+	rsp, err := c.StartGoogleSignIn(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

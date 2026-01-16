@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/samber/lo"
@@ -38,7 +39,7 @@ func NewService(cfg ServiceConfig, oidcProvider port.OIDCProvider, crypter port.
 
 func (s *Service) StartGoogleSignIn(ctx context.Context, req domain.StartGoogleSignInRequest,
 ) (domain.StartGoogleSignInResponse, error) {
-	state, err := s.createOIDCState(req.HTTPReq)
+	state, err := s.createOIDCState(req.HTTPReq, req.RedirectPath)
 	if err != nil {
 		return domain.StartGoogleSignInResponse{}, fmt.Errorf("creating OIDC state: %w", err)
 	}
@@ -90,7 +91,7 @@ func (s *Service) FinishGoogleSignIn(ctx context.Context, req domain.FinishGoogl
 	}
 
 	return domain.FinishGoogleSignInResponse{
-		RedirectURL: state.OriginURL,
+		RedirectURL: state.RedirectURL,
 		OIDCCookie:  s.deleteOIDCStateCookie(),
 		UserCookie:  s.createUserCookie(token),
 	}, nil
@@ -123,6 +124,20 @@ func httpBaseURL(r *http.Request) string {
 	return fmt.Sprintf("%s://%s", scheme, r.Host)
 }
 
-func httpReferer(r *http.Request) string {
-	return cmp.Or(r.Referer(), httpBaseURL(r))
+func httpRedirectURL(r *http.Request, redirectPath string) string {
+	return httpRefererOrigin(r) + cmp.Or(redirectPath, "/")
+}
+
+func httpRefererOrigin(r *http.Request) string {
+	referer := r.Referer()
+	if referer == "" {
+		return httpBaseURL(r)
+	}
+
+	parsed, err := url.Parse(referer)
+	if err != nil {
+		return httpBaseURL(r)
+	}
+
+	return fmt.Sprintf("%s://%s", parsed.Scheme, parsed.Host)
 }

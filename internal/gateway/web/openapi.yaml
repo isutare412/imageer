@@ -253,6 +253,8 @@ paths:
       security: []
       tags:
         - Authentication
+      parameters:
+        - $ref: '#/components/parameters/RedirectQuery'
       responses:
         '302':
           description: Redirecting to Google Sign-In
@@ -443,6 +445,14 @@ components:
         type: boolean
         default: false
         example: false
+
+    RedirectQuery:
+      name: redirect
+      in: query
+      description: The path to redirect to after successful sign-in. Defaults to root path if not provided.
+      schema:
+        type: string
+        example: /projects
 
   responses:
     ###

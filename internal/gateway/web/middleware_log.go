@@ -38,6 +38,7 @@ func accessLog(next echo.HandlerFunc) echo.HandlerFunc {
 			slog.Int("status", resp.Status),
 			slog.String("method", req.Method),
 			slog.String("path", req.URL.Path),
+			slog.String("query", req.URL.RawQuery),
 			slog.String("remoteAddress", ctx.RealIP()),
 			slog.String("userAgent", req.UserAgent()),
 			slog.Duration("elapsedTime", time.Since(before)),

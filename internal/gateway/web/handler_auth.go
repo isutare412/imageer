@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/samber/lo"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 )
@@ -12,11 +13,12 @@ import (
 // Authentication handlers
 
 // StartGoogleSignIn starts Google Sign-In process
-func (h *handler) StartGoogleSignIn(ctx echo.Context) error {
+func (h *handler) StartGoogleSignIn(ctx echo.Context, params StartGoogleSignInParams) error {
 	rctx := ctx.Request().Context()
 
 	req := domain.StartGoogleSignInRequest{
-		HTTPReq: ctx.Request(),
+		HTTPReq:      ctx.Request(),
+		RedirectPath: lo.FromPtr(params.Redirect),
 	}
 	resp, err := h.authSvc.StartGoogleSignIn(rctx, req)
 	if err != nil {

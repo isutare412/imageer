@@ -462,9 +462,9 @@ func (mr *MockClientInterfaceMockRecorder) SignOut(ctx any, reqEditors ...any) *
 }
 
 // StartGoogleSignIn mocks base method.
-func (m *MockClientInterface) StartGoogleSignIn(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (m *MockClientInterface) StartGoogleSignIn(ctx context.Context, params *StartGoogleSignInParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx}
+	varargs := []any{ctx, params}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -475,9 +475,9 @@ func (m *MockClientInterface) StartGoogleSignIn(ctx context.Context, reqEditors 
 }
 
 // StartGoogleSignIn indicates an expected call of StartGoogleSignIn.
-func (mr *MockClientInterfaceMockRecorder) StartGoogleSignIn(ctx any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) StartGoogleSignIn(ctx, params any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx}, reqEditors...)
+	varargs := append([]any{ctx, params}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartGoogleSignIn", reflect.TypeOf((*MockClientInterface)(nil).StartGoogleSignIn), varargs...)
 }
 
@@ -966,9 +966,9 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) SignOutWithResponse(ctx 
 }
 
 // StartGoogleSignInWithResponse mocks base method.
-func (m *MockClientWithResponsesInterface) StartGoogleSignInWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*StartGoogleSignInResponse, error) {
+func (m *MockClientWithResponsesInterface) StartGoogleSignInWithResponse(ctx context.Context, params *StartGoogleSignInParams, reqEditors ...RequestEditorFn) (*StartGoogleSignInResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx}
+	varargs := []any{ctx, params}
 	for _, a := range reqEditors {
 		varargs = append(varargs, a)
 	}
@@ -979,9 +979,9 @@ func (m *MockClientWithResponsesInterface) StartGoogleSignInWithResponse(ctx con
 }
 
 // StartGoogleSignInWithResponse indicates an expected call of StartGoogleSignInWithResponse.
-func (mr *MockClientWithResponsesInterfaceMockRecorder) StartGoogleSignInWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+func (mr *MockClientWithResponsesInterfaceMockRecorder) StartGoogleSignInWithResponse(ctx, params any, reqEditors ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx}, reqEditors...)
+	varargs := append([]any{ctx, params}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartGoogleSignInWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).StartGoogleSignInWithResponse), varargs...)
 }
 
