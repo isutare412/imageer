@@ -57,6 +57,20 @@ func (mr *MockAuthServiceMockRecorder) FinishGoogleSignIn(arg0, arg1 any) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FinishGoogleSignIn", reflect.TypeOf((*MockAuthService)(nil).FinishGoogleSignIn), arg0, arg1)
 }
 
+// SignOut mocks base method.
+func (m *MockAuthService) SignOut(ctx context.Context) domain.SignOutResponse {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SignOut", ctx)
+	ret0, _ := ret[0].(domain.SignOutResponse)
+	return ret0
+}
+
+// SignOut indicates an expected call of SignOut.
+func (mr *MockAuthServiceMockRecorder) SignOut(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignOut", reflect.TypeOf((*MockAuthService)(nil).SignOut), ctx)
+}
+
 // StartGoogleSignIn mocks base method.
 func (m *MockAuthService) StartGoogleSignIn(arg0 context.Context, arg1 domain.StartGoogleSignInRequest) (domain.StartGoogleSignInResponse, error) {
 	m.ctrl.T.Helper()

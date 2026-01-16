@@ -64,3 +64,7 @@ type FinishGoogleSignInResponse struct {
 	OIDCCookie  *http.Cookie
 	UserCookie  *http.Cookie
 }
+
+type SignOutResponse struct {
+	UserCookie *http.Cookie
+}

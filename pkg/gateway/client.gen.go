@@ -617,6 +617,9 @@ type ClientInterface interface {
 	// FinishGoogleSignIn request
 	FinishGoogleSignIn(ctx context.Context, params *FinishGoogleSignInParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// SignOut request
+	SignOut(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetProject request
 	GetProject(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -838,6 +841,18 @@ func (c *Client) StartGoogleSignIn(ctx context.Context, reqEditors ...RequestEdi
 
 func (c *Client) FinishGoogleSignIn(ctx context.Context, params *FinishGoogleSignInParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewFinishGoogleSignInRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SignOut(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSignOutRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -1479,6 +1494,33 @@ func NewFinishGoogleSignInRequest(server string, params *FinishGoogleSignInParam
 	return req, nil
 }
 
+// NewSignOutRequest generates requests for SignOut
+func NewSignOutRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/auth/sign-out")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetProjectRequest generates requests for GetProject
 func NewGetProjectRequest(server string, projectID ProjectIDPath) (*http.Request, error) {
 	var err error
@@ -1741,6 +1783,9 @@ type ClientWithResponsesInterface interface {
 
 	// FinishGoogleSignInWithResponse request
 	FinishGoogleSignInWithResponse(ctx context.Context, params *FinishGoogleSignInParams, reqEditors ...RequestEditorFn) (*FinishGoogleSignInResponse, error)
+
+	// SignOutWithResponse request
+	SignOutWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*SignOutResponse, error)
 
 	// GetProjectWithResponse request
 	GetProjectWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*GetProjectResponse, error)
@@ -2052,6 +2097,28 @@ func (r FinishGoogleSignInResponse) StatusCode() int {
 	return 0
 }
 
+type SignOutResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r SignOutResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SignOutResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetProjectResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -2299,6 +2366,15 @@ func (c *ClientWithResponses) FinishGoogleSignInWithResponse(ctx context.Context
 		return nil, err
 	}
 	return ParseFinishGoogleSignInResponse(rsp)
+}
+
+// SignOutWithResponse request returning *SignOutResponse
+func (c *ClientWithResponses) SignOutWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*SignOutResponse, error) {
+	rsp, err := c.SignOut(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSignOutResponse(rsp)
 }
 
 // GetProjectWithResponse request returning *GetProjectResponse
@@ -2729,6 +2805,32 @@ func ParseFinishGoogleSignInResponse(rsp *http.Response) (*FinishGoogleSignInRes
 	}
 
 	response := &FinishGoogleSignInResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseSignOutResponse parses an HTTP response from a SignOutWithResponse call
+func ParseSignOutResponse(rsp *http.Response) (*SignOutResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SignOutResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

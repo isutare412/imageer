@@ -36,3 +36,13 @@ func (s *Service) createUserCookie(token string) *http.Cookie {
 		SameSite: http.SameSiteLaxMode,
 	}
 }
+
+func (s *Service) deleteUserCookie() *http.Cookie {
+	return &http.Cookie{
+		Name:     s.cfg.UserCookieName,
+		Path:     "/",
+		MaxAge:   -1, // Delete cookie immediately
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	}
+}

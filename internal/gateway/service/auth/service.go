@@ -106,6 +106,12 @@ func (s *Service) VerifyUserToken(
 	return payload, nil
 }
 
+func (s *Service) SignOut(ctx context.Context) domain.SignOutResponse {
+	return domain.SignOutResponse{
+		UserCookie: s.deleteUserCookie(),
+	}
+}
+
 func httpBaseURL(r *http.Request) string {
 	scheme := "http"
 	switch {

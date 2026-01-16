@@ -441,6 +441,26 @@ func (mr *MockClientInterfaceMockRecorder) ReprocessImagesAdminWithBody(ctx, pro
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReprocessImagesAdminWithBody", reflect.TypeOf((*MockClientInterface)(nil).ReprocessImagesAdminWithBody), varargs...)
 }
 
+// SignOut mocks base method.
+func (m *MockClientInterface) SignOut(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SignOut", varargs...)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SignOut indicates an expected call of SignOut.
+func (mr *MockClientInterfaceMockRecorder) SignOut(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignOut", reflect.TypeOf((*MockClientInterface)(nil).SignOut), varargs...)
+}
+
 // StartGoogleSignIn mocks base method.
 func (m *MockClientInterface) StartGoogleSignIn(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -923,6 +943,26 @@ func (mr *MockClientWithResponsesInterfaceMockRecorder) ReprocessImagesAdminWith
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, projectID, body}, reqEditors...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReprocessImagesAdminWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).ReprocessImagesAdminWithResponse), varargs...)
+}
+
+// SignOutWithResponse mocks base method.
+func (m *MockClientWithResponsesInterface) SignOutWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*SignOutResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range reqEditors {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SignOutWithResponse", varargs...)
+	ret0, _ := ret[0].(*SignOutResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SignOutWithResponse indicates an expected call of SignOutWithResponse.
+func (mr *MockClientWithResponsesInterfaceMockRecorder) SignOutWithResponse(ctx any, reqEditors ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, reqEditors...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignOutWithResponse", reflect.TypeOf((*MockClientWithResponsesInterface)(nil).SignOutWithResponse), varargs...)
 }
 
 // StartGoogleSignInWithResponse mocks base method.

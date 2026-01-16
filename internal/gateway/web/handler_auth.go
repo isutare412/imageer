@@ -45,3 +45,12 @@ func (h *handler) FinishGoogleSignIn(ctx echo.Context, params FinishGoogleSignIn
 	ctx.SetCookie(resp.UserCookie)
 	return ctx.Redirect(http.StatusFound, resp.RedirectURL)
 }
+
+// SignOut signs out the current user by clearing the user cookie
+func (h *handler) SignOut(ctx echo.Context) error {
+	rctx := ctx.Request().Context()
+
+	resp := h.authSvc.SignOut(rctx)
+	ctx.SetCookie(resp.UserCookie)
+	return ctx.NoContent(http.StatusOK)
+}
