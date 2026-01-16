@@ -1,8 +1,13 @@
 <script lang="ts">
   import './layout.css';
-  import { ToastContainer } from '$lib';
+  import { ToastContainer, themeStore } from '$lib';
+  import { onMount } from 'svelte';
 
   let { children } = $props();
+
+  onMount(() => {
+    themeStore.init();
+  });
 </script>
 
 <svelte:head>
