@@ -55,6 +55,18 @@ func buildPresetUpdateAssigners(req domain.UpsertPresetRequest) []clause.Assigne
 	if req.Default != nil {
 		assigners = append(assigners, gen.Preset.Default.Set(*req.Default))
 	}
+	if req.Format != nil {
+		assigners = append(assigners, gen.Preset.Format.Set(*req.Format))
+	}
+	if req.Quality != nil {
+		assigners = append(assigners, gen.Preset.Quality.Set(*req.Quality))
+	}
+	if req.Fit != nil {
+		assigners = append(assigners, gen.Preset.Fit.Set(*req.Fit))
+	}
+	if req.Anchor != nil {
+		assigners = append(assigners, gen.Preset.Anchor.Set(*req.Anchor))
+	}
 	if req.Width != nil {
 		assigners = append(assigners, gen.Preset.Width.Set(*req.Width))
 	}
