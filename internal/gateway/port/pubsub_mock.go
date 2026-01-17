@@ -79,16 +79,17 @@ func (m *MockImageProcessDoneSubscriber) EXPECT() *MockImageProcessDoneSubscribe
 	return m.recorder
 }
 
-// Wait mocks base method.
-func (m *MockImageProcessDoneSubscriber) Wait(ctx context.Context, imageID string) error {
+// Subscribe mocks base method.
+func (m *MockImageProcessDoneSubscriber) Subscribe(ctx context.Context, imageID string) (<-chan struct{}, <-chan error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Wait", ctx, imageID)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "Subscribe", ctx, imageID)
+	ret0, _ := ret[0].(<-chan struct{})
+	ret1, _ := ret[1].(<-chan error)
+	return ret0, ret1
 }
 
-// Wait indicates an expected call of Wait.
-func (mr *MockImageProcessDoneSubscriberMockRecorder) Wait(ctx, imageID any) *gomock.Call {
+// Subscribe indicates an expected call of Subscribe.
+func (mr *MockImageProcessDoneSubscriberMockRecorder) Subscribe(ctx, imageID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Wait", reflect.TypeOf((*MockImageProcessDoneSubscriber)(nil).Wait), ctx, imageID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockImageProcessDoneSubscriber)(nil).Subscribe), ctx, imageID)
 }

@@ -111,6 +111,7 @@ type ValkeyConfig struct {
 	PubSub struct {
 		ImageProcessDone struct {
 			ChannelPrefix string `koanf:"channel-prefix" validate:"required"`
+			MaxRetries    int    `koanf:"max-retries" validate:"gte=0"`
 		} `koanf:"image-process-done"`
 	} `koanf:"pubsub"`
 }

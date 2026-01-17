@@ -9,5 +9,7 @@ type ImageProcessDonePublisher interface {
 }
 
 type ImageProcessDoneSubscriber interface {
-	Wait(ctx context.Context, imageID string) error
+	// Subscribe returns a channel that emits struct{}{} on each notification.
+	// Channel closes when context is cancelled or on error.
+	Subscribe(ctx context.Context, imageID string) (<-chan struct{}, <-chan error)
 }

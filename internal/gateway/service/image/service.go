@@ -65,67 +65,50 @@ func (s *Service) GetWaitUntilProcessed(ctx context.Context, imageID string) (do
 		return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
 	}
 
-	if image.State != images.StateUploadPending {
+	if image.AllVariantsProcessed() {
 		return image, nil
 	}
-
-	var (
-		imageWaitCh    = make(chan domain.Image, 1)
-		imageRecheckCh = make(chan domain.Image, 1)
-		errorCh        = make(chan error, 1)
-	)
 
 	jobCtx, cancel := context.WithTimeout(ctx, s.cfg.ProcessDoneWaitTimeout)
 	defer cancel()
 
-	// Wait for image processing done notification
-	go func() {
-		if err := s.imageProcDoneSubscriber.Wait(jobCtx, imageID); err != nil {
-			errorCh <- fmt.Errorf("waiting for image process done: %w", err)
-			return
-		}
+	notifyCh, errorCh := s.imageProcDoneSubscriber.Subscribe(jobCtx, imageID)
 
-		img, err := s.imageRepo.FindByID(jobCtx, imageID)
-		if err != nil {
-			errorCh <- fmt.Errorf("finding image by ID: %w", err)
-			return
-		}
-
-		imageWaitCh <- img
-		close(imageWaitCh)
-	}()
-
-	// Recheck image state in case the notification is published before we start
-	// waiting
-	go func() {
-		img, err := s.imageRepo.FindByID(jobCtx, imageID)
-		if err != nil {
-			errorCh <- fmt.Errorf("finding image by ID: %w", err)
-			return
-		}
-
-		if img.State != images.StateUploadPending {
-			imageRecheckCh <- img
-			close(imageRecheckCh)
-		}
-	}()
-
-	select {
-	case <-ctx.Done():
-		return domain.Image{}, ctx.Err()
-	case err := <-errorCh:
-		if jobCtx.Err() != nil {
-			// If the job context timed out, fallback to returning upload waiting image
-			return image, nil
-		}
-		return domain.Image{}, err
-	case img := <-imageWaitCh:
-		image = img
-	case img := <-imageRecheckCh:
-		image = img
+	// NOTE: Recheck immediately (race condition: variant may have finished before subscribe)
+	image, err = s.imageRepo.FindByID(jobCtx, imageID)
+	if err != nil {
+		return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
+	}
+	if image.AllVariantsProcessed() {
+		return image, nil
 	}
 
-	return image, nil
+	// Loop until all variants done
+	for {
+		select {
+		case <-ctx.Done():
+			return domain.Image{}, ctx.Err()
+
+		case err, ok := <-errorCh:
+			if !ok {
+				return image, nil // Channel closed - return current state
+			}
+			return domain.Image{}, fmt.Errorf("subscribing: %w", err)
+
+		case _, ok := <-notifyCh:
+			if !ok {
+				return image, nil // Channel closed - return current state
+			}
+
+			image, err = s.imageRepo.FindByID(jobCtx, imageID)
+			if err != nil {
+				return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
+			}
+			if image.AllVariantsProcessed() {
+				return image, nil
+			}
+		}
+	}
 }
 
 func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadURLRequest,

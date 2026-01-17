@@ -80,3 +80,12 @@ func (s *VariantState) Scan(value any) error {
 	*s = VariantState(str)
 	return nil
 }
+
+func (s VariantState) IsTerminal() bool {
+	switch s {
+	case VariantStateReady, VariantStateFailed, VariantStateUploadExpired:
+		return true
+	default:
+		return false
+	}
+}

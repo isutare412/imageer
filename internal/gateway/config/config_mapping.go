@@ -117,6 +117,7 @@ func (c *Config) ToValkeyImageProcessDonePublisherConfig() valkey.ImageProcessDo
 func (c *Config) ToValkeyImageProcessDoneSubscriberConfig() valkey.ImageProcessDoneSubscriberConfig {
 	return valkey.ImageProcessDoneSubscriberConfig{
 		ChannelPrefix: c.Valkey.PubSub.ImageProcessDone.ChannelPrefix,
+		MaxRetries:    c.Valkey.PubSub.ImageProcessDone.MaxRetries,
 	}
 }
 

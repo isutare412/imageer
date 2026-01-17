@@ -199,6 +199,7 @@ config:
     pubsub:
       image-process-done:
         channel-prefix: "imageer:prod:image-process-done:"
+        max-retries: 3
 
   auth:
     cookies:

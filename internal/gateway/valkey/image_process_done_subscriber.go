@@ -8,28 +8,49 @@ import (
 )
 
 type ImageProcessDoneSubscriber struct {
-	subscriber *valkeypubsub.OneShotSubscriber
-	cfg        ImageProcessDoneSubscriberConfig
+	client *Client
+	cfg    ImageProcessDoneSubscriberConfig
 }
 
 func NewImageProcessDoneSubscriber(cfg ImageProcessDoneSubscriberConfig, c *Client,
 ) *ImageProcessDoneSubscriber {
 	return &ImageProcessDoneSubscriber{
-		subscriber: valkeypubsub.NewOneShotSubscriber(c.client),
-		cfg:        cfg,
+		client: c,
+		cfg:    cfg,
 	}
 }
 
-func (s *ImageProcessDoneSubscriber) Wait(ctx context.Context, imageID string) error {
+func (s *ImageProcessDoneSubscriber) Subscribe(ctx context.Context, imageID string,
+) (<-chan struct{}, <-chan error) {
 	channel := imageProcessDoneChannel(s.cfg.ChannelPrefix, imageID)
 
-	messageCh, errorCh := s.subscriber.Subscribe(ctx, channel)
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case err := <-errorCh:
-		return fmt.Errorf("subscribing image process done channel: %w", err)
-	case <-messageCh:
-		return nil
-	}
+	notifyCh := make(chan struct{}, 1)
+	errorCh := make(chan error, 1)
+
+	sub := valkeypubsub.NewSubscriber(s.client.client, s.cfg.MaxRetries)
+
+	go func() {
+		defer close(notifyCh)
+		defer close(errorCh)
+		defer sub.Close()
+
+		if err := sub.Subscribe(ctx, channel); err != nil {
+			errorCh <- fmt.Errorf("subscribing channel: %w", err)
+			return
+		}
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case err := <-sub.Errors():
+				errorCh <- err
+				return
+			case <-sub.Messages():
+				notifyCh <- struct{}{}
+			}
+		}
+	}()
+
+	return notifyCh, errorCh
 }

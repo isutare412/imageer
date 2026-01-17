@@ -39,6 +39,18 @@ func (i Image) ToProto() *imageerv1.Image {
 	}
 }
 
+func (i Image) AllVariantsProcessed() bool {
+	if len(i.Variants) == 0 {
+		return true
+	}
+	for _, v := range i.Variants {
+		if !v.State.IsTerminal() {
+			return false
+		}
+	}
+	return true
+}
+
 type Images struct {
 	Items []Image
 	Total int64
