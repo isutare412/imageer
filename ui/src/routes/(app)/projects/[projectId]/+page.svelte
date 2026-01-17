@@ -189,7 +189,9 @@
       </nav>
       <h1 class="mt-2 truncate text-2xl font-bold">{data.project.name}</h1>
       <p class="text-base-content/60 mt-1 text-sm">
-        Created {formatDate(data.project.createdAt)} · Updated {formatDate(data.project.updatedAt)}
+        {data.project.imageCount.toLocaleString()} images · Created {formatDate(
+          data.project.createdAt
+        )} · Updated {formatDate(data.project.updatedAt)}
       </p>
     </div>
     <div class="flex shrink-0 gap-2">

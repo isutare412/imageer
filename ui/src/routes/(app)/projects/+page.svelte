@@ -89,6 +89,7 @@
               <tr>
                 <th>Name</th>
                 <th>Presets</th>
+                <th>Images</th>
                 <th>Created</th>
                 <th>Updated</th>
                 <th class="w-24">Actions</th>
@@ -118,6 +119,9 @@
                         <span class="text-base-content/40 text-sm">No presets</span>
                       {/if}
                     </div>
+                  </td>
+                  <td class="text-base-content/80">
+                    {project.imageCount.toLocaleString()}
                   </td>
                   <td class="text-base-content/60">{formatDate(project.createdAt)}</td>
                   <td class="text-base-content/60">{formatDate(project.updatedAt)}</td>

@@ -456,6 +456,12 @@ export interface components {
             name: string;
             /** @description List of presets to apply to images of the project. */
             presets: components["schemas"]["Preset"][];
+            /**
+             * Format: int64
+             * @description The total number of images in the project.
+             * @example 42
+             */
+            imageCount: number;
         };
         Projects: {
             items: components["schemas"]["Project"][];

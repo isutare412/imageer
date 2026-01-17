@@ -8,7 +8,7 @@ export const load: PageLoad = async ({ fetch }) => {
   // Fetch stats in parallel
   const [projectsResult, serviceAccountsResult] = await Promise.all([
     client.GET('/api/v1/admin/projects', {
-      params: { query: { offset: 0, limit: 1 } },
+      params: { query: { offset: 0, limit: 100 } },
     }),
     client.GET('/api/v1/admin/service-accounts', {
       params: { query: { offset: 0, limit: 1 } },
@@ -18,10 +18,14 @@ export const load: PageLoad = async ({ fetch }) => {
   const projects = unwrap(projectsResult);
   const serviceAccounts = unwrap(serviceAccountsResult);
 
+  // Calculate total images across all projects
+  const totalImages = projects.items.reduce((sum, project) => sum + project.imageCount, 0);
+
   return {
     stats: {
       projects: projects.total,
       serviceAccounts: serviceAccounts.total,
+      totalImages,
     },
   };
 };

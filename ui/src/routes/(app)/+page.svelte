@@ -36,8 +36,7 @@
     <div class="card bg-base-100 shadow-sm">
       <div class="card-body">
         <h2 class="card-title text-base-content/70 text-base font-medium">Total Images</h2>
-        <p class="text-base-content/40 text-3xl font-bold">-</p>
-        <p class="text-base-content/50 text-xs">Coming soon</p>
+        <p class="text-3xl font-bold">{data.stats.totalImages.toLocaleString()}</p>
       </div>
     </div>
   </div>
