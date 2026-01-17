@@ -226,6 +226,9 @@ type Project struct {
 	// ID The unique identifier of the project.
 	ID string `json:"id"`
 
+	// ImageCount The total number of images in the project.
+	ImageCount int64 `json:"imageCount"`
+
 	// Name The name of the project.
 	Name string `json:"name"`
 

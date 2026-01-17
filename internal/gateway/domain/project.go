@@ -9,11 +9,12 @@ import (
 )
 
 type Project struct {
-	ID        string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name      string
-	Presets   []Preset
+	ID         string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	Name       string
+	Presets    []Preset
+	ImageCount int64
 }
 
 type ProjectReference struct {

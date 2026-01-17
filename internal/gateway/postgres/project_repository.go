@@ -36,7 +36,18 @@ func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Pro
 		return domain.Project{}, dbhelpers.WrapGORMError(err, "Failed to get project %s", id)
 	}
 
-	return proj.ToDomain(), nil
+	// Fetch image count
+	imageCount, err := gorm.G[entity.Image](tx).
+		Where(gen.Image.ProjectID.Eq(id)).
+		Count(ctx, "COUNT(1)")
+	if err != nil {
+		return domain.Project{}, dbhelpers.WrapGORMError(err,
+			"Failed to count images for project %s", id)
+	}
+
+	result := proj.ToDomain()
+	result.ImageCount = imageCount
+	return result, nil
 }
 
 func (r *ProjectRepository) List(
@@ -64,9 +75,20 @@ func (r *ProjectRepository) List(
 		return domain.Projects{}, dbhelpers.WrapGORMError(err, "Failed to count projects")
 	}
 
+	// Fetch image counts in batch
+	projectIDs := lo.Map(projects, func(p entity.Project, _ int) string {
+		return p.ID
+	})
+	imageCounts, err := r.getImageCountsByProjectIDs(ctx, tx, projectIDs)
+	if err != nil {
+		return domain.Projects{}, err
+	}
+
 	return domain.Projects{
 		Items: lo.Map(projects, func(p entity.Project, _ int) domain.Project {
-			return p.ToDomain()
+			proj := p.ToDomain()
+			proj.ImageCount = imageCounts[p.ID]
+			return proj
 		}),
 		Total: totalCount,
 	}, nil
@@ -187,4 +209,33 @@ func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 	}
 
 	return nil
+}
+
+func (r *ProjectRepository) getImageCountsByProjectIDs(
+	ctx context.Context, tx *gorm.DB, projectIDs []string,
+) (map[string]int64, error) {
+	if len(projectIDs) == 0 {
+		return make(map[string]int64), nil
+	}
+
+	type countResult struct {
+		ProjectID string `gorm:"column:project_id"`
+		Count     int64  `gorm:"column:count"`
+	}
+
+	var results []countResult
+	err := gorm.G[entity.Image](tx).
+		Select(gen.Image.ProjectID.Column().Name, "COUNT(1) AS count").
+		Where(gen.Image.ProjectID.In(projectIDs...)).
+		Group(gen.Image.ProjectID.Column().Name).
+		Scan(ctx, &results)
+	if err != nil {
+		return nil, dbhelpers.WrapGORMError(err, "Failed to count images by project")
+	}
+
+	counts := make(map[string]int64, len(projectIDs))
+	for _, r := range results {
+		counts[r.ProjectID] = r.Count
+	}
+	return counts, nil
 }

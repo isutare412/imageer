@@ -815,12 +815,18 @@ components:
           description: List of presets to apply to images of the project.
           items:
             $ref: '#/components/schemas/Preset'
+        imageCount:
+          type: integer
+          format: int64
+          description: The total number of images in the project.
+          example: 42
       required:
         - id
         - createdAt
         - updatedAt
         - name
         - presets
+        - imageCount
 
     Projects:
       type: object

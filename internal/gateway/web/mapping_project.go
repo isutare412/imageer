@@ -16,6 +16,7 @@ func ProjectToWeb(p domain.Project) Project {
 			func(t domain.Preset, _ int) Preset {
 				return PresetToWeb(t)
 			}),
+		ImageCount: p.ImageCount,
 	}
 }
 

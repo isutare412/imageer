@@ -48,6 +48,10 @@ func TestProjectRepository_FindByID(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Preset]()).
 						AddRow("preset-1", time.Now(), time.Now(), "preset-1", false, images.FormatWebp,
 							images.Quality(90), images.FitCover, nil, 100, 100, "project-1"))
+				mock.ExpectQuery(`SELECT COUNT(1) FROM "images" WHERE "project_id" = $1`).
+					WithArgs("project-1").
+					WillReturnRows(sqlmock.NewRows([]string{"count"}).
+						AddRow(5))
 				mock.ExpectCommit()
 			},
 			wantErr: false,
@@ -122,6 +126,10 @@ func TestProjectRepository_List(t *testing.T) {
 					`SELECT COUNT(1) FROM "projects" WHERE "name" = $1`).
 					WithArgs(tt.req.SearchFilter.Name).
 					WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(5))
+				mock.ExpectQuery(
+					`SELECT "project_id",COUNT(1) AS count FROM "images" WHERE "project_id" = $1 GROUP BY "project_id"`).
+					WithArgs("project-1").
+					WillReturnRows(sqlmock.NewRows([]string{"project_id", "count"}).AddRow("project-1", 3))
 				mock.ExpectCommit()
 			},
 			wantErr: false,
