@@ -21,7 +21,7 @@ type Image struct {
 	S3Key     string        `gorm:"size:1024"`
 	URL       string        `gorm:"size:1024"`
 
-	ProjectID string  `gorm:"size:36"`
+	ProjectID string  `gorm:"size:36; index"`
 	Project   Project `gorm:"constraint:OnDelete:SET NULL"`
 
 	Variants []ImageVariant `gorm:"constraint:OnDelete:SET NULL"`
