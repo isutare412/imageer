@@ -16,43 +16,97 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockImageProcessDonePublisher is a mock of ImageProcessDonePublisher interface.
-type MockImageProcessDonePublisher struct {
+// MockImageNotificationPublisher is a mock of ImageNotificationPublisher interface.
+type MockImageNotificationPublisher struct {
 	ctrl     *gomock.Controller
-	recorder *MockImageProcessDonePublisherMockRecorder
+	recorder *MockImageNotificationPublisherMockRecorder
 	isgomock struct{}
 }
 
-// MockImageProcessDonePublisherMockRecorder is the mock recorder for MockImageProcessDonePublisher.
-type MockImageProcessDonePublisherMockRecorder struct {
-	mock *MockImageProcessDonePublisher
+// MockImageNotificationPublisherMockRecorder is the mock recorder for MockImageNotificationPublisher.
+type MockImageNotificationPublisherMockRecorder struct {
+	mock *MockImageNotificationPublisher
 }
 
-// NewMockImageProcessDonePublisher creates a new mock instance.
-func NewMockImageProcessDonePublisher(ctrl *gomock.Controller) *MockImageProcessDonePublisher {
-	mock := &MockImageProcessDonePublisher{ctrl: ctrl}
-	mock.recorder = &MockImageProcessDonePublisherMockRecorder{mock}
+// NewMockImageNotificationPublisher creates a new mock instance.
+func NewMockImageNotificationPublisher(ctrl *gomock.Controller) *MockImageNotificationPublisher {
+	mock := &MockImageNotificationPublisher{ctrl: ctrl}
+	mock.recorder = &MockImageNotificationPublisherMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockImageProcessDonePublisher) EXPECT() *MockImageProcessDonePublisherMockRecorder {
+func (m *MockImageNotificationPublisher) EXPECT() *MockImageNotificationPublisherMockRecorder {
 	return m.recorder
 }
 
-// Publish mocks base method.
-func (m *MockImageProcessDonePublisher) Publish(ctx context.Context, imageID string) (int64, error) {
+// PublishProcessDone mocks base method.
+func (m *MockImageNotificationPublisher) PublishProcessDone(ctx context.Context, imageID string) (int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Publish", ctx, imageID)
+	ret := m.ctrl.Call(m, "PublishProcessDone", ctx, imageID)
 	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Publish indicates an expected call of Publish.
-func (mr *MockImageProcessDonePublisherMockRecorder) Publish(ctx, imageID any) *gomock.Call {
+// PublishProcessDone indicates an expected call of PublishProcessDone.
+func (mr *MockImageNotificationPublisherMockRecorder) PublishProcessDone(ctx, imageID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*MockImageProcessDonePublisher)(nil).Publish), ctx, imageID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PublishProcessDone", reflect.TypeOf((*MockImageNotificationPublisher)(nil).PublishProcessDone), ctx, imageID)
+}
+
+// PublishUploadDone mocks base method.
+func (m *MockImageNotificationPublisher) PublishUploadDone(ctx context.Context, imageID string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PublishUploadDone", ctx, imageID)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PublishUploadDone indicates an expected call of PublishUploadDone.
+func (mr *MockImageNotificationPublisherMockRecorder) PublishUploadDone(ctx, imageID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PublishUploadDone", reflect.TypeOf((*MockImageNotificationPublisher)(nil).PublishUploadDone), ctx, imageID)
+}
+
+// MockImageUploadDoneSubscriber is a mock of ImageUploadDoneSubscriber interface.
+type MockImageUploadDoneSubscriber struct {
+	ctrl     *gomock.Controller
+	recorder *MockImageUploadDoneSubscriberMockRecorder
+	isgomock struct{}
+}
+
+// MockImageUploadDoneSubscriberMockRecorder is the mock recorder for MockImageUploadDoneSubscriber.
+type MockImageUploadDoneSubscriberMockRecorder struct {
+	mock *MockImageUploadDoneSubscriber
+}
+
+// NewMockImageUploadDoneSubscriber creates a new mock instance.
+func NewMockImageUploadDoneSubscriber(ctrl *gomock.Controller) *MockImageUploadDoneSubscriber {
+	mock := &MockImageUploadDoneSubscriber{ctrl: ctrl}
+	mock.recorder = &MockImageUploadDoneSubscriberMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockImageUploadDoneSubscriber) EXPECT() *MockImageUploadDoneSubscriberMockRecorder {
+	return m.recorder
+}
+
+// Subscribe mocks base method.
+func (m *MockImageUploadDoneSubscriber) Subscribe(ctx context.Context, imageID string) (<-chan struct{}, <-chan error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Subscribe", ctx, imageID)
+	ret0, _ := ret[0].(<-chan struct{})
+	ret1, _ := ret[1].(<-chan error)
+	return ret0, ret1
+}
+
+// Subscribe indicates an expected call of Subscribe.
+func (mr *MockImageUploadDoneSubscriberMockRecorder) Subscribe(ctx, imageID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockImageUploadDoneSubscriber)(nil).Subscribe), ctx, imageID)
 }
 
 // MockImageProcessDoneSubscriber is a mock of ImageProcessDoneSubscriber interface.

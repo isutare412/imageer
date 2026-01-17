@@ -108,9 +108,17 @@ func (c *Config) ToValkeyImageProcessResultHandlerConfig() valkey.ImageProcessRe
 	}
 }
 
-func (c *Config) ToValkeyImageProcessDonePublisherConfig() valkey.ImageProcessDonePublisherConfig {
-	return valkey.ImageProcessDonePublisherConfig{
-		ChannelPrefix: c.Valkey.PubSub.ImageProcessDone.ChannelPrefix,
+func (c *Config) ToValkeyImageNotificationPublisherConfig() valkey.ImageNotificationPublisherConfig {
+	return valkey.ImageNotificationPublisherConfig{
+		UploadDoneChannelPrefix:  c.Valkey.PubSub.ImageUploadDone.ChannelPrefix,
+		ProcessDoneChannelPrefix: c.Valkey.PubSub.ImageProcessDone.ChannelPrefix,
+	}
+}
+
+func (c *Config) ToValkeyImageUploadDoneSubscriberConfig() valkey.ImageUploadDoneSubscriberConfig {
+	return valkey.ImageUploadDoneSubscriberConfig{
+		ChannelPrefix: c.Valkey.PubSub.ImageUploadDone.ChannelPrefix,
+		MaxRetries:    c.Valkey.PubSub.ImageUploadDone.MaxRetries,
 	}
 }
 

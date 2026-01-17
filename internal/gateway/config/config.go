@@ -109,6 +109,10 @@ type ValkeyConfig struct {
 	} `koanf:"streams"`
 
 	PubSub struct {
+		ImageUploadDone struct {
+			ChannelPrefix string `koanf:"channel-prefix" validate:"required"`
+			MaxRetries    int    `koanf:"max-retries" validate:"gte=0"`
+		} `koanf:"image-upload-done"`
 		ImageProcessDone struct {
 			ChannelPrefix string `koanf:"channel-prefix" validate:"required"`
 			MaxRetries    int    `koanf:"max-retries" validate:"gte=0"`

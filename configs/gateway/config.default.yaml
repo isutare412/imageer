@@ -70,6 +70,9 @@ valkey:
         min-idle-time: 1h
 
   pubsub:
+    image-upload-done:
+      channel-prefix: "imageer:local:image-upload-done:"
+      max-retries: 3
     image-process-done:
       channel-prefix: "imageer:local:image-process-done:"
       max-retries: 3

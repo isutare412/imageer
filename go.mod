@@ -43,6 +43,7 @@ require (
 	github.com/valkey-io/valkey-go v1.0.70
 	go.uber.org/mock v0.5.2
 	golang.org/x/oauth2 v0.30.0
+	golang.org/x/sync v0.19.0
 	google.golang.org/protobuf v1.36.11
 	gorm.io/cli/gorm v0.2.4
 	gorm.io/driver/postgres v1.6.0
@@ -126,7 +127,6 @@ require (
 	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3 // indirect
 	golang.org/x/mod v0.30.0 // indirect
 	golang.org/x/net v0.48.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/term v0.38.0 // indirect
 	golang.org/x/text v0.32.0 // indirect

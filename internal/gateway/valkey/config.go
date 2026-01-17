@@ -88,11 +88,17 @@ func (c ImageProcessResultHandlerConfig) ToStealerConfig(consumerName string,
 	}
 }
 
+type ImageUploadDoneSubscriberConfig struct {
+	ChannelPrefix string
+	MaxRetries    int
+}
+
 type ImageProcessDoneSubscriberConfig struct {
 	ChannelPrefix string
 	MaxRetries    int
 }
 
-type ImageProcessDonePublisherConfig struct {
-	ChannelPrefix string
+type ImageNotificationPublisherConfig struct {
+	UploadDoneChannelPrefix  string
+	ProcessDoneChannelPrefix string
 }

@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/port"
@@ -17,15 +19,16 @@ import (
 )
 
 type Service struct {
-	s3Presigner             port.S3Presigner
-	transactioner           port.Transactioner
-	imageRepo               port.ImageRepository
-	imageVarRepo            port.ImageVariantRepository
-	imageProcLogRepo        port.ImageProcessingLogRepository
-	presetRepo              port.PresetRepository
-	imageProcRequestQueue   port.ImageProcessRequestQueue
-	imageProcDonePublisher  port.ImageProcessDonePublisher
-	imageProcDoneSubscriber port.ImageProcessDoneSubscriber
+	s3Presigner                port.S3Presigner
+	transactioner              port.Transactioner
+	imageRepo                  port.ImageRepository
+	imageVarRepo               port.ImageVariantRepository
+	imageProcLogRepo           port.ImageProcessingLogRepository
+	presetRepo                 port.PresetRepository
+	imageProcRequestQueue      port.ImageProcessRequestQueue
+	imageNotificationPublisher port.ImageNotificationPublisher
+	imageUploadDoneSubscriber  port.ImageUploadDoneSubscriber
+	imageProcDoneSubscriber    port.ImageProcessDoneSubscriber
 
 	cfg Config
 }
@@ -34,20 +37,22 @@ func NewService(cfg Config, s3Presigner port.S3Presigner, transactioner port.Tra
 	imageRepo port.ImageRepository, imageVarRepo port.ImageVariantRepository,
 	imageProcLogRepo port.ImageProcessingLogRepository, presetRepo port.PresetRepository,
 	imageProcRequestQueue port.ImageProcessRequestQueue,
-	imageProcDonePublisher port.ImageProcessDonePublisher,
+	imageNotificationPublisher port.ImageNotificationPublisher,
+	imageUploadDoneSubscriber port.ImageUploadDoneSubscriber,
 	imageProcDoneSubscriber port.ImageProcessDoneSubscriber,
 ) *Service {
 	return &Service{
-		s3Presigner:             s3Presigner,
-		transactioner:           transactioner,
-		imageRepo:               imageRepo,
-		imageVarRepo:            imageVarRepo,
-		imageProcLogRepo:        imageProcLogRepo,
-		presetRepo:              presetRepo,
-		imageProcRequestQueue:   imageProcRequestQueue,
-		imageProcDonePublisher:  imageProcDonePublisher,
-		imageProcDoneSubscriber: imageProcDoneSubscriber,
-		cfg:                     cfg,
+		s3Presigner:                s3Presigner,
+		transactioner:              transactioner,
+		imageRepo:                  imageRepo,
+		imageVarRepo:               imageVarRepo,
+		imageProcLogRepo:           imageProcLogRepo,
+		presetRepo:                 presetRepo,
+		imageProcRequestQueue:      imageProcRequestQueue,
+		imageNotificationPublisher: imageNotificationPublisher,
+		imageUploadDoneSubscriber:  imageUploadDoneSubscriber,
+		imageProcDoneSubscriber:    imageProcDoneSubscriber,
+		cfg:                        cfg,
 	}
 }
 
@@ -65,50 +70,111 @@ func (s *Service) GetWaitUntilProcessed(ctx context.Context, imageID string) (do
 		return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
 	}
 
-	if image.AllVariantsProcessed() {
+	// Check if image is already fully processed (upload done and all variants processed)
+	if image.State != images.StateUploadPending && image.AllVariantsProcessed() {
 		return image, nil
 	}
 
-	jobCtx, cancel := context.WithTimeout(ctx, s.cfg.ProcessDoneWaitTimeout)
-	defer cancel()
+	jobCtx, jobCancel := context.WithTimeout(ctx, s.cfg.ProcessDoneWaitTimeout)
+	defer jobCancel()
 
-	notifyCh, errorCh := s.imageProcDoneSubscriber.Subscribe(jobCtx, imageID)
+	var (
+		resultImage domain.Image
+		resultErr   error
+		resultOnce  sync.Once
+	)
 
-	// NOTE: Recheck immediately (race condition: variant may have finished before subscribe)
-	image, err = s.imageRepo.FindByID(jobCtx, imageID)
+	setResult := func(img domain.Image, err error) {
+		resultOnce.Do(func() {
+			resultImage = img
+			resultErr = err
+			jobCancel() // Cancel context to stop all goroutines
+		})
+	}
+
+	checkImageState := func() {
+		img, err := s.imageRepo.FindByID(jobCtx, imageID)
+		if err != nil {
+			setResult(domain.Image{}, fmt.Errorf("finding image by ID: %w", err))
+			return
+		}
+		if img.State != images.StateUploadPending && img.AllVariantsProcessed() {
+			setResult(img, nil)
+		}
+	}
+
+	eg, egCtx := errgroup.WithContext(jobCtx)
+	subscribeReady := make(chan struct{}, 2)
+
+	// Goroutine for upload done notifications
+	eg.Go(func() error {
+		notifyCh, errorCh := s.imageUploadDoneSubscriber.Subscribe(egCtx, imageID)
+		subscribeReady <- struct{}{}
+		for {
+			select {
+			case <-egCtx.Done():
+				return nil
+			case err, ok := <-errorCh:
+				if !ok {
+					return nil
+				}
+				return fmt.Errorf("subscribing to upload done: %w", err)
+			case _, ok := <-notifyCh:
+				if !ok {
+					return nil
+				}
+				checkImageState()
+			}
+		}
+	})
+
+	// Goroutine for process done notifications
+	eg.Go(func() error {
+		notifyCh, errorCh := s.imageProcDoneSubscriber.Subscribe(egCtx, imageID)
+		subscribeReady <- struct{}{}
+		for {
+			select {
+			case <-egCtx.Done():
+				return nil
+			case err, ok := <-errorCh:
+				if !ok {
+					return nil
+				}
+				return fmt.Errorf("subscribing to process done: %w", err)
+			case _, ok := <-notifyCh:
+				if !ok {
+					return nil
+				}
+				checkImageState()
+			}
+		}
+	})
+
+	// NOTE: Recheck immediately after subscribing (race condition: may have finished before subscribe)
+	<-subscribeReady
+	<-subscribeReady
+	checkImageState()
+
+	if err := eg.Wait(); err != nil {
+		return domain.Image{}, err
+	}
+
+	// Return result if we got one
+	if resultImage.ID != "" || resultErr != nil {
+		return resultImage, resultErr
+	}
+
+	// If caller's context is cancelled, return error
+	if ctx.Err() != nil {
+		return domain.Image{}, ctx.Err()
+	}
+
+	// jobCtx timed out but caller is still waiting - return current image state
+	image, err = s.imageRepo.FindByID(ctx, imageID)
 	if err != nil {
 		return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
 	}
-	if image.AllVariantsProcessed() {
-		return image, nil
-	}
-
-	// Loop until all variants done
-	for {
-		select {
-		case <-ctx.Done():
-			return domain.Image{}, ctx.Err()
-
-		case err, ok := <-errorCh:
-			if !ok {
-				return image, nil // Channel closed - return current state
-			}
-			return domain.Image{}, fmt.Errorf("subscribing: %w", err)
-
-		case _, ok := <-notifyCh:
-			if !ok {
-				return image, nil // Channel closed - return current state
-			}
-
-			image, err = s.imageRepo.FindByID(jobCtx, imageID)
-			if err != nil {
-				return domain.Image{}, fmt.Errorf("finding image by ID: %w", err)
-			}
-			if image.AllVariantsProcessed() {
-				return image, nil
-			}
-		}
-	}
+	return image, nil
 }
 
 func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadURLRequest,
@@ -250,7 +316,11 @@ func (s *Service) StartImageProcessingOnUpload(ctx context.Context, s3Key string
 		}
 	}
 
-	slog.InfoContext(ctx, "Started image processing after client upload", "imageId", image.ID)
+	if _, err := s.imageNotificationPublisher.PublishUploadDone(ctx, image.ID); err != nil {
+		return fmt.Errorf("publishing image upload done notification: %w", err)
+	}
+
+	slog.InfoContext(ctx, "Request image processing after client upload", "imageId", image.ID)
 
 	return nil
 }
@@ -285,7 +355,7 @@ func (s *Service) ReceiveImageProcessResult(ctx context.Context, res *imageerv1.
 		return fmt.Errorf("during transaction: %w", err)
 	}
 
-	if _, err := s.imageProcDonePublisher.Publish(ctx, res.ImageId); err != nil {
+	if _, err := s.imageNotificationPublisher.PublishProcessDone(ctx, res.ImageId); err != nil {
 		return fmt.Errorf("publishing image process done notification: %w", err)
 	}
 
