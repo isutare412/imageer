@@ -1,21 +1,23 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation';
-  import {
-    getApiClient,
-    unwrap,
-    type UpdateProjectRequest,
-    type UpsertPresetRequest,
-  } from '$lib/api';
+  import { getApiClient, type UpdateProjectRequest, type UpsertPresetRequest } from '$lib/api';
   import { toastStore, FormField, PresetForm, Badge, ConfirmModal, type PresetData } from '$lib';
 
   let { data } = $props();
 
-  // Form state - initialized from project data (intentional one-time initialization)
+  // Form state (initial values synced via $effect below)
   // svelte-ignore state_referenced_locally
   let name = $state(data.project.name);
   // svelte-ignore state_referenced_locally
-  let presets = $state<PresetData[]>(
-    data.project.presets.map((p) => ({
+  let presets = $state<PresetData[]>(mapPresets(data.project.presets));
+
+  let saving = $state(false);
+  let errors = $state<{ name?: string }>({});
+  let deleteModal = $state({ open: false, loading: false });
+
+  // Helper to map API presets to local PresetData format
+  function mapPresets(apiPresets: typeof data.project.presets): PresetData[] {
+    return apiPresets.map((p) => ({
       id: p.id,
       name: p.name,
       default: p.default,
@@ -25,12 +27,14 @@
       anchor: p.anchor ?? '',
       width: p.width,
       height: p.height,
-    }))
-  );
+    }));
+  }
 
-  let saving = $state(false);
-  let errors = $state<{ name?: string }>({});
-  let deleteModal = $state({ open: false, loading: false });
+  // Sync form state when page data changes (e.g., on page refresh or navigation)
+  $effect(() => {
+    name = data.project.name;
+    presets = mapPresets(data.project.presets);
+  });
 
   // Track if form has been modified
   let isDirty = $derived.by(() => {
@@ -62,10 +66,6 @@
     if (firstPreset && !presets.some((p) => p.default)) {
       firstPreset.default = true;
     }
-  }
-
-  function updatePreset(index: number, preset: PresetData) {
-    presets = presets.map((p, i) => (i === index ? preset : p));
   }
 
   function validateForm(): boolean {
@@ -121,23 +121,9 @@
     });
 
     if (!result.error) {
-      const updated = unwrap(result);
       toastStore.success('Project updated successfully');
-      // Refresh the page data
+      // Refresh the page data - the $effect will sync form state from updated data
       await invalidateAll();
-      // Reset form state to match new data
-      name = updated.name;
-      presets = updated.presets.map((p) => ({
-        id: p.id,
-        name: p.name,
-        default: p.default,
-        format: p.format ?? '',
-        quality: p.quality,
-        fit: p.fit ?? '',
-        anchor: p.anchor ?? '',
-        width: p.width,
-        height: p.height,
-      }));
     }
 
     saving = false;
@@ -307,13 +293,14 @@
           </div>
         {:else}
           <div class="mt-4 space-y-4">
-            {#each presets as preset, index (preset.id ?? index)}
-              <PresetForm
-                {preset}
-                {index}
-                onremove={() => removePreset(index)}
-                onchange={(p) => updatePreset(index, p)}
-              />
+            {#each { length: presets.length } as _, index (presets[index]?.id ?? index)}
+              {#if presets[index]}
+                <PresetForm
+                  bind:preset={presets[index]}
+                  {index}
+                  onremove={() => removePreset(index)}
+                />
+              {/if}
             {/each}
           </div>
         {/if}

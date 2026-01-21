@@ -1,11 +1,11 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation';
-  import { getApiClient, unwrap, type UpdateServiceAccountRequest } from '$lib/api';
-  import { toastStore, FormField, Select, MultiSelect, Badge, ConfirmModal } from '$lib';
+  import { Badge, ConfirmModal, FormField, MultiSelect, Select, toastStore } from '$lib';
+  import { getApiClient, type UpdateServiceAccountRequest } from '$lib/api';
 
   let { data } = $props();
 
-  // Form state (intentional one-time initialization)
+  // Form state (synced via $effect below)
   // svelte-ignore state_referenced_locally
   let name = $state(data.serviceAccount.name);
   // svelte-ignore state_referenced_locally
@@ -13,15 +13,23 @@
   // svelte-ignore state_referenced_locally
   let projectIds = $state<string[]>(data.serviceAccount.projects.map((p) => p.id));
   // svelte-ignore state_referenced_locally
-  let expireAt = $state(
-    data.serviceAccount.expireAt
-      ? new Date(data.serviceAccount.expireAt).toISOString().slice(0, 16)
-      : ''
-  );
+  let expireAt = $state(formatExpireAt(data.serviceAccount.expireAt));
 
   let saving = $state(false);
   let errors = $state<{ name?: string; projectIds?: string }>({});
   let deleteModal = $state({ open: false, loading: false });
+
+  function formatExpireAt(expireAt: string | undefined): string {
+    return expireAt ? new Date(expireAt).toISOString().slice(0, 16) : '';
+  }
+
+  // Sync form state when page data changes (e.g., on page refresh or navigation)
+  $effect(() => {
+    name = data.serviceAccount.name;
+    accessScope = data.serviceAccount.accessScope;
+    projectIds = data.serviceAccount.projects.map((p) => p.id);
+    expireAt = formatExpireAt(data.serviceAccount.expireAt);
+  });
 
   let projectOptions = $derived(
     data.projects.items.map((p) => ({
@@ -78,14 +86,9 @@
     });
 
     if (!result.error) {
-      const updated = unwrap(result);
       toastStore.success('Service account updated successfully');
+      // Refresh the page data - the $effect will sync form state from updated data
       await invalidateAll();
-      // Reset form state
-      name = updated.name;
-      accessScope = updated.accessScope;
-      projectIds = updated.projects.map((p) => p.id);
-      expireAt = updated.expireAt ? new Date(updated.expireAt).toISOString().slice(0, 16) : '';
     }
 
     saving = false;

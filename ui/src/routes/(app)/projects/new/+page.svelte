@@ -38,10 +38,6 @@
     }
   }
 
-  function updatePreset(index: number, preset: PresetData) {
-    presets = presets.map((p, i) => (i === index ? preset : p));
-  }
-
   function validateForm(): boolean {
     errors = {};
 
@@ -181,13 +177,14 @@
           </div>
         {:else}
           <div class="mt-4 space-y-4">
-            {#each presets as preset, index (index)}
-              <PresetForm
-                {preset}
-                {index}
-                onremove={() => removePreset(index)}
-                onchange={(p) => updatePreset(index, p)}
-              />
+            {#each { length: presets.length } as _, index (presets[index]?.id ?? index)}
+              {#if presets[index]}
+                <PresetForm
+                  bind:preset={presets[index]}
+                  {index}
+                  onremove={() => removePreset(index)}
+                />
+              {/if}
             {/each}
           </div>
         {/if}
