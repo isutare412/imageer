@@ -12,5 +12,9 @@ func buildImageVariantUpdateAssigners(req domain.UpdateImageVariantRequest) []cl
 	if req.State != nil {
 		assigners = append(assigners, gen.ImageVariant.State.Set(*req.State))
 	}
+
+	if len(assigners) > 0 {
+		assigners = append(assigners, gen.ImageVariant.UpdatedAt.Now())
+	}
 	return assigners
 }

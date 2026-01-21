@@ -279,7 +279,7 @@ func TestProjectRepository_Update(t *testing.T) {
 
 				mock.ExpectBegin()
 				mock.ExpectExec(
-					`UPDATE "presets" SET "name"=$1,"width"=$2,"height"=$3,"updated_at"=$4 WHERE "id" = $5`).
+					`UPDATE "presets" SET "name"=$1,"width"=$2,"height"=$3,"updated_at"=NOW() WHERE "id" = $4`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
 					`INSERT INTO "presets" ` +
@@ -291,7 +291,7 @@ func TestProjectRepository_Update(t *testing.T) {
 					WithArgs("project-1", sqlmock.AnyArg(), sqlmock.AnyArg()).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec(
-					`UPDATE "projects" SET "name"=$1,"updated_at"=$2 WHERE "id" = $3`).
+					`UPDATE "projects" SET "name"=$1,"updated_at"=NOW() WHERE "id" = $2`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectQuery(
 					`SELECT * FROM "projects" WHERE "id" = $1 ORDER BY "projects"."id" LIMIT $2`).

@@ -126,7 +126,7 @@ func TestImageVariantRepository_Update(t *testing.T) {
 
 				mock.ExpectBegin()
 				mock.ExpectExec(
-					`UPDATE "image_variants" SET "state"=$1,"updated_at"=$2 WHERE "id" = $3`).
+					`UPDATE "image_variants" SET "state"=$1,"updated_at"=NOW() WHERE "id" = $2`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectQuery(
 					`SELECT * FROM "image_variants" WHERE "id" = $1 ORDER BY "image_variants"."id" LIMIT $2`).

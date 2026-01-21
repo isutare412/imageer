@@ -73,5 +73,9 @@ func buildPresetUpdateAssigners(req domain.UpsertPresetRequest) []clause.Assigne
 	if req.Height != nil {
 		assigners = append(assigners, gen.Preset.Height.Set(*req.Height))
 	}
+
+	if len(assigners) > 0 {
+		assigners = append(assigners, gen.Preset.UpdatedAt.Now())
+	}
 	return assigners
 }

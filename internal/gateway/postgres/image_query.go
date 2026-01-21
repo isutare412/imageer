@@ -52,5 +52,9 @@ func buildImageUpdateAssigners(req domain.UpdateImageRequest) []clause.Assigner 
 	if req.State != nil {
 		assigners = append(assigners, gen.Image.State.Set(*req.State))
 	}
+
+	if len(assigners) > 0 {
+		assigners = append(assigners, gen.Image.UpdatedAt.Now())
+	}
 	return assigners
 }

@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/samber/lo"
 	"gorm.io/gorm"
@@ -99,7 +98,7 @@ func (r *ImageRepository) Update(ctx context.Context, req domain.UpdateImageRequ
 	assigners := buildImageUpdateAssigners(req)
 	_, err := gorm.G[entity.Image](tx).
 		Where(gen.Image.ID.Eq(req.ID)).
-		Set(append(assigners, gen.Image.UpdatedAt.Set(time.Now()))...).
+		Set(assigners...).
 		Update(ctx)
 	if err != nil {
 		return domain.Image{}, dbhelpers.WrapGORMError(err, "Failed to update image %s", req.ID)

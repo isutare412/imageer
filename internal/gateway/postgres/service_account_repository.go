@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"time"
 
 	"github.com/samber/lo"
 	"gorm.io/gorm"
@@ -140,7 +139,7 @@ func (r *ServiceAccountRepository) Update(
 	assigners := buildServiceAccountUpdateAssigners(req)
 	_, err := gorm.G[entity.ServiceAccount](tx).
 		Where(gen.ServiceAccount.ID.Eq(req.ID)).
-		Set(append(assigners, gen.ServiceAccount.UpdatedAt.Set(time.Now()))...).
+		Set(assigners...).
 		Update(ctx)
 	if err != nil {
 		return domain.ServiceAccount{},

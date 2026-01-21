@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/samber/lo"
 	"gorm.io/gorm"
@@ -119,7 +118,7 @@ func (r *ProjectRepository) Update(
 	if len(assigners) > 0 {
 		_, err := gorm.G[entity.Project](tx).
 			Where(gen.Project.ID.Eq(req.ID)).
-			Set(append(assigners, gen.Project.UpdatedAt.Set(time.Now()))...).
+			Set(assigners...).
 			Update(ctx)
 		if err != nil {
 			return domain.Project{}, dbhelpers.WrapGORMError(err, "Failed to update project %s", req.ID)
@@ -174,7 +173,7 @@ func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 
 		count, err := gorm.G[entity.Preset](tx).
 			Where(gen.Preset.ID.Eq(*t.ID)).
-			Set(append(assigners, gen.Preset.UpdatedAt.Set(time.Now()))...).
+			Set(assigners...).
 			Update(ctx)
 		if err != nil {
 			return dbhelpers.WrapGORMError(err, "Failed to update preset %s", *t.ID)

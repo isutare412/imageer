@@ -49,5 +49,9 @@ func buildProjectUpdateAssigners(req domain.UpdateProjectRequest) []clause.Assig
 	if req.Name != nil {
 		assigners = append(assigners, gen.Project.Name.Set(*req.Name))
 	}
+
+	if len(assigners) > 0 {
+		assigners = append(assigners, gen.Project.UpdatedAt.Now())
+	}
 	return assigners
 }

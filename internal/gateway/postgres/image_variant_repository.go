@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"gorm.io/gorm"
 
@@ -63,7 +62,7 @@ func (r *ImageVariantRepository) Update(ctx context.Context, req domain.UpdateIm
 	assigners := buildImageVariantUpdateAssigners(req)
 	_, err := gorm.G[entity.ImageVariant](tx).
 		Where(gen.ImageVariant.ID.Eq(req.ID)).
-		Set(append(assigners, gen.ImageVariant.UpdatedAt.Set(time.Now()))...).
+		Set(assigners...).
 		Update(ctx)
 	if err != nil {
 		return domain.ImageVariant{}, dbhelpers.WrapGORMError(err,

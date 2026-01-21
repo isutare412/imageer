@@ -54,5 +54,9 @@ func buildServiceAccountUpdateAssigners(req domain.UpdateServiceAccountRequest) 
 	if req.ExpireAt != nil {
 		assigners = append(assigners, gen.ServiceAccount.ExpireAt.Set(*req.ExpireAt))
 	}
+
+	if len(assigners) > 0 {
+		assigners = append(assigners, gen.ServiceAccount.UpdatedAt.Now())
+	}
 	return assigners
 }
