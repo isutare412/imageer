@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22-slim AS builder
+FROM node:24-slim AS builder
 
 WORKDIR /app
 
@@ -21,7 +21,7 @@ COPY svelte.config.js tsconfig.json vite.config.ts ./
 RUN pnpm run build
 
 # Production stage
-FROM node:22-slim AS production
+FROM node:24-slim AS production
 
 WORKDIR /app
 
