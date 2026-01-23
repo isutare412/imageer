@@ -140,7 +140,7 @@
                           <Badge variant="neutral" size="sm" truncate>{project.name}</Badge>
                         {/each}
                         {#if sa.projects.length > 2}
-                          <Badge variant="neutral" size="sm" outline>
+                          <Badge variant="neutral" size="sm">
                             +{sa.projects.length - 2} more
                           </Badge>
                         {/if}

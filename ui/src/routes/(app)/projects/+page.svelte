@@ -111,7 +111,7 @@
                         </Badge>
                       {/each}
                       {#if project.presets.length > 3}
-                        <Badge variant="neutral" size="sm" outline>
+                        <Badge variant="neutral" size="sm">
                           +{project.presets.length - 3} more
                         </Badge>
                       {/if}
