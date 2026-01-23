@@ -8,6 +8,7 @@ export {
   type ToastOptions,
 } from './stores/toast.svelte';
 export { themeStore } from './stores/theme.svelte';
+export { imagePreferencesStore } from './stores/imagePreferences.svelte';
 
 // Components - Toast
 export { default as Toast } from './components/Toast.svelte';

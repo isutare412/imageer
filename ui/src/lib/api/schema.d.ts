@@ -58,6 +58,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/projects/{projectId}/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List images in a project */
+        get: operations["listImagesAdmin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{projectId}/images/{imageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete an image */
+        delete: operations["deleteImageAdmin"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/service-accounts": {
         parameters: {
             query?: never;
@@ -197,6 +231,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{projectId}/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List images in a project */
+        get: operations["listImages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{projectId}/images/{imageId}": {
         parameters: {
             query?: never;
@@ -208,7 +259,8 @@ export interface paths {
         get: operations["getImage"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete an image */
+        delete: operations["deleteImage"];
         options?: never;
         head?: never;
         patch?: never;
@@ -263,6 +315,12 @@ export interface components {
          * @enum {string}
          */
         ServiceAccountAccessScope: "FULL" | "PROJECT";
+        /**
+         * @description The sort direction for list operations.
+         * @example DESC
+         * @enum {string}
+         */
+        SortDirection: "ASC" | "DESC";
         CreateProjectAdminRequest: {
             /**
              * @description The name of the project.
@@ -742,6 +800,10 @@ export interface components {
         OffsetQuery: number;
         /** @description Limit for pagination */
         LimitQuery: number;
+        /** @description Field to sort by */
+        SortByQuery: "createdAt" | "updatedAt";
+        /** @description Sort direction */
+        SortOrderQuery: components["schemas"]["SortDirection"];
         /** @description Wait until the image processing is completed */
         WaitUntilProcessedQuery: boolean;
         /** @description The path to redirect to after successful sign-in. Defaults to root path if not provided. */
@@ -902,6 +964,63 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Images"];
                 };
+            };
+            default: components["responses"]["ErrorResponse"];
+        };
+    };
+    listImagesAdmin: {
+        parameters: {
+            query?: {
+                /** @description Offset for pagination */
+                offset?: components["parameters"]["OffsetQuery"];
+                /** @description Limit for pagination */
+                limit?: components["parameters"]["LimitQuery"];
+                /** @description Field to sort by */
+                sortBy?: components["parameters"]["SortByQuery"];
+                /** @description Sort direction */
+                sortOrder?: components["parameters"]["SortOrderQuery"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the project to which the image belongs. */
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully retrieved images */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Images"];
+                };
+            };
+            default: components["responses"]["ErrorResponse"];
+        };
+    };
+    deleteImageAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The ID of the project to which the image belongs. */
+                projectId: components["parameters"]["ProjectIdPath"];
+                /** @description The ID of the image. */
+                imageId: components["parameters"]["ImageIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully deleted image */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             default: components["responses"]["ErrorResponse"];
         };
@@ -1173,6 +1292,39 @@ export interface operations {
             default: components["responses"]["ErrorResponse"];
         };
     };
+    listImages: {
+        parameters: {
+            query?: {
+                /** @description Offset for pagination */
+                offset?: components["parameters"]["OffsetQuery"];
+                /** @description Limit for pagination */
+                limit?: components["parameters"]["LimitQuery"];
+                /** @description Field to sort by */
+                sortBy?: components["parameters"]["SortByQuery"];
+                /** @description Sort direction */
+                sortOrder?: components["parameters"]["SortOrderQuery"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the project to which the image belongs. */
+                projectId: components["parameters"]["ProjectIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully retrieved images */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Images"];
+                };
+            };
+            default: components["responses"]["ErrorResponse"];
+        };
+    };
     getImage: {
         parameters: {
             query?: {
@@ -1198,6 +1350,30 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Image"];
                 };
+            };
+            default: components["responses"]["ErrorResponse"];
+        };
+    };
+    deleteImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The ID of the project to which the image belongs. */
+                projectId: components["parameters"]["ProjectIdPath"];
+                /** @description The ID of the image. */
+                imageId: components["parameters"]["ImageIdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully deleted image */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             default: components["responses"]["ErrorResponse"];
         };
