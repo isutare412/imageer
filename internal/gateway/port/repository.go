@@ -41,6 +41,7 @@ type ImageRepository interface {
 	List(context.Context, domain.ListImagesParams) (domain.Images, error)
 	Create(context.Context, domain.Image) (domain.Image, error)
 	Update(context.Context, domain.UpdateImageRequest) (domain.Image, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type ImageVariantRepository interface {

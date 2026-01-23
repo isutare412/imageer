@@ -1,3 +1,4 @@
 /bin
+/docs/plans
 config.local.yaml
 .env.local

@@ -177,6 +177,30 @@ func (s *Service) GetWaitUntilProcessed(ctx context.Context, imageID string) (do
 	return image, nil
 }
 
+func (s *Service) List(ctx context.Context, params domain.ListImagesParams,
+) (domain.Images, error) {
+	var images domain.Images
+	err := s.transactioner.WithTx(ctx, func(ctx context.Context) error {
+		var err error
+		images, err = s.imageRepo.List(ctx, params)
+		return err
+	})
+	if err != nil {
+		return domain.Images{}, fmt.Errorf("listing images: %w", err)
+	}
+	return images, nil
+}
+
+func (s *Service) Delete(ctx context.Context, id string) error {
+	err := s.transactioner.WithTx(ctx, func(ctx context.Context) error {
+		return s.imageRepo.Delete(ctx, id)
+	})
+	if err != nil {
+		return fmt.Errorf("deleting image: %w", err)
+	}
+	return nil
+}
+
 func (s *Service) CreateUploadURL(ctx context.Context, req domain.CreateUploadURLRequest,
 ) (domain.UploadURL, error) {
 	if err := validation.Validate(req); err != nil {

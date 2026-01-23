@@ -137,6 +137,43 @@ paths:
         default:
           $ref: '#/components/responses/ErrorResponse'
 
+  /api/v1/admin/projects/{projectId}/images:
+    get:
+      operationId: listImagesAdmin
+      summary: List images in a project
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/SortByQuery'
+        - $ref: '#/components/parameters/SortOrderQuery'
+      responses:
+        '200':
+          description: Successfully retrieved images
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Images'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/admin/projects/{projectId}/images/{imageId}:
+    delete:
+      operationId: deleteImageAdmin
+      summary: Delete an image
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+        - $ref: '#/components/parameters/ImageIdPath'
+      responses:
+        '200':
+          description: Successfully deleted image
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
   /api/v1/admin/service-accounts:
     get:
       operationId: listServiceAccountsAdmin
@@ -350,6 +387,28 @@ paths:
         default:
           $ref: '#/components/responses/ErrorResponse'
 
+  /api/v1/projects/{projectId}/images:
+    get:
+      operationId: listImages
+      summary: List images in a project
+      tags:
+        - Image
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/SortByQuery'
+        - $ref: '#/components/parameters/SortOrderQuery'
+      responses:
+        '200':
+          description: Successfully retrieved images
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Images'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
   /api/v1/projects/{projectId}/images/{imageId}:
     get:
       operationId: getImage
@@ -367,6 +426,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Image'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    delete:
+      operationId: deleteImage
+      summary: Delete an image
+      tags:
+        - Image
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdPath'
+        - $ref: '#/components/parameters/ImageIdPath'
+      responses:
+        '200':
+          description: Successfully deleted image
         default:
           $ref: '#/components/responses/ErrorResponse'
 
@@ -436,6 +509,24 @@ components:
         type: integer
         format: int64
         example: 10
+
+    SortByQuery:
+      name: sortBy
+      in: query
+      description: Field to sort by
+      schema:
+        type: string
+        enum:
+          - createdAt
+          - updatedAt
+        default: createdAt
+
+    SortOrderQuery:
+      name: sortOrder
+      in: query
+      description: Sort direction
+      schema:
+        $ref: '#/components/schemas/SortDirection'
 
     WaitUntilProcessedQuery:
       name: waitUntilProcessed
@@ -562,6 +653,17 @@ components:
       x-go-type: serviceaccounts.AccessScope
       x-go-type-import:
         path: github.com/isutare412/imageer/pkg/serviceaccounts
+
+    SortDirection:
+      type: string
+      enum:
+        - ASC
+        - DESC
+      description: The sort direction for list operations.
+      example: DESC
+      x-go-type: dbhelpers.SortDirection
+      x-go-type-import:
+        path: github.com/isutare412/imageer/pkg/dbhelpers
 
     ###
     # Request Schemas

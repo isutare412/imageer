@@ -13,6 +13,9 @@ import (
 func applyImageSearchFilter(
 	q gorm.ChainInterface[entity.Image], filter domain.ImageSearchFilter,
 ) gorm.ChainInterface[entity.Image] {
+	if filter.ProjectID != nil {
+		q = q.Where(gen.Image.ProjectID.Eq(*filter.ProjectID))
+	}
 	if filter.State != nil {
 		q = q.Where(gen.Image.State.Eq(*filter.State))
 	}

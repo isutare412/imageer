@@ -23,23 +23,25 @@ type UserService interface {
 type ServiceAccountService interface {
 	GetByID(ctx context.Context, id string) (domain.ServiceAccount, error)
 	GetByAPIKey(ctx context.Context, key string) (domain.ServiceAccount, error)
-	List(ctx context.Context, params domain.ListServiceAccountsParams) (domain.ServiceAccounts, error)
-	Create(ctx context.Context, req domain.CreateServiceAccountRequest) (domain.ServiceAccountWithAPIKey, error)
-	Update(ctx context.Context, req domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error)
+	List(context.Context, domain.ListServiceAccountsParams) (domain.ServiceAccounts, error)
+	Create(context.Context, domain.CreateServiceAccountRequest) (domain.ServiceAccountWithAPIKey, error)
+	Update(context.Context, domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error)
 	Delete(ctx context.Context, id string) error
 }
 
 type ProjectService interface {
 	GetByID(ctx context.Context, id string) (domain.Project, error)
-	List(ctx context.Context, params domain.ListProjectsParams) (domain.Projects, error)
-	Create(ctx context.Context, req domain.CreateProjectRequest) (domain.Project, error)
-	Update(ctx context.Context, req domain.UpdateProjectRequest) (domain.Project, error)
+	List(context.Context, domain.ListProjectsParams) (domain.Projects, error)
+	Create(context.Context, domain.CreateProjectRequest) (domain.Project, error)
+	Update(context.Context, domain.UpdateProjectRequest) (domain.Project, error)
 	Delete(ctx context.Context, id string) error
 }
 
 type ImageService interface {
 	Get(ctx context.Context, imageID string) (domain.Image, error)
 	GetWaitUntilProcessed(ctx context.Context, imageID string) (domain.Image, error)
+	List(context.Context, domain.ListImagesParams) (domain.Images, error)
+	Delete(ctx context.Context, id string) error
 	CreateUploadURL(context.Context, domain.CreateUploadURLRequest) (domain.UploadURL, error)
 	StartImageProcessingOnUpload(ctx context.Context, s3Key string) error
 	ReceiveImageProcessResult(context.Context, *imageerv1.ImageProcessResult) error

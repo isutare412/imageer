@@ -165,18 +165,18 @@ func (m *MockServiceAccountService) EXPECT() *MockServiceAccountServiceMockRecor
 }
 
 // Create mocks base method.
-func (m *MockServiceAccountService) Create(ctx context.Context, req domain.CreateServiceAccountRequest) (domain.ServiceAccountWithAPIKey, error) {
+func (m *MockServiceAccountService) Create(arg0 context.Context, arg1 domain.CreateServiceAccountRequest) (domain.ServiceAccountWithAPIKey, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, req)
+	ret := m.ctrl.Call(m, "Create", arg0, arg1)
 	ret0, _ := ret[0].(domain.ServiceAccountWithAPIKey)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockServiceAccountServiceMockRecorder) Create(ctx, req any) *gomock.Call {
+func (mr *MockServiceAccountServiceMockRecorder) Create(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockServiceAccountService)(nil).Create), ctx, req)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockServiceAccountService)(nil).Create), arg0, arg1)
 }
 
 // Delete mocks base method.
@@ -224,33 +224,33 @@ func (mr *MockServiceAccountServiceMockRecorder) GetByID(ctx, id any) *gomock.Ca
 }
 
 // List mocks base method.
-func (m *MockServiceAccountService) List(ctx context.Context, params domain.ListServiceAccountsParams) (domain.ServiceAccounts, error) {
+func (m *MockServiceAccountService) List(arg0 context.Context, arg1 domain.ListServiceAccountsParams) (domain.ServiceAccounts, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", ctx, params)
+	ret := m.ctrl.Call(m, "List", arg0, arg1)
 	ret0, _ := ret[0].(domain.ServiceAccounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *MockServiceAccountServiceMockRecorder) List(ctx, params any) *gomock.Call {
+func (mr *MockServiceAccountServiceMockRecorder) List(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockServiceAccountService)(nil).List), ctx, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockServiceAccountService)(nil).List), arg0, arg1)
 }
 
 // Update mocks base method.
-func (m *MockServiceAccountService) Update(ctx context.Context, req domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error) {
+func (m *MockServiceAccountService) Update(arg0 context.Context, arg1 domain.UpdateServiceAccountRequest) (domain.ServiceAccount, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, req)
+	ret := m.ctrl.Call(m, "Update", arg0, arg1)
 	ret0, _ := ret[0].(domain.ServiceAccount)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockServiceAccountServiceMockRecorder) Update(ctx, req any) *gomock.Call {
+func (mr *MockServiceAccountServiceMockRecorder) Update(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockServiceAccountService)(nil).Update), ctx, req)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockServiceAccountService)(nil).Update), arg0, arg1)
 }
 
 // MockProjectService is a mock of ProjectService interface.
@@ -278,18 +278,18 @@ func (m *MockProjectService) EXPECT() *MockProjectServiceMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockProjectService) Create(ctx context.Context, req domain.CreateProjectRequest) (domain.Project, error) {
+func (m *MockProjectService) Create(arg0 context.Context, arg1 domain.CreateProjectRequest) (domain.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, req)
+	ret := m.ctrl.Call(m, "Create", arg0, arg1)
 	ret0, _ := ret[0].(domain.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockProjectServiceMockRecorder) Create(ctx, req any) *gomock.Call {
+func (mr *MockProjectServiceMockRecorder) Create(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockProjectService)(nil).Create), ctx, req)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockProjectService)(nil).Create), arg0, arg1)
 }
 
 // Delete mocks base method.
@@ -322,33 +322,33 @@ func (mr *MockProjectServiceMockRecorder) GetByID(ctx, id any) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockProjectService) List(ctx context.Context, params domain.ListProjectsParams) (domain.Projects, error) {
+func (m *MockProjectService) List(arg0 context.Context, arg1 domain.ListProjectsParams) (domain.Projects, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", ctx, params)
+	ret := m.ctrl.Call(m, "List", arg0, arg1)
 	ret0, _ := ret[0].(domain.Projects)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // List indicates an expected call of List.
-func (mr *MockProjectServiceMockRecorder) List(ctx, params any) *gomock.Call {
+func (mr *MockProjectServiceMockRecorder) List(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockProjectService)(nil).List), ctx, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockProjectService)(nil).List), arg0, arg1)
 }
 
 // Update mocks base method.
-func (m *MockProjectService) Update(ctx context.Context, req domain.UpdateProjectRequest) (domain.Project, error) {
+func (m *MockProjectService) Update(arg0 context.Context, arg1 domain.UpdateProjectRequest) (domain.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, req)
+	ret := m.ctrl.Call(m, "Update", arg0, arg1)
 	ret0, _ := ret[0].(domain.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockProjectServiceMockRecorder) Update(ctx, req any) *gomock.Call {
+func (mr *MockProjectServiceMockRecorder) Update(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockProjectService)(nil).Update), ctx, req)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockProjectService)(nil).Update), arg0, arg1)
 }
 
 // MockImageService is a mock of ImageService interface.
@@ -390,6 +390,20 @@ func (mr *MockImageServiceMockRecorder) CreateUploadURL(arg0, arg1 any) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUploadURL", reflect.TypeOf((*MockImageService)(nil).CreateUploadURL), arg0, arg1)
 }
 
+// Delete mocks base method.
+func (m *MockImageService) Delete(ctx context.Context, id string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockImageServiceMockRecorder) Delete(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockImageService)(nil).Delete), ctx, id)
+}
+
 // Get mocks base method.
 func (m *MockImageService) Get(ctx context.Context, imageID string) (domain.Image, error) {
 	m.ctrl.T.Helper()
@@ -418,6 +432,21 @@ func (m *MockImageService) GetWaitUntilProcessed(ctx context.Context, imageID st
 func (mr *MockImageServiceMockRecorder) GetWaitUntilProcessed(ctx, imageID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWaitUntilProcessed", reflect.TypeOf((*MockImageService)(nil).GetWaitUntilProcessed), ctx, imageID)
+}
+
+// List mocks base method.
+func (m *MockImageService) List(arg0 context.Context, arg1 domain.ListImagesParams) (domain.Images, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", arg0, arg1)
+	ret0, _ := ret[0].(domain.Images)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List.
+func (mr *MockImageServiceMockRecorder) List(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockImageService)(nil).List), arg0, arg1)
 }
 
 // ReceiveImageProcessResult mocks base method.

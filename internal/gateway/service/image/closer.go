@@ -80,6 +80,7 @@ func (c *Closer) closeExpiredImages() error {
 
 	// Find expired images
 	params := domain.ListImagesParams{
+		Limit: lo.ToPtr(-1),
 		SearchFilter: domain.ImageSearchFilter{
 			State:           lo.ToPtr(images.StateUploadPending),
 			UpdatedAtBefore: &threshold,

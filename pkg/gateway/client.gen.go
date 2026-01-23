@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 	"github.com/isutare412/imageer/pkg/images"
 	"github.com/isutare412/imageer/pkg/serviceaccounts"
 	"github.com/isutare412/imageer/pkg/users"
@@ -24,6 +25,24 @@ const (
 	ApiKeyAuthScopes = "apiKeyAuth.Scopes"
 	BearerAuthScopes = "bearerAuth.Scopes"
 	CookieAuthScopes = "cookieAuth.Scopes"
+)
+
+// Defines values for SortByQuery.
+const (
+	SortByQueryCreatedAt SortByQuery = "createdAt"
+	SortByQueryUpdatedAt SortByQuery = "updatedAt"
+)
+
+// Defines values for ListImagesAdminParamsSortBy.
+const (
+	ListImagesAdminParamsSortByCreatedAt ListImagesAdminParamsSortBy = "createdAt"
+	ListImagesAdminParamsSortByUpdatedAt ListImagesAdminParamsSortBy = "updatedAt"
+)
+
+// Defines values for ListImagesParamsSortBy.
+const (
+	CreatedAt ListImagesParamsSortBy = "createdAt"
+	UpdatedAt ListImagesParamsSortBy = "updatedAt"
 )
 
 // AppError defines model for AppError.
@@ -327,6 +346,9 @@ type ServiceAccounts struct {
 	Total int64 `json:"total"`
 }
 
+// SortDirection The sort direction for list operations.
+type SortDirection = dbhelpers.SortDirection
+
 // UpdateProjectAdminRequest defines model for UpdateProjectAdminRequest.
 type UpdateProjectAdminRequest struct {
 	// Name The name of the project.
@@ -444,6 +466,12 @@ type RedirectQuery = string
 // ServiceAccountIDPath defines model for ServiceAccountIdPath.
 type ServiceAccountIDPath = string
 
+// SortByQuery defines model for SortByQuery.
+type SortByQuery string
+
+// SortOrderQuery The sort direction for list operations.
+type SortOrderQuery = SortDirection
+
 // WaitUntilProcessedQuery defines model for WaitUntilProcessedQuery.
 type WaitUntilProcessedQuery = bool
 
@@ -458,6 +486,24 @@ type ListProjectsAdminParams struct {
 	// Limit Limit for pagination
 	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
 }
+
+// ListImagesAdminParams defines parameters for ListImagesAdmin.
+type ListImagesAdminParams struct {
+	// Offset Offset for pagination
+	Offset *OffsetQuery `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// Limit Limit for pagination
+	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *ListImagesAdminParamsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+
+	// SortOrder Sort direction
+	SortOrder *SortOrderQuery `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+}
+
+// ListImagesAdminParamsSortBy defines parameters for ListImagesAdmin.
+type ListImagesAdminParamsSortBy string
 
 // ListServiceAccountsAdminParams defines parameters for ListServiceAccountsAdmin.
 type ListServiceAccountsAdminParams struct {
@@ -482,6 +528,24 @@ type FinishGoogleSignInParams struct {
 	// State The state parameter to prevent CSRF attacks.
 	State string `form:"state" json:"state"`
 }
+
+// ListImagesParams defines parameters for ListImages.
+type ListImagesParams struct {
+	// Offset Offset for pagination
+	Offset *OffsetQuery `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// Limit Limit for pagination
+	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *ListImagesParamsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+
+	// SortOrder Sort direction
+	SortOrder *SortOrderQuery `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+}
+
+// ListImagesParamsSortBy defines parameters for ListImages.
+type ListImagesParamsSortBy string
 
 // GetImageParams defines parameters for GetImage.
 type GetImageParams struct {
@@ -599,10 +663,16 @@ type ClientInterface interface {
 
 	UpdateProjectAdmin(ctx context.Context, projectID ProjectIDPath, body UpdateProjectAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListImagesAdmin request
+	ListImagesAdmin(ctx context.Context, projectID ProjectIDPath, params *ListImagesAdminParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ReprocessImagesAdminWithBody request with any body
 	ReprocessImagesAdminWithBody(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	ReprocessImagesAdmin(ctx context.Context, projectID ProjectIDPath, body ReprocessImagesAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteImageAdmin request
+	DeleteImageAdmin(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListServiceAccountsAdmin request
 	ListServiceAccountsAdmin(ctx context.Context, params *ListServiceAccountsAdminParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -635,10 +705,16 @@ type ClientInterface interface {
 	// GetProject request
 	GetProject(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListImages request
+	ListImages(ctx context.Context, projectID ProjectIDPath, params *ListImagesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// CreateUploadURLWithBody request with any body
 	CreateUploadURLWithBody(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateUploadURL(ctx context.Context, projectID ProjectIDPath, body CreateUploadURLJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteImage request
+	DeleteImage(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetImage request
 	GetImage(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, params *GetImageParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -731,6 +807,18 @@ func (c *Client) UpdateProjectAdmin(ctx context.Context, projectID ProjectIDPath
 	return c.Client.Do(req)
 }
 
+func (c *Client) ListImagesAdmin(ctx context.Context, projectID ProjectIDPath, params *ListImagesAdminParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListImagesAdminRequest(c.Server, projectID, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) ReprocessImagesAdminWithBody(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReprocessImagesAdminRequestWithBody(c.Server, projectID, contentType, body)
 	if err != nil {
@@ -745,6 +833,18 @@ func (c *Client) ReprocessImagesAdminWithBody(ctx context.Context, projectID Pro
 
 func (c *Client) ReprocessImagesAdmin(ctx context.Context, projectID ProjectIDPath, body ReprocessImagesAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReprocessImagesAdminRequest(c.Server, projectID, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteImageAdmin(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteImageAdminRequest(c.Server, projectID, imageID)
 	if err != nil {
 		return nil, err
 	}
@@ -887,6 +987,18 @@ func (c *Client) GetProject(ctx context.Context, projectID ProjectIDPath, reqEdi
 	return c.Client.Do(req)
 }
 
+func (c *Client) ListImages(ctx context.Context, projectID ProjectIDPath, params *ListImagesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListImagesRequest(c.Server, projectID, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) CreateUploadURLWithBody(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateUploadURLRequestWithBody(c.Server, projectID, contentType, body)
 	if err != nil {
@@ -901,6 +1013,18 @@ func (c *Client) CreateUploadURLWithBody(ctx context.Context, projectID ProjectI
 
 func (c *Client) CreateUploadURL(ctx context.Context, projectID ProjectIDPath, body CreateUploadURLJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateUploadURLRequest(c.Server, projectID, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteImage(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteImageRequest(c.Server, projectID, imageID)
 	if err != nil {
 		return nil, err
 	}
@@ -1155,6 +1279,110 @@ func NewUpdateProjectAdminRequestWithBody(server string, projectID ProjectIDPath
 	return req, nil
 }
 
+// NewListImagesAdminRequest generates requests for ListImagesAdmin
+func NewListImagesAdminRequest(server string, projectID ProjectIDPath, params *ListImagesAdminParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/admin/projects/%s/images", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortOrder != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortOrder", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewReprocessImagesAdminRequest calls the generic ReprocessImagesAdmin builder with application/json body
 func NewReprocessImagesAdminRequest(server string, projectID ProjectIDPath, body ReprocessImagesAdminJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -1198,6 +1426,47 @@ func NewReprocessImagesAdminRequestWithBody(server string, projectID ProjectIDPa
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteImageAdminRequest generates requests for DeleteImageAdmin
+func NewDeleteImageAdminRequest(server string, projectID ProjectIDPath, imageID ImageIDPath) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "imageId", runtime.ParamLocationPath, imageID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/admin/projects/%s/images/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -1589,6 +1858,110 @@ func NewGetProjectRequest(server string, projectID ProjectIDPath) (*http.Request
 	return req, nil
 }
 
+// NewListImagesRequest generates requests for ListImages
+func NewListImagesRequest(server string, projectID ProjectIDPath, params *ListImagesParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/projects/%s/images", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortBy", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortOrder != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortOrder", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewCreateUploadURLRequest calls the generic CreateUploadURL builder with application/json body
 func NewCreateUploadURLRequest(server string, projectID ProjectIDPath, body CreateUploadURLJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -1632,6 +2005,47 @@ func NewCreateUploadURLRequestWithBody(server string, projectID ProjectIDPath, c
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteImageRequest generates requests for DeleteImage
+func NewDeleteImageRequest(server string, projectID ProjectIDPath, imageID ImageIDPath) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectId", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "imageId", runtime.ParamLocationPath, imageID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/projects/%s/images/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -1788,10 +2202,16 @@ type ClientWithResponsesInterface interface {
 
 	UpdateProjectAdminWithResponse(ctx context.Context, projectID ProjectIDPath, body UpdateProjectAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateProjectAdminResponse, error)
 
+	// ListImagesAdminWithResponse request
+	ListImagesAdminWithResponse(ctx context.Context, projectID ProjectIDPath, params *ListImagesAdminParams, reqEditors ...RequestEditorFn) (*ListImagesAdminResponse, error)
+
 	// ReprocessImagesAdminWithBodyWithResponse request with any body
 	ReprocessImagesAdminWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReprocessImagesAdminResponse, error)
 
 	ReprocessImagesAdminWithResponse(ctx context.Context, projectID ProjectIDPath, body ReprocessImagesAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*ReprocessImagesAdminResponse, error)
+
+	// DeleteImageAdminWithResponse request
+	DeleteImageAdminWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*DeleteImageAdminResponse, error)
 
 	// ListServiceAccountsAdminWithResponse request
 	ListServiceAccountsAdminWithResponse(ctx context.Context, params *ListServiceAccountsAdminParams, reqEditors ...RequestEditorFn) (*ListServiceAccountsAdminResponse, error)
@@ -1824,10 +2244,16 @@ type ClientWithResponsesInterface interface {
 	// GetProjectWithResponse request
 	GetProjectWithResponse(ctx context.Context, projectID ProjectIDPath, reqEditors ...RequestEditorFn) (*GetProjectResponse, error)
 
+	// ListImagesWithResponse request
+	ListImagesWithResponse(ctx context.Context, projectID ProjectIDPath, params *ListImagesParams, reqEditors ...RequestEditorFn) (*ListImagesResponse, error)
+
 	// CreateUploadURLWithBodyWithResponse request with any body
 	CreateUploadURLWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUploadURLResponse, error)
 
 	CreateUploadURLWithResponse(ctx context.Context, projectID ProjectIDPath, body CreateUploadURLJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateUploadURLResponse, error)
+
+	// DeleteImageWithResponse request
+	DeleteImageWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error)
 
 	// GetImageWithResponse request
 	GetImageWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, params *GetImageParams, reqEditors ...RequestEditorFn) (*GetImageResponse, error)
@@ -1950,6 +2376,29 @@ func (r UpdateProjectAdminResponse) StatusCode() int {
 	return 0
 }
 
+type ListImagesAdminResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Images
+	JSONDefault  *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r ListImagesAdminResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListImagesAdminResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ReprocessImagesAdminResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -1967,6 +2416,28 @@ func (r ReprocessImagesAdminResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ReprocessImagesAdminResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteImageAdminResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteImageAdminResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteImageAdminResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2176,6 +2647,29 @@ func (r GetProjectResponse) StatusCode() int {
 	return 0
 }
 
+type ListImagesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Images
+	JSONDefault  *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r ListImagesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListImagesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type CreateUploadURLResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -2193,6 +2687,28 @@ func (r CreateUploadURLResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r CreateUploadURLResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteImageResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteImageResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteImageResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2306,6 +2822,15 @@ func (c *ClientWithResponses) UpdateProjectAdminWithResponse(ctx context.Context
 	return ParseUpdateProjectAdminResponse(rsp)
 }
 
+// ListImagesAdminWithResponse request returning *ListImagesAdminResponse
+func (c *ClientWithResponses) ListImagesAdminWithResponse(ctx context.Context, projectID ProjectIDPath, params *ListImagesAdminParams, reqEditors ...RequestEditorFn) (*ListImagesAdminResponse, error) {
+	rsp, err := c.ListImagesAdmin(ctx, projectID, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListImagesAdminResponse(rsp)
+}
+
 // ReprocessImagesAdminWithBodyWithResponse request with arbitrary body returning *ReprocessImagesAdminResponse
 func (c *ClientWithResponses) ReprocessImagesAdminWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReprocessImagesAdminResponse, error) {
 	rsp, err := c.ReprocessImagesAdminWithBody(ctx, projectID, contentType, body, reqEditors...)
@@ -2321,6 +2846,15 @@ func (c *ClientWithResponses) ReprocessImagesAdminWithResponse(ctx context.Conte
 		return nil, err
 	}
 	return ParseReprocessImagesAdminResponse(rsp)
+}
+
+// DeleteImageAdminWithResponse request returning *DeleteImageAdminResponse
+func (c *ClientWithResponses) DeleteImageAdminWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*DeleteImageAdminResponse, error) {
+	rsp, err := c.DeleteImageAdmin(ctx, projectID, imageID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteImageAdminResponse(rsp)
 }
 
 // ListServiceAccountsAdminWithResponse request returning *ListServiceAccountsAdminResponse
@@ -2420,6 +2954,15 @@ func (c *ClientWithResponses) GetProjectWithResponse(ctx context.Context, projec
 	return ParseGetProjectResponse(rsp)
 }
 
+// ListImagesWithResponse request returning *ListImagesResponse
+func (c *ClientWithResponses) ListImagesWithResponse(ctx context.Context, projectID ProjectIDPath, params *ListImagesParams, reqEditors ...RequestEditorFn) (*ListImagesResponse, error) {
+	rsp, err := c.ListImages(ctx, projectID, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListImagesResponse(rsp)
+}
+
 // CreateUploadURLWithBodyWithResponse request with arbitrary body returning *CreateUploadURLResponse
 func (c *ClientWithResponses) CreateUploadURLWithBodyWithResponse(ctx context.Context, projectID ProjectIDPath, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUploadURLResponse, error) {
 	rsp, err := c.CreateUploadURLWithBody(ctx, projectID, contentType, body, reqEditors...)
@@ -2435,6 +2978,15 @@ func (c *ClientWithResponses) CreateUploadURLWithResponse(ctx context.Context, p
 		return nil, err
 	}
 	return ParseCreateUploadURLResponse(rsp)
+}
+
+// DeleteImageWithResponse request returning *DeleteImageResponse
+func (c *ClientWithResponses) DeleteImageWithResponse(ctx context.Context, projectID ProjectIDPath, imageID ImageIDPath, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error) {
+	rsp, err := c.DeleteImage(ctx, projectID, imageID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteImageResponse(rsp)
 }
 
 // GetImageWithResponse request returning *GetImageResponse
@@ -2613,6 +3165,39 @@ func ParseUpdateProjectAdminResponse(rsp *http.Response) (*UpdateProjectAdminRes
 	return response, nil
 }
 
+// ParseListImagesAdminResponse parses an HTTP response from a ListImagesAdminWithResponse call
+func ParseListImagesAdminResponse(rsp *http.Response) (*ListImagesAdminResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListImagesAdminResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Images
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseReprocessImagesAdminResponse parses an HTTP response from a ReprocessImagesAdminWithResponse call
 func ParseReprocessImagesAdminResponse(rsp *http.Response) (*ReprocessImagesAdminResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2634,6 +3219,32 @@ func ParseReprocessImagesAdminResponse(rsp *http.Response) (*ReprocessImagesAdmi
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteImageAdminResponse parses an HTTP response from a DeleteImageAdminWithResponse call
+func ParseDeleteImageAdminResponse(rsp *http.Response) (*DeleteImageAdminResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteImageAdminResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2915,6 +3526,39 @@ func ParseGetProjectResponse(rsp *http.Response) (*GetProjectResponse, error) {
 	return response, nil
 }
 
+// ParseListImagesResponse parses an HTTP response from a ListImagesWithResponse call
+func ParseListImagesResponse(rsp *http.Response) (*ListImagesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListImagesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Images
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseCreateUploadURLResponse parses an HTTP response from a CreateUploadURLWithResponse call
 func ParseCreateUploadURLResponse(rsp *http.Response) (*CreateUploadURLResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2936,6 +3580,32 @@ func ParseCreateUploadURLResponse(rsp *http.Response) (*CreateUploadURLResponse,
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteImageResponse parses an HTTP response from a DeleteImageWithResponse call
+func ParseDeleteImageResponse(rsp *http.Response) (*DeleteImageResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteImageResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {

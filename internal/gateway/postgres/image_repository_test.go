@@ -149,6 +149,46 @@ func TestImageRepository_List(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "filter by project id",
+			req: domain.ListImagesParams{
+				SearchFilter: domain.ImageSearchFilter{
+					ProjectID: lo.ToPtr("project-1"),
+				},
+				SortFilter: domain.ImageSortFilter{
+					CreatedAt: true,
+					Direction: dbhelpers.SortDirectionDesc,
+				},
+			},
+			setup: func(t *testing.T, tt *testSet) {
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
+				tt.imageRepo = postgres.NewImageRepository(postgresClient)
+				tt.mock = mock
+
+				mock.ExpectBegin()
+				mock.ExpectQuery(
+					`SELECT * FROM "images" WHERE "project_id" = $1 `+
+						`ORDER BY "created_at" DESC LIMIT $2`).
+					WithArgs("project-1", 20).
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Image]()).
+						AddRow("image-1", time.Now(), time.Now(), "file-1.jpg", images.FormatJPEG,
+							images.StateReady, "s3-key-1", "url-1", "project-1"))
+				mock.ExpectQuery(`SELECT * FROM "projects" WHERE "projects"."id" = $1`).
+					WithArgs("project-1").
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.Project]()).
+						AddRow("project-1", time.Now(), time.Now(), "project-1"))
+				mock.ExpectQuery(`SELECT * FROM "image_variants" WHERE "image_variants"."image_id" = $1`).
+					WithArgs("image-1").
+					WillReturnRows(sqlmock.NewRows(dbhelpers.ColumnNamesFor[entity.ImageVariant]()))
+				mock.ExpectQuery(
+					`SELECT COUNT(1) FROM "images" WHERE "project_id" = $1`).
+					WithArgs("project-1").
+					WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(1))
+				mock.ExpectCommit()
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -315,6 +355,57 @@ func TestImageRepository_Update(t *testing.T) {
 			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
 				_, err := tt.imageRepo.Update(ctx, tt.req)
 				return err
+			})
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			err = tt.mock.ExpectationsWereMet()
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestImageRepository_Delete(t *testing.T) {
+	type testSet struct {
+		name          string // description of this test case
+		transactioner *postgres.Transactioner
+		imageRepo     *postgres.ImageRepository
+		mock          sqlmock.Sqlmock
+
+		id      string
+		setup   func(t *testing.T, tt *testSet)
+		wantErr bool
+	}
+
+	tests := []testSet{
+		{
+			name: "normal case",
+			id:   "image-1",
+			setup: func(t *testing.T, tt *testSet) {
+				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)
+				tt.transactioner = transactioner
+				tt.imageRepo = postgres.NewImageRepository(postgresClient)
+				tt.mock = mock
+
+				mock.ExpectBegin()
+				mock.ExpectExec(
+					`DELETE FROM "images" WHERE "id" = $1`).
+					WithArgs("image-1").
+					WillReturnResult(sqlmock.NewResult(0, 1))
+				mock.ExpectCommit()
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup(t, &tt)
+
+			err := tt.transactioner.WithTx(t.Context(), func(ctx context.Context) error {
+				return tt.imageRepo.Delete(ctx, tt.id)
 			})
 			if tt.wantErr {
 				require.Error(t, err)

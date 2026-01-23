@@ -62,3 +62,54 @@ func (h *handler) ReprocessImagesAdmin(ctx echo.Context, projectID ProjectIDPath
 	return apperr.NewError(apperr.CodeNotImplemented).
 		WithSummary("Method not implemented")
 }
+
+// ListImagesAdmin lists all images in a project (admin endpoint)
+func (h *handler) ListImagesAdmin(ctx echo.Context, projectID ProjectIDPath,
+	params ListImagesAdminParams,
+) error {
+	rctx := ctx.Request().Context()
+
+	images, err := h.imageSvc.List(rctx, ListImagesAdminParamsToDomain(projectID, params))
+	if err != nil {
+		return fmt.Errorf("listing images: %w", err)
+	}
+
+	return ctx.JSON(http.StatusOK, ImagesToWeb(images))
+}
+
+// DeleteImageAdmin deletes an image (admin endpoint)
+func (h *handler) DeleteImageAdmin(ctx echo.Context, projectID ProjectIDPath, imageID ImageIDPath,
+) error {
+	rctx := ctx.Request().Context()
+
+	if err := h.imageSvc.Delete(rctx, imageID); err != nil {
+		return fmt.Errorf("deleting image: %w", err)
+	}
+
+	return ctx.NoContent(http.StatusOK)
+}
+
+// ListImages lists all images in a project
+func (h *handler) ListImages(ctx echo.Context, projectID ProjectIDPath, params ListImagesParams,
+) error {
+	rctx := ctx.Request().Context()
+
+	images, err := h.imageSvc.List(rctx, ListImagesParamsToDomain(projectID, params))
+	if err != nil {
+		return fmt.Errorf("listing images: %w", err)
+	}
+
+	return ctx.JSON(http.StatusOK, ImagesToWeb(images))
+}
+
+// DeleteImage deletes an image
+func (h *handler) DeleteImage(ctx echo.Context, projectID ProjectIDPath, imageID ImageIDPath,
+) error {
+	rctx := ctx.Request().Context()
+
+	if err := h.imageSvc.Delete(rctx, imageID); err != nil {
+		return fmt.Errorf("deleting image: %w", err)
+	}
+
+	return ctx.NoContent(http.StatusOK)
+}

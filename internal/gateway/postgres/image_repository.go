@@ -112,6 +112,17 @@ func (r *ImageRepository) Update(ctx context.Context, req domain.UpdateImageRequ
 	return img.ToDomain(), nil
 }
 
+func (r *ImageRepository) Delete(ctx context.Context, id string) error {
+	tx := GetTxOrDB(ctx, r.db)
+
+	if _, err := gorm.G[entity.Image](tx).
+		Where(gen.Image.ID.Eq(id)).
+		Delete(ctx); err != nil {
+		return dbhelpers.WrapGORMError(err, "Failed to delete image %s", id)
+	}
+	return nil
+}
+
 func (r *ImageRepository) get(ctx context.Context, tx *gorm.DB, id string) (entity.Image, error) {
 	img, err := gorm.G[entity.Image](tx).
 		Where(gen.Image.ID.Eq(id)).

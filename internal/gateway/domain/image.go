@@ -65,14 +65,15 @@ type ListImagesParams struct {
 }
 
 func (p ListImagesParams) OffsetOrDefault() int {
-	return lo.FromPtrOr(p.Offset, -1)
+	return lo.FromPtrOr(p.Offset, 0)
 }
 
 func (p ListImagesParams) LimitOrDefault() int {
-	return lo.FromPtrOr(p.Limit, -1)
+	return lo.FromPtrOr(p.Limit, 20)
 }
 
 type ImageSearchFilter struct {
+	ProjectID       *string
 	State           *images.State
 	UpdatedAtBefore *time.Time
 }

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 	"github.com/isutare412/imageer/pkg/images"
 	"github.com/isutare412/imageer/pkg/serviceaccounts"
 	"github.com/isutare412/imageer/pkg/users"
@@ -26,6 +27,24 @@ const (
 	ApiKeyAuthScopes = "apiKeyAuth.Scopes"
 	BearerAuthScopes = "bearerAuth.Scopes"
 	CookieAuthScopes = "cookieAuth.Scopes"
+)
+
+// Defines values for SortByQuery.
+const (
+	SortByQueryCreatedAt SortByQuery = "createdAt"
+	SortByQueryUpdatedAt SortByQuery = "updatedAt"
+)
+
+// Defines values for ListImagesAdminParamsSortBy.
+const (
+	ListImagesAdminParamsSortByCreatedAt ListImagesAdminParamsSortBy = "createdAt"
+	ListImagesAdminParamsSortByUpdatedAt ListImagesAdminParamsSortBy = "updatedAt"
+)
+
+// Defines values for ListImagesParamsSortBy.
+const (
+	CreatedAt ListImagesParamsSortBy = "createdAt"
+	UpdatedAt ListImagesParamsSortBy = "updatedAt"
 )
 
 // AppError defines model for AppError.
@@ -329,6 +348,9 @@ type ServiceAccounts struct {
 	Total int64 `json:"total"`
 }
 
+// SortDirection The sort direction for list operations.
+type SortDirection = dbhelpers.SortDirection
+
 // UpdateProjectAdminRequest defines model for UpdateProjectAdminRequest.
 type UpdateProjectAdminRequest struct {
 	// Name The name of the project.
@@ -446,6 +468,12 @@ type RedirectQuery = string
 // ServiceAccountIDPath defines model for ServiceAccountIdPath.
 type ServiceAccountIDPath = string
 
+// SortByQuery defines model for SortByQuery.
+type SortByQuery string
+
+// SortOrderQuery The sort direction for list operations.
+type SortOrderQuery = SortDirection
+
 // WaitUntilProcessedQuery defines model for WaitUntilProcessedQuery.
 type WaitUntilProcessedQuery = bool
 
@@ -460,6 +488,24 @@ type ListProjectsAdminParams struct {
 	// Limit Limit for pagination
 	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
 }
+
+// ListImagesAdminParams defines parameters for ListImagesAdmin.
+type ListImagesAdminParams struct {
+	// Offset Offset for pagination
+	Offset *OffsetQuery `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// Limit Limit for pagination
+	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *ListImagesAdminParamsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+
+	// SortOrder Sort direction
+	SortOrder *SortOrderQuery `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+}
+
+// ListImagesAdminParamsSortBy defines parameters for ListImagesAdmin.
+type ListImagesAdminParamsSortBy string
 
 // ListServiceAccountsAdminParams defines parameters for ListServiceAccountsAdmin.
 type ListServiceAccountsAdminParams struct {
@@ -484,6 +530,24 @@ type FinishGoogleSignInParams struct {
 	// State The state parameter to prevent CSRF attacks.
 	State string `form:"state" json:"state"`
 }
+
+// ListImagesParams defines parameters for ListImages.
+type ListImagesParams struct {
+	// Offset Offset for pagination
+	Offset *OffsetQuery `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// Limit Limit for pagination
+	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *ListImagesParamsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+
+	// SortOrder Sort direction
+	SortOrder *SortOrderQuery `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+}
+
+// ListImagesParamsSortBy defines parameters for ListImages.
+type ListImagesParamsSortBy string
 
 // GetImageParams defines parameters for GetImage.
 type GetImageParams struct {
@@ -526,9 +590,15 @@ type ServerInterface interface {
 	// Update project details
 	// (PUT /api/v1/admin/projects/{projectId})
 	UpdateProjectAdmin(ctx echo.Context, projectID ProjectIDPath) error
+	// List images in a project
+	// (GET /api/v1/admin/projects/{projectId}/images)
+	ListImagesAdmin(ctx echo.Context, projectID ProjectIDPath, params ListImagesAdminParams) error
 	// Reprocess multiple images in a project
 	// (POST /api/v1/admin/projects/{projectId}/images/reprocess)
 	ReprocessImagesAdmin(ctx echo.Context, projectID ProjectIDPath) error
+	// Delete an image
+	// (DELETE /api/v1/admin/projects/{projectId}/images/{imageId})
+	DeleteImageAdmin(ctx echo.Context, projectID ProjectIDPath, imageID ImageIDPath) error
 	// List service accounts
 	// (GET /api/v1/admin/service-accounts)
 	ListServiceAccountsAdmin(ctx echo.Context, params ListServiceAccountsAdminParams) error
@@ -556,9 +626,15 @@ type ServerInterface interface {
 	// Get project details
 	// (GET /api/v1/projects/{projectId})
 	GetProject(ctx echo.Context, projectID ProjectIDPath) error
+	// List images in a project
+	// (GET /api/v1/projects/{projectId}/images)
+	ListImages(ctx echo.Context, projectID ProjectIDPath, params ListImagesParams) error
 	// Issue a presigned URL for uploading an image
 	// (POST /api/v1/projects/{projectId}/images/upload-url)
 	CreateUploadURL(ctx echo.Context, projectID ProjectIDPath) error
+	// Delete an image
+	// (DELETE /api/v1/projects/{projectId}/images/{imageId})
+	DeleteImage(ctx echo.Context, projectID ProjectIDPath, imageID ImageIDPath) error
 	// Get image details
 	// (GET /api/v1/projects/{projectId}/images/{imageId})
 	GetImage(ctx echo.Context, projectID ProjectIDPath, imageID ImageIDPath, params GetImageParams) error
@@ -684,6 +760,58 @@ func (w *ServerInterfaceWrapper) UpdateProjectAdmin(ctx echo.Context) error {
 	return err
 }
 
+// ListImagesAdmin converts echo context to params.
+func (w *ServerInterfaceWrapper) ListImagesAdmin(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "projectId" -------------
+	var projectID ProjectIDPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", ctx.Param("projectId"), &projectID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListImagesAdminParams
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "offset", ctx.QueryParams(), &params.Offset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset: %s", err))
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
+	}
+
+	// ------------- Optional query parameter "sortBy" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortBy", ctx.QueryParams(), &params.SortBy)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sortBy: %s", err))
+	}
+
+	// ------------- Optional query parameter "sortOrder" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortOrder", ctx.QueryParams(), &params.SortOrder)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sortOrder: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ListImagesAdmin(ctx, projectID, params)
+	return err
+}
+
 // ReprocessImagesAdmin converts echo context to params.
 func (w *ServerInterfaceWrapper) ReprocessImagesAdmin(ctx echo.Context) error {
 	var err error
@@ -703,6 +831,36 @@ func (w *ServerInterfaceWrapper) ReprocessImagesAdmin(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ReprocessImagesAdmin(ctx, projectID)
+	return err
+}
+
+// DeleteImageAdmin converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteImageAdmin(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "projectId" -------------
+	var projectID ProjectIDPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", ctx.Param("projectId"), &projectID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
+	}
+
+	// ------------- Path parameter "imageId" -------------
+	var imageID ImageIDPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "imageId", ctx.Param("imageId"), &imageID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter imageId: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeleteImageAdmin(ctx, projectID, imageID)
 	return err
 }
 
@@ -898,6 +1056,58 @@ func (w *ServerInterfaceWrapper) GetProject(ctx echo.Context) error {
 	return err
 }
 
+// ListImages converts echo context to params.
+func (w *ServerInterfaceWrapper) ListImages(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "projectId" -------------
+	var projectID ProjectIDPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", ctx.Param("projectId"), &projectID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListImagesParams
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "offset", ctx.QueryParams(), &params.Offset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset: %s", err))
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
+	}
+
+	// ------------- Optional query parameter "sortBy" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortBy", ctx.QueryParams(), &params.SortBy)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sortBy: %s", err))
+	}
+
+	// ------------- Optional query parameter "sortOrder" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortOrder", ctx.QueryParams(), &params.SortOrder)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sortOrder: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ListImages(ctx, projectID, params)
+	return err
+}
+
 // CreateUploadURL converts echo context to params.
 func (w *ServerInterfaceWrapper) CreateUploadURL(ctx echo.Context) error {
 	var err error
@@ -917,6 +1127,36 @@ func (w *ServerInterfaceWrapper) CreateUploadURL(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CreateUploadURL(ctx, projectID)
+	return err
+}
+
+// DeleteImage converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteImage(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "projectId" -------------
+	var projectID ProjectIDPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", ctx.Param("projectId"), &projectID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter projectId: %s", err))
+	}
+
+	// ------------- Path parameter "imageId" -------------
+	var imageID ImageIDPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "imageId", ctx.Param("imageId"), &imageID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter imageId: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	ctx.Set(ApiKeyAuthScopes, []string{})
+
+	ctx.Set(CookieAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeleteImage(ctx, projectID, imageID)
 	return err
 }
 
@@ -1007,7 +1247,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.DELETE(baseURL+"/api/v1/admin/projects/:projectId", wrapper.DeleteProjectAdmin)
 	router.GET(baseURL+"/api/v1/admin/projects/:projectId", wrapper.GetProjectAdmin)
 	router.PUT(baseURL+"/api/v1/admin/projects/:projectId", wrapper.UpdateProjectAdmin)
+	router.GET(baseURL+"/api/v1/admin/projects/:projectId/images", wrapper.ListImagesAdmin)
 	router.POST(baseURL+"/api/v1/admin/projects/:projectId/images/reprocess", wrapper.ReprocessImagesAdmin)
+	router.DELETE(baseURL+"/api/v1/admin/projects/:projectId/images/:imageId", wrapper.DeleteImageAdmin)
 	router.GET(baseURL+"/api/v1/admin/service-accounts", wrapper.ListServiceAccountsAdmin)
 	router.POST(baseURL+"/api/v1/admin/service-accounts", wrapper.CreateServiceAccountAdmin)
 	router.DELETE(baseURL+"/api/v1/admin/service-accounts/:serviceAccountId", wrapper.DeleteServiceAccountAdmin)
@@ -1017,7 +1259,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/api/v1/auth/google/sign-in/callback", wrapper.FinishGoogleSignIn)
 	router.POST(baseURL+"/api/v1/auth/sign-out", wrapper.SignOut)
 	router.GET(baseURL+"/api/v1/projects/:projectId", wrapper.GetProject)
+	router.GET(baseURL+"/api/v1/projects/:projectId/images", wrapper.ListImages)
 	router.POST(baseURL+"/api/v1/projects/:projectId/images/upload-url", wrapper.CreateUploadURL)
+	router.DELETE(baseURL+"/api/v1/projects/:projectId/images/:imageId", wrapper.DeleteImage)
 	router.GET(baseURL+"/api/v1/projects/:projectId/images/:imageId", wrapper.GetImage)
 	router.GET(baseURL+"/api/v1/users/me", wrapper.GetCurrentUser)
 
@@ -1026,73 +1270,76 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
