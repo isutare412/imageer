@@ -55,3 +55,41 @@ func (mr *MockS3PresignerMockRecorder) PresignPutObject(arg0, arg1 any) *gomock.
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresignPutObject", reflect.TypeOf((*MockS3Presigner)(nil).PresignPutObject), arg0, arg1)
 }
+
+// MockObjectStorage is a mock of ObjectStorage interface.
+type MockObjectStorage struct {
+	ctrl     *gomock.Controller
+	recorder *MockObjectStorageMockRecorder
+	isgomock struct{}
+}
+
+// MockObjectStorageMockRecorder is the mock recorder for MockObjectStorage.
+type MockObjectStorageMockRecorder struct {
+	mock *MockObjectStorage
+}
+
+// NewMockObjectStorage creates a new mock instance.
+func NewMockObjectStorage(ctrl *gomock.Controller) *MockObjectStorage {
+	mock := &MockObjectStorage{ctrl: ctrl}
+	mock.recorder = &MockObjectStorageMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockObjectStorage) EXPECT() *MockObjectStorageMockRecorder {
+	return m.recorder
+}
+
+// DeleteObjects mocks base method.
+func (m *MockObjectStorage) DeleteObjects(ctx context.Context, keys []string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteObjects", ctx, keys)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteObjects indicates an expected call of DeleteObjects.
+func (mr *MockObjectStorageMockRecorder) DeleteObjects(ctx, keys any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObjects", reflect.TypeOf((*MockObjectStorage)(nil).DeleteObjects), ctx, keys)
+}

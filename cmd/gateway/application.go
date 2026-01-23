@@ -28,12 +28,13 @@ import (
 )
 
 type application struct {
-	webServer                 *web.Server
-	imageUploadListener       *sqs.ImageUploadListener
-	postgresClient            *postgres.Client
-	valkeyClient              *valkey.Client
-	imageProcessResultHandler *valkey.ImageProcessResultHandler
-	leaderElector             leaderElector
+	webServer                   *web.Server
+	imageUploadListener         *sqs.ImageUploadListener
+	postgresClient              *postgres.Client
+	valkeyClient                *valkey.Client
+	imageProcessResultHandler   *valkey.ImageProcessResultHandler
+	imageS3DeleteRequestHandler *valkey.ImageS3DeleteRequestHandler
+	leaderElector               leaderElector
 
 	cfg config.Config
 }
@@ -69,6 +70,12 @@ func newApplication(cfg config.Config) (*application, error) {
 	s3Presigner, err := s3.NewPresigner(cfg.ToS3PresignerConfig())
 	if err != nil {
 		return nil, fmt.Errorf("creating s3 presigner: %w", err)
+	}
+
+	slog.Info("Create s3 object storage")
+	s3ObjectStorage, err := s3.NewObjectStorage(cfg.ToS3ObjectStorageConfig())
+	if err != nil {
+		return nil, fmt.Errorf("creating s3 object storage: %w", err)
 	}
 
 	slog.Info("Create repository client")
@@ -111,6 +118,10 @@ func newApplication(cfg config.Config) (*application, error) {
 	imageProcRequestQueue := valkey.NewImageProcessRequestQueue(
 		cfg.ToValkeyImageProcessRequestQueueConfig(), valkeyClient)
 
+	slog.Info("Create valkey image S3 delete request queue")
+	imageS3DeleteRequestQueue := valkey.NewImageS3DeleteRequestQueue(
+		cfg.ToValkeyImageS3DeleteRequestQueueConfig(), valkeyClient)
+
 	slog.Info("Create valkey image notification publisher")
 	imageNotificationPublisher := valkey.NewImageNotificationPublisher(
 		cfg.ToValkeyImageNotificationPublisherConfig(), valkeyClient)
@@ -137,9 +148,10 @@ func newApplication(cfg config.Config) (*application, error) {
 	userSvc := user.NewService(userRepo)
 
 	slog.Info("Create image service")
-	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, transactioner, imageRepo,
-		imageVarRepo, imageProcLogRepo, presetRepo, imageProcRequestQueue,
-		imageNotificationPublisher, imageUploadDoneSubscriber, imageProcDoneSubscriber)
+	imageSvc := image.NewService(cfg.ToImageServiceConfig(), s3Presigner, s3ObjectStorage,
+		transactioner, imageRepo, imageVarRepo, imageProcLogRepo, presetRepo, imageProcRequestQueue,
+		imageNotificationPublisher, imageUploadDoneSubscriber, imageProcDoneSubscriber,
+		imageS3DeleteRequestQueue)
 
 	slog.Info("Create web server")
 	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, userSvc,
@@ -155,6 +167,10 @@ func newApplication(cfg config.Config) (*application, error) {
 	slog.Info("Create valkey image process result handler")
 	imageProcessResultHandler := valkey.NewImageProcessResultHandler(
 		cfg.ToValkeyImageProcessResultHandlerConfig(), valkeyClient, imageSvc)
+
+	slog.Info("Create valkey image S3 delete request handler")
+	imageS3DeleteRequestHandler := valkey.NewImageS3DeleteRequestHandler(
+		cfg.ToValkeyImageS3DeleteRequestHandlerConfig(), valkeyClient, imageSvc)
 
 	slog.Info("Create image closer")
 	imageCloser := image.NewCloser(cfg.ToImageCloserConfig(), transactioner, imageRepo,
@@ -182,13 +198,14 @@ func newApplication(cfg config.Config) (*application, error) {
 	}
 
 	return &application{
-		webServer:                 webServer,
-		imageUploadListener:       imageUploadListener,
-		postgresClient:            postgresClient,
-		valkeyClient:              valkeyClient,
-		imageProcessResultHandler: imageProcessResultHandler,
-		leaderElector:             elector,
-		cfg:                       cfg,
+		webServer:                   webServer,
+		imageUploadListener:         imageUploadListener,
+		postgresClient:              postgresClient,
+		valkeyClient:                valkeyClient,
+		imageProcessResultHandler:   imageProcessResultHandler,
+		imageS3DeleteRequestHandler: imageS3DeleteRequestHandler,
+		leaderElector:               elector,
+		cfg:                         cfg,
 	}, nil
 }
 
@@ -211,6 +228,11 @@ func (a *application) initialize() error {
 		return fmt.Errorf("initializing image process result handler: %w", err)
 	}
 
+	slog.Info("Initialize image S3 delete request handler")
+	if err := a.imageS3DeleteRequestHandler.Initialize(ctx); err != nil {
+		return fmt.Errorf("initializing image S3 delete request handler: %w", err)
+	}
+
 	return nil
 }
 
@@ -220,6 +242,9 @@ func (a *application) run() {
 
 	slog.Info("Run image process result handler")
 	a.imageProcessResultHandler.Run()
+
+	slog.Info("Run image S3 delete request handler")
+	a.imageS3DeleteRequestHandler.Run()
 
 	slog.Info("Run kubernetes leader elector")
 	a.leaderElector.Run()
@@ -253,6 +278,9 @@ func (a *application) shutdown() {
 
 	slog.Info("Shutdown image process result handler")
 	a.imageProcessResultHandler.Shutdown()
+
+	slog.Info("Shutdown image S3 delete request handler")
+	a.imageS3DeleteRequestHandler.Shutdown()
 
 	slog.Info("Shutdown valkey client")
 	a.valkeyClient.Shutdown()

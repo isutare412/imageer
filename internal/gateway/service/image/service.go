@@ -20,6 +20,7 @@ import (
 
 type Service struct {
 	s3Presigner                port.S3Presigner
+	objectStorage              port.ObjectStorage
 	transactioner              port.Transactioner
 	imageRepo                  port.ImageRepository
 	imageVarRepo               port.ImageVariantRepository
@@ -29,20 +30,24 @@ type Service struct {
 	imageNotificationPublisher port.ImageNotificationPublisher
 	imageUploadDoneSubscriber  port.ImageUploadDoneSubscriber
 	imageProcDoneSubscriber    port.ImageProcessDoneSubscriber
+	imageS3DeleteRequestQueue  port.ImageS3DeleteRequestQueue
 
 	cfg Config
 }
 
-func NewService(cfg Config, s3Presigner port.S3Presigner, transactioner port.Transactioner,
+func NewService(cfg Config, s3Presigner port.S3Presigner, objectStorage port.ObjectStorage,
+	transactioner port.Transactioner,
 	imageRepo port.ImageRepository, imageVarRepo port.ImageVariantRepository,
 	imageProcLogRepo port.ImageProcessingLogRepository, presetRepo port.PresetRepository,
 	imageProcRequestQueue port.ImageProcessRequestQueue,
 	imageNotificationPublisher port.ImageNotificationPublisher,
 	imageUploadDoneSubscriber port.ImageUploadDoneSubscriber,
 	imageProcDoneSubscriber port.ImageProcessDoneSubscriber,
+	imageS3DeleteRequestQueue port.ImageS3DeleteRequestQueue,
 ) *Service {
 	return &Service{
 		s3Presigner:                s3Presigner,
+		objectStorage:              objectStorage,
 		transactioner:              transactioner,
 		imageRepo:                  imageRepo,
 		imageVarRepo:               imageVarRepo,
@@ -52,6 +57,7 @@ func NewService(cfg Config, s3Presigner port.S3Presigner, transactioner port.Tra
 		imageNotificationPublisher: imageNotificationPublisher,
 		imageUploadDoneSubscriber:  imageUploadDoneSubscriber,
 		imageProcDoneSubscriber:    imageProcDoneSubscriber,
+		imageS3DeleteRequestQueue:  imageS3DeleteRequestQueue,
 		cfg:                        cfg,
 	}
 }
@@ -192,11 +198,50 @@ func (s *Service) List(ctx context.Context, params domain.ListImagesParams,
 }
 
 func (s *Service) Delete(ctx context.Context, id string) error {
+	var s3Keys []string
+	var projectID string
+
 	err := s.transactioner.WithTx(ctx, func(ctx context.Context) error {
-		return s.imageRepo.Delete(ctx, id)
+		// Fetch image with variants to collect S3 keys
+		image, err := s.imageRepo.FindByID(ctx, id)
+		if err != nil {
+			return fmt.Errorf("finding image by ID: %w", err)
+		}
+
+		projectID = image.Project.ID
+		s3Keys = append(s3Keys, image.S3Key)
+		for _, variant := range image.Variants {
+			s3Keys = append(s3Keys, variant.S3Key)
+		}
+
+		// Delete image from DB
+		if err := s.imageRepo.Delete(ctx, id); err != nil {
+			return fmt.Errorf("deleting image: %w", err)
+		}
+
+		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("deleting image: %w", err)
+		return fmt.Errorf("during transaction: %w", err)
+	}
+
+	// Push S3 delete request to queue (async)
+	req := &imageerv1.ImageS3DeleteRequest{
+		ImageId:   id,
+		ProjectId: projectID,
+		S3Keys:    s3Keys,
+	}
+	if err := s.imageS3DeleteRequestQueue.Push(ctx, req); err != nil {
+		// Log error but don't fail the delete operation
+		slog.ErrorContext(ctx, "Failed to push S3 delete request", "imageId", id, "error", err)
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteS3Objects(ctx context.Context, req *imageerv1.ImageS3DeleteRequest) error {
+	if err := s.objectStorage.DeleteObjects(ctx, req.S3Keys); err != nil {
+		return fmt.Errorf("deleting S3 objects: %w", err)
 	}
 	return nil
 }

@@ -6,3 +6,7 @@ type PresignerConfig struct {
 	Bucket string
 	Expiry time.Duration
 }
+
+type ObjectStorageConfig struct {
+	Bucket string
+}

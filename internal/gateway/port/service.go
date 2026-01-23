@@ -42,6 +42,7 @@ type ImageService interface {
 	GetWaitUntilProcessed(ctx context.Context, imageID string) (domain.Image, error)
 	List(context.Context, domain.ListImagesParams) (domain.Images, error)
 	Delete(ctx context.Context, id string) error
+	DeleteS3Objects(context.Context, *imageerv1.ImageS3DeleteRequest) error
 	CreateUploadURL(context.Context, domain.CreateUploadURLRequest) (domain.UploadURL, error)
 	StartImageProcessingOnUpload(ctx context.Context, s3Key string) error
 	ReceiveImageProcessResult(context.Context, *imageerv1.ImageProcessResult) error

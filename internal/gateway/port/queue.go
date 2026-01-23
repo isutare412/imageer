@@ -11,3 +11,7 @@ import (
 type ImageProcessRequestQueue interface {
 	Push(context.Context, *imageerv1.ImageProcessRequest) error
 }
+
+type ImageS3DeleteRequestQueue interface {
+	Push(context.Context, *imageerv1.ImageS3DeleteRequest) error
+}

@@ -93,6 +93,13 @@ func (c *Config) ToValkeyImageProcessRequestQueueConfig() valkey.ImageProcessReq
 	}
 }
 
+func (c *Config) ToValkeyImageS3DeleteRequestQueueConfig() valkey.ImageS3DeleteRequestQueueConfig {
+	return valkey.ImageS3DeleteRequestQueueConfig{
+		StreamKey:  c.Valkey.Streams.ImageS3DeleteRequest.StreamKey,
+		StreamSize: c.Valkey.Streams.ImageS3DeleteRequest.StreamSize,
+	}
+}
+
 func (c *Config) ToValkeyImageProcessResultHandlerConfig() valkey.ImageProcessResultHandlerConfig {
 	return valkey.ImageProcessResultHandlerConfig{
 		StreamKey:            c.Valkey.Streams.ImageProcessResult.StreamKey,
@@ -105,6 +112,21 @@ func (c *Config) ToValkeyImageProcessResultHandlerConfig() valkey.ImageProcessRe
 		StealInterval:        c.Valkey.Streams.ImageProcessResult.Stealer.Interval,
 		StealMinIdleTime:     c.Valkey.Streams.ImageProcessResult.Stealer.MinIdleTime,
 		MaxDeliveryAttempt:   c.Valkey.Streams.ImageProcessResult.Stealer.MaxDeliveryAttempt,
+	}
+}
+
+func (c *Config) ToValkeyImageS3DeleteRequestHandlerConfig() valkey.ImageS3DeleteRequestHandlerConfig {
+	return valkey.ImageS3DeleteRequestHandlerConfig{
+		StreamKey:            c.Valkey.Streams.ImageS3DeleteRequest.StreamKey,
+		GroupName:            c.Valkey.Streams.ImageS3DeleteRequest.GroupName,
+		HandleConcurrency:    c.Valkey.Streams.ImageS3DeleteRequest.Handler.Concurrency,
+		HandleTimeout:        c.Valkey.Streams.ImageS3DeleteRequest.Handler.Timeout,
+		ReadBlockTimeout:     c.Valkey.Streams.ImageS3DeleteRequest.Reader.BlockTimeout,
+		ReadBatchSize:        c.Valkey.Streams.ImageS3DeleteRequest.Reader.BatchSize,
+		ReapConsumerIdleTime: c.Valkey.Streams.ImageS3DeleteRequest.Reaper.MinIdleTime,
+		StealInterval:        c.Valkey.Streams.ImageS3DeleteRequest.Stealer.Interval,
+		StealMinIdleTime:     c.Valkey.Streams.ImageS3DeleteRequest.Stealer.MinIdleTime,
+		MaxDeliveryAttempt:   c.Valkey.Streams.ImageS3DeleteRequest.Stealer.MaxDeliveryAttempt,
 	}
 }
 
@@ -175,6 +197,12 @@ func (c *Config) ToS3PresignerConfig() s3.PresignerConfig {
 	return s3.PresignerConfig{
 		Bucket: c.AWS.S3.Bucket,
 		Expiry: c.AWS.S3.Presign.Expiry,
+	}
+}
+
+func (c *Config) ToS3ObjectStorageConfig() s3.ObjectStorageConfig {
+	return s3.ObjectStorageConfig{
+		Bucket: c.AWS.S3.Bucket,
 	}
 }
 

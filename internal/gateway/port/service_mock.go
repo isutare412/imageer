@@ -404,6 +404,20 @@ func (mr *MockImageServiceMockRecorder) Delete(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockImageService)(nil).Delete), ctx, id)
 }
 
+// DeleteS3Objects mocks base method.
+func (m *MockImageService) DeleteS3Objects(arg0 context.Context, arg1 *imageerv1.ImageS3DeleteRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteS3Objects", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteS3Objects indicates an expected call of DeleteS3Objects.
+func (mr *MockImageServiceMockRecorder) DeleteS3Objects(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteS3Objects", reflect.TypeOf((*MockImageService)(nil).DeleteS3Objects), arg0, arg1)
+}
+
 // Get mocks base method.
 func (m *MockImageService) Get(ctx context.Context, imageID string) (domain.Image, error) {
 	m.ctrl.T.Helper()

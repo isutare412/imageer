@@ -180,8 +180,26 @@ config:
       image-process-request:
         stream-key: imageer:prod:image-process-request-stream
         stream-size: 1000
+
       image-process-result:
         stream-key: imageer:prod:image-process-result-stream
+        group-name: gateway
+        handler:
+          concurrency: 5
+          timeout: 30s
+        reader:
+          batch-size: 10
+          block-timeout: 30s
+        stealer:
+          interval: 30s
+          min-idle-time: 1m
+          max-delivery-attempt: 3
+        reaper:
+          min-idle-time: 1h
+
+      image-s3-delete-request:
+        stream-key: imageer:prod:image-s3-delete-request-stream
+        stream-size: 1000
         group-name: gateway
         handler:
           concurrency: 5

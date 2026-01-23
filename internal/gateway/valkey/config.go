@@ -30,6 +30,15 @@ func (c ImageProcessRequestQueueConfig) StreamSizeString() string {
 	return strconv.Itoa(c.StreamSize)
 }
 
+type ImageS3DeleteRequestQueueConfig struct {
+	StreamKey  string
+	StreamSize int
+}
+
+func (c ImageS3DeleteRequestQueueConfig) StreamSizeString() string {
+	return strconv.Itoa(c.StreamSize)
+}
+
 type ImageProcessResultHandlerConfig struct {
 	StreamKey            string
 	GroupName            string
@@ -78,6 +87,64 @@ func (c ImageProcessResultHandlerConfig) ToReaderConfig(consumerName string,
 }
 
 func (c ImageProcessResultHandlerConfig) ToStealerConfig(consumerName string,
+) valkeystream.StealerConfig {
+	return valkeystream.StealerConfig{
+		Consumer:           c.ToConsumerConfig(consumerName),
+		EntryFieldKey:      "msg",
+		StealInterval:      c.StealInterval,
+		StealMinIdleTime:   c.StealMinIdleTime,
+		MaxDeliveryAttempt: c.MaxDeliveryAttempt,
+	}
+}
+
+type ImageS3DeleteRequestHandlerConfig struct {
+	StreamKey            string
+	GroupName            string
+	HandleConcurrency    int
+	HandleTimeout        time.Duration
+	ReadBlockTimeout     time.Duration
+	ReadBatchSize        int64
+	ReapConsumerIdleTime time.Duration
+	StealInterval        time.Duration
+	StealMinIdleTime     time.Duration
+	MaxDeliveryAttempt   int64
+}
+
+func (c ImageS3DeleteRequestHandlerConfig) ToConsumerConfig(consumerName string,
+) valkeystream.ConsumerConfig {
+	return valkeystream.ConsumerConfig{
+		Stream: c.StreamKey,
+		Group:  c.GroupName,
+		Name:   consumerName,
+	}
+}
+
+func (c ImageS3DeleteRequestHandlerConfig) ToInitializerConfig(consumerName string,
+) valkeystream.InitializerConfig {
+	return valkeystream.InitializerConfig{
+		Consumer: c.ToConsumerConfig(consumerName),
+	}
+}
+
+func (c ImageS3DeleteRequestHandlerConfig) ToReaperConfig() valkeystream.ReaperConfig {
+	return valkeystream.ReaperConfig{
+		Stream:            c.StreamKey,
+		Group:             c.GroupName,
+		IdleTimeThreshold: c.ReapConsumerIdleTime,
+	}
+}
+
+func (c ImageS3DeleteRequestHandlerConfig) ToReaderConfig(consumerName string,
+) valkeystream.ReaderConfig {
+	return valkeystream.ReaderConfig{
+		Consumer:         c.ToConsumerConfig(consumerName),
+		EntryFieldKey:    "msg",
+		ReadBlockTimeout: c.ReadBlockTimeout,
+		ReadBatchSize:    c.ReadBatchSize,
+	}
+}
+
+func (c ImageS3DeleteRequestHandlerConfig) ToStealerConfig(consumerName string,
 ) valkeystream.StealerConfig {
 	return valkeystream.StealerConfig{
 		Consumer:           c.ToConsumerConfig(consumerName),

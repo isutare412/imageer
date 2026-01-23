@@ -54,3 +54,41 @@ func (mr *MockImageProcessRequestQueueMockRecorder) Push(arg0, arg1 any) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockImageProcessRequestQueue)(nil).Push), arg0, arg1)
 }
+
+// MockImageS3DeleteRequestQueue is a mock of ImageS3DeleteRequestQueue interface.
+type MockImageS3DeleteRequestQueue struct {
+	ctrl     *gomock.Controller
+	recorder *MockImageS3DeleteRequestQueueMockRecorder
+	isgomock struct{}
+}
+
+// MockImageS3DeleteRequestQueueMockRecorder is the mock recorder for MockImageS3DeleteRequestQueue.
+type MockImageS3DeleteRequestQueueMockRecorder struct {
+	mock *MockImageS3DeleteRequestQueue
+}
+
+// NewMockImageS3DeleteRequestQueue creates a new mock instance.
+func NewMockImageS3DeleteRequestQueue(ctrl *gomock.Controller) *MockImageS3DeleteRequestQueue {
+	mock := &MockImageS3DeleteRequestQueue{ctrl: ctrl}
+	mock.recorder = &MockImageS3DeleteRequestQueueMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockImageS3DeleteRequestQueue) EXPECT() *MockImageS3DeleteRequestQueueMockRecorder {
+	return m.recorder
+}
+
+// Push mocks base method.
+func (m *MockImageS3DeleteRequestQueue) Push(arg0 context.Context, arg1 *imageerv1.ImageS3DeleteRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Push", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Push indicates an expected call of Push.
+func (mr *MockImageS3DeleteRequestQueueMockRecorder) Push(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockImageS3DeleteRequestQueue)(nil).Push), arg0, arg1)
+}

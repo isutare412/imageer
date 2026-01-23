@@ -11,3 +11,7 @@ import (
 type S3Presigner interface {
 	PresignPutObject(context.Context, domain.PresignPutObjectRequest) (domain.PresignPutObjectResponse, error)
 }
+
+type ObjectStorage interface {
+	DeleteObjects(ctx context.Context, keys []string) error
+}
