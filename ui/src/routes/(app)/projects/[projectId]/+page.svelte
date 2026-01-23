@@ -180,7 +180,7 @@
         )} · Updated {formatDate(data.project.updatedAt)}
       </p>
     </div>
-    <div class="flex shrink-0 gap-2">
+    <div class="flex shrink-0 gap-2 self-end sm:self-auto">
       <button type="button" class="btn btn-outline btn-sm" onclick={handleReprocess}>
         <svg
           xmlns="http://www.w3.org/2000/svg"

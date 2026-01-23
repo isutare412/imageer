@@ -126,8 +126,8 @@
 
 <div class="space-y-6">
   <!-- Page header -->
-  <div class="flex items-start justify-between">
-    <div>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div class="min-w-0">
       <nav class="breadcrumbs text-sm">
         <ul>
           <li><a href="/service-accounts" class="link link-hover">Service Accounts</a></li>
@@ -146,27 +146,29 @@
         )}
       </p>
     </div>
-    <button
-      type="button"
-      class="btn btn-error btn-outline btn-sm"
-      onclick={() => (deleteModal.open = true)}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
+    <div class="flex shrink-0 gap-2 self-end sm:self-auto">
+      <button
+        type="button"
+        class="btn btn-error btn-outline btn-sm"
+        onclick={() => (deleteModal.open = true)}
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-        />
-      </svg>
-      Delete
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          />
+        </svg>
+        <span class="hidden sm:inline">Delete</span>
+      </button>
+    </div>
   </div>
 
   <!-- Form -->
