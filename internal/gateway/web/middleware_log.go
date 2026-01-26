@@ -47,7 +47,7 @@ func accessLog(next echo.HandlerFunc) echo.HandlerFunc {
 		)
 
 		entry = attachAuthenticationInfo(rctx, entry)
-		entry.Log(rctx, log.SlogLevelAccess, "Handle HTTP request")
+		entry.InfoContext(rctx, "Handle HTTP request")
 
 		return err
 	}

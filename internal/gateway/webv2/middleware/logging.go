@@ -48,7 +48,7 @@ func AccessLog(next http.Handler) http.Handler {
 		)
 
 		entry = attachAuthenticationInfo(ctx, entry)
-		entry.Log(ctx, log.SlogLevelAccess, "Handle HTTP request")
+		entry.InfoContext(ctx, "Handle HTTP request")
 	})
 }
 
