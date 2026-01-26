@@ -37,7 +37,7 @@ func NewServer(
 	immigration := immigration.New(serviceAccountSvc, projectSvc, imageSvc)
 
 	middlewares := []mux.MiddlewareFunc{
-		handlers.ProxyHeaders,
+		middleware.ProxyHeaders,
 		middleware.WithLogAttrContext,
 		middleware.WithContextBag,
 		middleware.WithRequestID,
