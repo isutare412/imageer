@@ -16,6 +16,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/sqs"
 	"github.com/isutare412/imageer/internal/gateway/valkey"
 	"github.com/isutare412/imageer/internal/gateway/web"
+	"github.com/isutare412/imageer/internal/gateway/webv2"
 	"github.com/isutare412/imageer/pkg/log"
 )
 
@@ -39,6 +40,25 @@ func (c *Config) ToWebConfig() web.Config {
 		ReadTimeout:       c.Web.ReadTimeout,
 		ReadHeaderTimeout: c.Web.ReadHeaderTimeout,
 		CORS: web.CORSConfig{
+			AllowOrigins:     parseCSV(c.Web.CORS.AllowOrigins, ","),
+			AllowHeaders:     parseCSV(c.Web.CORS.AllowHeaders, ","),
+			AllowMethods:     parseCSV(c.Web.CORS.AllowMethods, ","),
+			AllowCredentials: c.Web.CORS.AllowCredentials,
+			MaxAge:           c.Web.CORS.MaxAge,
+		},
+	}
+}
+
+func (c *Config) ToWebV2Config() webv2.Config {
+	return webv2.Config{
+		Port:              c.Web.Port,
+		ShowOpenAPIDocs:   c.Web.ShowOpenAPIDocs,
+		APIKeyHeader:      c.Auth.ServiceAccount.APIKeyHeader,
+		UserCookieName:    c.Auth.Cookies.User.Name,
+		WriteTimeout:      c.Web.WriteTimeout,
+		ReadTimeout:       c.Web.ReadTimeout,
+		ReadHeaderTimeout: c.Web.ReadHeaderTimeout,
+		CORS: webv2.CORSConfig{
 			AllowOrigins:     parseCSV(c.Web.CORS.AllowOrigins, ","),
 			AllowHeaders:     parseCSV(c.Web.CORS.AllowHeaders, ","),
 			AllowMethods:     parseCSV(c.Web.CORS.AllowMethods, ","),

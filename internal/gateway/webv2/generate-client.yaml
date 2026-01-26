@@ -1,0 +1,8 @@
+package: gateway
+generate:
+  client: true
+  models: true
+output: ../../../pkg/gateway/client.gen.go
+output-options:
+  name-normalizer: ToCamelCaseWithInitialisms
+  skip-prune: true

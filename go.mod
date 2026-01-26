@@ -16,6 +16,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.42.20
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.67.7
 	github.com/coreos/go-oidc/v3 v3.15.0
+	github.com/felixge/httpsnoop v1.0.4
 	github.com/getkin/kin-openapi v0.132.0
 	github.com/go-logr/logr v1.4.3
 	github.com/go-playground/locales v0.14.1
@@ -24,6 +25,8 @@ require (
 	github.com/golang-cz/devslog v0.0.15
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/handlers v1.5.2
+	github.com/gorilla/mux v1.8.1
 	github.com/h2non/bimg v1.1.9
 	github.com/jxskiss/base62 v1.1.0
 	github.com/knadh/koanf/parsers/yaml v1.1.0
@@ -35,6 +38,7 @@ require (
 	github.com/lmittmann/tint v1.1.2
 	github.com/mattn/go-isatty v0.0.20
 	github.com/oapi-codegen/echo-middleware v1.0.2
+	github.com/oapi-codegen/nethttp-middleware v1.1.2
 	github.com/oapi-codegen/runtime v1.1.2
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/samber/lo v1.51.0
@@ -85,7 +89,6 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/google/gnostic-models v0.7.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect

@@ -24,11 +24,11 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/service/user"
 	"github.com/isutare412/imageer/internal/gateway/sqs"
 	"github.com/isutare412/imageer/internal/gateway/valkey"
-	"github.com/isutare412/imageer/internal/gateway/web"
+	"github.com/isutare412/imageer/internal/gateway/webv2"
 )
 
 type application struct {
-	webServer                   *web.Server
+	webServer                   *webv2.Server
 	imageUploadListener         *sqs.ImageUploadListener
 	postgresClient              *postgres.Client
 	valkeyClient                *valkey.Client
@@ -154,8 +154,11 @@ func newApplication(cfg config.Config) (*application, error) {
 		imageS3DeleteRequestQueue)
 
 	slog.Info("Create web server")
-	webServer := web.NewServer(cfg.ToWebConfig(), authSvc, serviceAccountSvc, projectSvc, userSvc,
-		imageSvc)
+	webServer, err := webv2.NewServer(cfg.ToWebV2Config(), authSvc, serviceAccountSvc, projectSvc,
+		userSvc, imageSvc)
+	if err != nil {
+		return nil, fmt.Errorf("creating web server: %w", err)
+	}
 
 	slog.Info("Create SQS image upload listener")
 	imageUploadListener, err := sqs.NewImageUploadListener(cfg.ToSQSImageUploadListenerConfig(),
