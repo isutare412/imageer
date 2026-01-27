@@ -57,6 +57,21 @@ func (mr *MockAuthServiceMockRecorder) FinishGoogleSignIn(arg0, arg1 any) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FinishGoogleSignIn", reflect.TypeOf((*MockAuthService)(nil).FinishGoogleSignIn), arg0, arg1)
 }
 
+// RefreshUserToken mocks base method.
+func (m *MockAuthService) RefreshUserToken(ctx context.Context, userID string) (domain.RefreshUserTokenResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RefreshUserToken", ctx, userID)
+	ret0, _ := ret[0].(domain.RefreshUserTokenResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RefreshUserToken indicates an expected call of RefreshUserToken.
+func (mr *MockAuthServiceMockRecorder) RefreshUserToken(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshUserToken", reflect.TypeOf((*MockAuthService)(nil).RefreshUserToken), ctx, userID)
+}
+
 // SignOut mocks base method.
 func (m *MockAuthService) SignOut(ctx context.Context) domain.SignOutResponse {
 	m.ctrl.T.Helper()

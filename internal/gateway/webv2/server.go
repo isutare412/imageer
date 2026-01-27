@@ -33,7 +33,7 @@ func NewServer(
 	handler := handlers.NewHandler(authSvc, serviceAccountSvc, projectSvc, userSvc, imageSvc)
 
 	authenticator := auth.NewAuthenticator(cfg.APIKeyHeader, cfg.UserCookieName,
-		authSvc, serviceAccountSvc)
+		cfg.TokenRefreshThreshold, authSvc, serviceAccountSvc)
 
 	authorizer := auth.NewAuthorizer(serviceAccountSvc, projectSvc, imageSvc)
 
@@ -119,7 +119,7 @@ func logRegisteredRoutes(r *mux.Router) error {
 		}
 
 		for _, method := range methods {
-			slog.Debug("Regiestered route", "method", method, "path", path)
+			slog.Debug("Registered route", "method", method, "path", path)
 		}
 
 		return nil

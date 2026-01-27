@@ -69,3 +69,7 @@ type FinishGoogleSignInResponse struct {
 type SignOutResponse struct {
 	UserCookie *http.Cookie
 }
+
+type RefreshUserTokenResponse struct {
+	UserCookie *http.Cookie
+}

@@ -14,6 +14,7 @@ type AuthService interface {
 	FinishGoogleSignIn(context.Context, domain.FinishGoogleSignInRequest) (domain.FinishGoogleSignInResponse, error)
 	SignOut(ctx context.Context) domain.SignOutResponse
 	VerifyUserToken(ctx context.Context, userToken string) (domain.UserTokenPayload, error)
+	RefreshUserToken(ctx context.Context, userID string) (domain.RefreshUserTokenResponse, error)
 }
 
 type UserService interface {

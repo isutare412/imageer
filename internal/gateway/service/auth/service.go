@@ -113,6 +113,34 @@ func (s *Service) SignOut(ctx context.Context) domain.SignOutResponse {
 	}
 }
 
+func (s *Service) RefreshUserToken(ctx context.Context, userID string,
+) (domain.RefreshUserTokenResponse, error) {
+	user, err := s.userRepo.FindByID(ctx, userID)
+	if err != nil {
+		return domain.RefreshUserTokenResponse{}, fmt.Errorf("getting user: %w", err)
+	}
+
+	issuedAt := time.Now()
+	payload := domain.UserTokenPayload{
+		UserID:     user.ID,
+		IssuedAt:   issuedAt,
+		ExpireAt:   issuedAt.Add(s.cfg.UserCookieTTL),
+		Role:       user.Role,
+		Nickname:   user.Nickname,
+		Email:      user.Email,
+		PictureURL: user.PhotoURL,
+	}
+
+	token, err := s.jwtSigner.SignUserToken(payload)
+	if err != nil {
+		return domain.RefreshUserTokenResponse{}, fmt.Errorf("signing user token: %w", err)
+	}
+
+	return domain.RefreshUserTokenResponse{
+		UserCookie: s.createUserCookie(token),
+	}, nil
+}
+
 func httpBaseURL(r *http.Request) string {
 	scheme := "http"
 	switch {

@@ -7,14 +7,15 @@ import (
 )
 
 type Config struct {
-	Port              int
-	ShowOpenAPIDocs   bool
-	APIKeyHeader      string
-	UserCookieName    string
-	WriteTimeout      time.Duration
-	ReadTimeout       time.Duration
-	ReadHeaderTimeout time.Duration
-	CORS              CORSConfig
+	Port                  int
+	ShowOpenAPIDocs       bool
+	APIKeyHeader          string
+	UserCookieName        string
+	TokenRefreshThreshold time.Duration
+	WriteTimeout          time.Duration
+	ReadTimeout           time.Duration
+	ReadHeaderTimeout     time.Duration
+	CORS                  CORSConfig
 }
 
 type CORSConfig struct {

@@ -51,13 +51,14 @@ func (c *Config) ToWebConfig() web.Config {
 
 func (c *Config) ToWebV2Config() webv2.Config {
 	return webv2.Config{
-		Port:              c.Web.Port,
-		ShowOpenAPIDocs:   c.Web.ShowOpenAPIDocs,
-		APIKeyHeader:      c.Auth.ServiceAccount.APIKeyHeader,
-		UserCookieName:    c.Auth.Cookies.User.Name,
-		WriteTimeout:      c.Web.WriteTimeout,
-		ReadTimeout:       c.Web.ReadTimeout,
-		ReadHeaderTimeout: c.Web.ReadHeaderTimeout,
+		Port:                  c.Web.Port,
+		ShowOpenAPIDocs:       c.Web.ShowOpenAPIDocs,
+		APIKeyHeader:          c.Auth.ServiceAccount.APIKeyHeader,
+		UserCookieName:        c.Auth.Cookies.User.Name,
+		TokenRefreshThreshold: c.Auth.Cookies.User.RefreshThreshold,
+		WriteTimeout:          c.Web.WriteTimeout,
+		ReadTimeout:           c.Web.ReadTimeout,
+		ReadHeaderTimeout:     c.Web.ReadHeaderTimeout,
 		CORS: webv2.CORSConfig{
 			AllowOrigins:     parseCSV(c.Web.CORS.AllowOrigins, ","),
 			AllowHeaders:     parseCSV(c.Web.CORS.AllowHeaders, ","),

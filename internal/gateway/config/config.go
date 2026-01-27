@@ -150,8 +150,9 @@ type AuthConfig struct {
 		} `koanf:"oidc-state"`
 
 		User struct {
-			Name string        `koanf:"name" validate:"required"`
-			TTL  time.Duration `koanf:"ttl" validate:"required,gte=1m"`
+			Name             string        `koanf:"name" validate:"required"`
+			TTL              time.Duration `koanf:"ttl" validate:"required,gte=1m"`
+			RefreshThreshold time.Duration `koanf:"refresh-threshold" validate:"required,gte=1m"`
 		} `koanf:"user"`
 	} `koanf:"cookies"`
 

@@ -230,6 +230,7 @@ config:
       user:
         name: USER
         ttl: 720h
+        refresh-threshold: 336h
 
     service-account:
       api-key-header: X-API-KEY
