@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/isutare412/imageer/internal/gateway/port"
-	"github.com/isutare412/imageer/internal/gateway/web/immigration"
+	"github.com/isutare412/imageer/internal/gateway/web/auth"
 )
 
 //go:embed openapi.yaml openapi.html
@@ -30,10 +30,10 @@ func NewServer(
 ) *Server {
 	handler := newHandler(authSvc, serviceAccountSvc, projectSvc, userSvc, imageSvc)
 
-	passportIssuer := immigration.NewPassportIssuer(cfg.APIKeyHeader, cfg.UserCookieName,
+	authenticator := auth.NewAuthenticator(cfg.APIKeyHeader, cfg.UserCookieName,
 		authSvc, serviceAccountSvc)
 
-	immigration := immigration.New(serviceAccountSvc, projectSvc, imageSvc)
+	authorizer := auth.NewAuthorizer(serviceAccountSvc, projectSvc, imageSvc)
 
 	e := echo.New()
 	e.HidePort = true
@@ -58,9 +58,9 @@ func NewServer(
 			AllowCredentials: cfg.CORS.AllowCredentials,
 			MaxAge:           int(cfg.CORS.MaxAge.Seconds()),
 		}),
+		authenticator.Authenticate,
+		authorizer.Authorize,
 		openAPIValidator(),
-		passportIssuer.IssuePassport,
-		immigration.Immigrate,
 	)
 
 	RegisterHandlers(e, handler)

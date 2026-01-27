@@ -1,4 +1,4 @@
-package webv2
+package handlers
 
 import (
 	"fmt"
@@ -17,20 +17,20 @@ func (h *handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	bag, ok := contextbag.BagFromContext(ctx)
-	if !ok || bag.Passport == nil {
+	if !ok || bag.Identity == nil {
 		gen.RespondError(w, r, apperr.NewError(apperr.CodeUnauthorized).
 			WithSummary("No authentication provided"))
 		return
 	}
 
-	passport, ok := bag.Passport.(domain.UserTokenPassport)
+	identity, ok := bag.Identity.(domain.UserTokenIdentity)
 	if !ok {
 		gen.RespondError(w, r, apperr.NewError(apperr.CodeForbidden).
 			WithSummary("Must be user token authentication"))
 		return
 	}
 
-	user, err := h.userSvc.GetByID(ctx, passport.Payload.UserID)
+	user, err := h.userSvc.GetByID(ctx, identity.Payload.UserID)
 	if err != nil {
 		gen.RespondError(w, r, fmt.Errorf("getting user by id: %w", err))
 		return

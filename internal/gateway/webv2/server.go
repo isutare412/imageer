@@ -8,12 +8,13 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/gorilla/handlers"
+	muxhandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"github.com/isutare412/imageer/internal/gateway/port"
+	"github.com/isutare412/imageer/internal/gateway/webv2/auth"
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
-	"github.com/isutare412/imageer/internal/gateway/webv2/immigration"
+	"github.com/isutare412/imageer/internal/gateway/webv2/handlers"
 	"github.com/isutare412/imageer/internal/gateway/webv2/middleware"
 )
 
@@ -29,12 +30,12 @@ func NewServer(
 	cfg Config, authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService,
 	projectSvc port.ProjectService, userSvc port.UserService, imageSvc port.ImageService,
 ) (*Server, error) {
-	handler := newHandler(authSvc, serviceAccountSvc, projectSvc, userSvc, imageSvc)
+	handler := handlers.NewHandler(authSvc, serviceAccountSvc, projectSvc, userSvc, imageSvc)
 
-	passportIssuer := immigration.NewPassportIssuer(cfg.APIKeyHeader, cfg.UserCookieName,
+	authenticator := auth.NewAuthenticator(cfg.APIKeyHeader, cfg.UserCookieName,
 		authSvc, serviceAccountSvc)
 
-	immigration := immigration.New(serviceAccountSvc, projectSvc, imageSvc)
+	authorizer := auth.NewAuthorizer(serviceAccountSvc, projectSvc, imageSvc)
 
 	middlewares := []mux.MiddlewareFunc{
 		middleware.ProxyHeaders,
@@ -44,10 +45,10 @@ func NewServer(
 		middleware.WithResponseMetrics,
 		middleware.AccessLog,
 		middleware.RecoverPanic,
-		handlers.CORS(cfg.CORS.buildCORSOptions()...),
+		muxhandlers.CORS(cfg.CORS.buildCORSOptions()...),
+		authenticator.Authenticate,
+		authorizer.Authorize,
 		middleware.WithOpenAPIValidator(),
-		passportIssuer.IssuePassport,
-		immigration.Immigrate,
 	}
 
 	r := mux.NewRouter()

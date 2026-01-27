@@ -59,26 +59,26 @@ func attachAuthenticationInfo(ctx context.Context, entry *slog.Logger) *slog.Log
 		return entry
 	}
 
-	switch pp := bag.Passport.(type) {
-	case domain.UserTokenPassport:
+	switch id := bag.Identity.(type) {
+	case domain.UserTokenIdentity:
 		entry = entry.With(
 			"authenticated", true,
 			"authenticationMethod", "userToken",
 			slog.Group("user",
-				"id", pp.Payload.UserID,
-				"nickname", pp.Payload.Nickname,
-				"role", pp.Payload.Role,
+				"id", id.Payload.UserID,
+				"nickname", id.Payload.Nickname,
+				"role", id.Payload.Role,
 			),
 		)
 
-	case domain.ServiceAccountPassport:
+	case domain.ServiceAccountIdentity:
 		entry = entry.With(
 			"authenticated", true,
 			"authenticationMethod", "serviceAccount",
 			slog.Group("serviceAccount",
-				"id", pp.ServiceAccount.ID,
-				"name", pp.ServiceAccount.Name,
-				"accessScope", pp.ServiceAccount.AccessScope,
+				"id", id.ServiceAccount.ID,
+				"name", id.ServiceAccount.Name,
+				"accessScope", id.ServiceAccount.AccessScope,
 			),
 		)
 	}

@@ -1,4 +1,4 @@
-package immigration
+package auth
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package webv2
+package handlers
 
 import (
 	"github.com/isutare412/imageer/internal/gateway/domain"

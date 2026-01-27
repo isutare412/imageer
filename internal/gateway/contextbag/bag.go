@@ -8,8 +8,8 @@ import (
 
 // Bag is a placeholder for storing cross-cutting concerns in context.
 type Bag struct {
-	// Passport holds the authentication and authorization information.
-	Passport domain.Passport
+	// Identity holds the authentication and authorization information.
+	Identity domain.Identity
 }
 
 // WithBag returns a new context with an empty Bag.

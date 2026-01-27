@@ -1,4 +1,4 @@
-package webv2
+package handlers
 
 import "github.com/isutare412/imageer/internal/gateway/port"
 
@@ -11,8 +11,8 @@ type handler struct {
 	imageSvc          port.ImageService
 }
 
-// newHandler creates a new Handler instance
-func newHandler(authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService,
+// NewHandler creates a new Handler instance
+func NewHandler(authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService,
 	projectSvc port.ProjectService, userSvc port.UserService, imageSvc port.ImageService,
 ) *handler {
 	return &handler{

@@ -1,4 +1,4 @@
-package immigration
+package auth
 
 import (
 	"fmt"
@@ -10,15 +10,15 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
 )
 
-type Immigration struct {
+type Authorizer struct {
 	permissionInspectors []permissionInspector
 	resourceInspectors   *resourceInspector
 }
 
-func New(serviceAccountSvc port.ServiceAccountService, projectSvc port.ProjectService,
+func NewAuthorizer(serviceAccountSvc port.ServiceAccountService, projectSvc port.ProjectService,
 	imageSvc port.ImageService,
-) *Immigration {
-	return &Immigration{
+) *Authorizer {
+	return &Authorizer{
 		permissionInspectors: []permissionInspector{
 			newAdminPermissionInspector(),
 			newProjectPermissionInspector(),
@@ -27,13 +27,13 @@ func New(serviceAccountSvc port.ServiceAccountService, projectSvc port.ProjectSe
 	}
 }
 
-func (i *Immigration) Immigrate(next http.Handler) http.Handler {
+func (i *Authorizer) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		var passport domain.Passport
+		var identity domain.Identity
 		if bag, ok := contextbag.BagFromContext(ctx); ok {
-			passport = bag.Passport
+			identity = bag.Identity
 		}
 
 		// Inspect permissions
@@ -41,8 +41,8 @@ func (i *Immigration) Immigrate(next http.Handler) http.Handler {
 			if !inspector.isTarget(r) {
 				continue
 			}
-			if err := inspector.inspect(r, passport); err != nil {
-				gen.RespondError(w, r, fmt.Errorf("inspecting passport: %w", err))
+			if err := inspector.inspect(r, identity); err != nil {
+				gen.RespondError(w, r, fmt.Errorf("checking authorization: %w", err))
 				return
 			}
 		}

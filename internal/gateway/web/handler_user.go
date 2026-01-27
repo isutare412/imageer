@@ -18,18 +18,18 @@ func (h *handler) GetCurrentUser(ctx echo.Context) error {
 	rctx := ctx.Request().Context()
 
 	bag, ok := contextbag.BagFromContext(rctx)
-	if !ok || bag.Passport == nil {
+	if !ok || bag.Identity == nil {
 		return apperr.NewError(apperr.CodeUnauthorized).
 			WithSummary("No authentication provided")
 	}
 
-	passport, ok := bag.Passport.(domain.UserTokenPassport)
+	identity, ok := bag.Identity.(domain.UserTokenIdentity)
 	if !ok {
 		return apperr.NewError(apperr.CodeForbidden).
 			WithSummary("Must be user token authentication")
 	}
 
-	user, err := h.userSvc.GetByID(rctx, passport.Payload.UserID)
+	user, err := h.userSvc.GetByID(rctx, identity.Payload.UserID)
 	if err != nil {
 		return fmt.Errorf("getting user by id: %w", err)
 	}

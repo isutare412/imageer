@@ -1,4 +1,4 @@
-package webv2
+package handlers
 
 import (
 	"encoding/json"
