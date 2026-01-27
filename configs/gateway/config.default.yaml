@@ -98,10 +98,10 @@ valkey:
 auth:
   cookies:
     oidc-state:
-      name: OIDC_STATE
+      name: IMAGEER_OIDC_STATE
       ttl: 5m
     user:
-      name: USER
+      name: IMAGEER_USER
       ttl: 720h
       refresh-threshold: 336h
 
