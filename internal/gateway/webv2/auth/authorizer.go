@@ -27,7 +27,7 @@ func NewAuthorizer(serviceAccountSvc port.ServiceAccountService, projectSvc port
 	}
 }
 
-func (i *Authorizer) Authorize(next http.Handler) http.Handler {
+func (a *Authorizer) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -37,7 +37,7 @@ func (i *Authorizer) Authorize(next http.Handler) http.Handler {
 		}
 
 		// Inspect permissions
-		for _, inspector := range i.permissionInspectors {
+		for _, inspector := range a.permissionInspectors {
 			if !inspector.isTarget(r) {
 				continue
 			}
@@ -48,7 +48,7 @@ func (i *Authorizer) Authorize(next http.Handler) http.Handler {
 		}
 
 		// Inspect existence, consistency of requested resources.
-		if err := i.resourceInspectors.inspect(r); err != nil {
+		if err := a.resourceInspectors.inspect(r); err != nil {
 			gen.RespondError(w, r, fmt.Errorf("inspecting resources: %w", err))
 			return
 		}

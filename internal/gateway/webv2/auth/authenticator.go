@@ -32,11 +32,11 @@ func NewAuthenticator(apiKeyHeader, userCookieName string, authSvc port.AuthServ
 	}
 }
 
-func (i *Authenticator) Authenticate(next http.Handler) http.Handler {
+func (a *Authenticator) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		if ok, err := i.authenticateByHeader(ctx, r.Header); err != nil {
+		if ok, err := a.authenticateByHeader(ctx, r.Header); err != nil {
 			gen.RespondError(w, r, fmt.Errorf("authenticate by header: %w", err))
 			return
 		} else if ok {
@@ -45,7 +45,7 @@ func (i *Authenticator) Authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		if ok, err := i.authenticateByCookie(ctx, r.Cookies()); err != nil {
+		if ok, err := a.authenticateByCookie(ctx, r.Cookies()); err != nil {
 			gen.RespondError(w, r, fmt.Errorf("authenticate by cookie: %w", err))
 			return
 		} else if ok {
@@ -59,14 +59,14 @@ func (i *Authenticator) Authenticate(next http.Handler) http.Handler {
 	})
 }
 
-func (i *Authenticator) authenticateByHeader(ctx context.Context, header http.Header) (bool, error) {
-	if ok, err := i.identityFromBearerToken(ctx, header); err != nil {
+func (a *Authenticator) authenticateByHeader(ctx context.Context, header http.Header) (bool, error) {
+	if ok, err := a.identityFromBearerToken(ctx, header); err != nil {
 		return false, fmt.Errorf("getting identity from bearer token: %w", err)
 	} else if ok {
 		return true, nil
 	}
 
-	if ok, err := i.identityFromAPIKey(ctx, header); err != nil {
+	if ok, err := a.identityFromAPIKey(ctx, header); err != nil {
 		return false, fmt.Errorf("getting identity from API key: %w", err)
 	} else if ok {
 		return true, nil
@@ -75,7 +75,7 @@ func (i *Authenticator) authenticateByHeader(ctx context.Context, header http.He
 	return false, nil
 }
 
-func (i *Authenticator) identityFromBearerToken(ctx context.Context, header http.Header) (bool, error) {
+func (a *Authenticator) identityFromBearerToken(ctx context.Context, header http.Header) (bool, error) {
 	auth := header.Get("Authorization")
 	if auth == "" {
 		return false, nil
@@ -86,49 +86,49 @@ func (i *Authenticator) identityFromBearerToken(ctx context.Context, header http
 		return false, nil
 	}
 
-	payload, err := i.authSvc.VerifyUserToken(ctx, token)
+	payload, err := a.authSvc.VerifyUserToken(ctx, token)
 	if err != nil {
 		return false, fmt.Errorf("verifying user token: %w", err)
 	}
 
 	identity := domain.NewUserTokenIdentity(payload)
-	i.registerIdentity(ctx, identity)
+	a.registerIdentity(ctx, identity)
 	return true, nil
 }
 
-func (i *Authenticator) identityFromAPIKey(ctx context.Context, header http.Header) (bool, error) {
-	apiKey := header.Get(i.apiKeyHeader)
+func (a *Authenticator) identityFromAPIKey(ctx context.Context, header http.Header) (bool, error) {
+	apiKey := header.Get(a.apiKeyHeader)
 	if apiKey == "" {
 		return false, nil
 	}
 
-	account, err := i.serviceAccountSvc.GetByAPIKey(ctx, apiKey)
+	account, err := a.serviceAccountSvc.GetByAPIKey(ctx, apiKey)
 	if err != nil {
 		return false, fmt.Errorf("getting service account by API key: %w", err)
 	}
 
 	identity := domain.NewServiceAccountIdentity(account)
-	i.registerIdentity(ctx, identity)
+	a.registerIdentity(ctx, identity)
 	return true, nil
 }
 
-func (i *Authenticator) authenticateByCookie(ctx context.Context, cookies []*http.Cookie) (bool, error) {
-	cookie, ok := lo.Find(cookies, func(c *http.Cookie) bool { return c.Name == i.userCookieName })
+func (a *Authenticator) authenticateByCookie(ctx context.Context, cookies []*http.Cookie) (bool, error) {
+	cookie, ok := lo.Find(cookies, func(c *http.Cookie) bool { return c.Name == a.userCookieName })
 	if !ok {
 		return false, nil
 	}
 
-	payload, err := i.authSvc.VerifyUserToken(ctx, cookie.Value)
+	payload, err := a.authSvc.VerifyUserToken(ctx, cookie.Value)
 	if err != nil {
 		return false, fmt.Errorf("verifying user token: %w", err)
 	}
 
 	identity := domain.NewUserTokenIdentity(payload)
-	i.registerIdentity(ctx, identity)
+	a.registerIdentity(ctx, identity)
 	return true, nil
 }
 
-func (i *Authenticator) registerIdentity(ctx context.Context, id domain.Identity) {
+func (a *Authenticator) registerIdentity(ctx context.Context, id domain.Identity) {
 	if bag, ok := contextbag.BagFromContext(ctx); ok {
 		bag.Identity = id
 	}
