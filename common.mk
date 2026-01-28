@@ -24,14 +24,14 @@ test: ## Run Go tests
 .PHONY: format
 format: ## Check Go code formatting
 	@echo "🔍 Checking Go code formatting..." && \
-		gofmt -d . && \
-		echo "✅ Code formatting check complete."
-
-.PHONY: format-fix
-format-fix: ## Format Go code
-	@echo "🔧 Formatting Go code..." && \
-		gofmt -w . && \
-		echo "✅ Code formatting complete."
+	OUTPUT=$$(gofmt -d $$(find . -name '*.go' -not -path './vendor/*')); \
+	if [ "$$OUTPUT" ]; then \
+		echo "$$OUTPUT"; \
+		echo "❌ Code is not properly formatted. Run 'go fmt ./...' to fix."; \
+		exit 1; \
+	else \
+		echo "✅ All Go files are properly formatted."; \
+	fi
 
 .PHONY: lint
 lint: golangci-lint ## Run golangci-lint
@@ -54,7 +54,7 @@ golangci-lint: ## Check and install golangci-lint if needed
 	@GOPATH_BIN=$$(go env GOPATH)/bin; \
 	if [ ! -f "$(GOLANGCI_LINT)" ]; then \
 		echo "⚠️ golangci-lint not found in $$LOCALBIN. Installing..."; \
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(LOCALBIN) v2.4.0 && \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(LOCALBIN) v2.8.0 && \
 		echo "✅ golangci-lint installed successfully."; \
 	else \
 		echo "✅ golangci-lint is already installed."; \
