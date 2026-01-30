@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Log    LogConfig    `koanf:"log"`
+	Web    WebConfig    `koanf:"web"`
 	Valkey ValkeyConfig `koanf:"valkey"`
 	AWS    AWSConfig    `koanf:"aws"`
 }
@@ -17,6 +18,10 @@ type LogConfig struct {
 	Level     log.Level  `koanf:"level" validate:"validateFn=Validate"`
 	AddSource bool       `koanf:"add-source"`
 	Component string     `koanf:"component" validate:"required"`
+}
+
+type WebConfig struct {
+	Port int `koanf:"port" validate:"required,gt=0,lte=65535"`
 }
 
 type ValkeyConfig struct {

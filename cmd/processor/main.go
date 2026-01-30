@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	pcconfig "github.com/isutare412/imageer/internal/processor/config"
+	"github.com/isutare412/imageer/internal/processor/metric"
 	"github.com/isutare412/imageer/pkg/config"
 	"github.com/isutare412/imageer/pkg/log"
 )
@@ -22,6 +23,7 @@ func main() {
 		return
 	}
 	log.Init(cfg.ToLogConfig())
+	metric.Init()
 
 	slog.Debug("Loaded config", "config", cfg)
 

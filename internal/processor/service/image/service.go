@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/isutare412/imageer/internal/processor/domain"
+	"github.com/isutare412/imageer/internal/processor/metric"
 	"github.com/isutare412/imageer/internal/processor/port"
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/images"
@@ -52,7 +53,13 @@ func (s *Service) Process(ctx context.Context, req *imageerv1.ImageProcessReques
 		result.IsSuccess = true
 	}
 
-	result.ProcessingTime = durationpb.New(time.Since(start))
+	duration := time.Since(start)
+	result.ProcessingTime = durationpb.New(duration)
+
+	metric.ObserveImageProcess(
+		string(images.NewFormatFromProto(req.Image.Format)),
+		string(domain.NewPreset(req.Preset).Format),
+		result.IsSuccess, duration)
 
 	if err := s.imageProcResultQueue.Push(ctx, result); err != nil {
 		return fmt.Errorf("pushing image process result: %w", err)

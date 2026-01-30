@@ -8,7 +8,6 @@ import (
 
 type Config struct {
 	Port                  int
-	ShowMetrics           bool
 	ShowOpenAPIDocs       bool
 	APIKeyHeader          string
 	UserCookieName        string

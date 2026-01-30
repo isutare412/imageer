@@ -135,9 +135,6 @@ config:
     add-source: false
     component: imageer-gateway
 
-  metrics:
-    enabled: true
-
   web:
     port: *port
     show-banner: false

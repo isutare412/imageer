@@ -8,7 +8,6 @@ import (
 
 type Config struct {
 	Log        LogConfig        `koanf:"log"`
-	Metrics    MetricsConfig    `koanf:"metrics"`
 	Web        WebConfig        `koanf:"web"`
 	Kubernetes KubernetesConfig `koanf:"kubernetes"`
 	Database   DatabaseConfig   `koanf:"database"`
@@ -24,10 +23,6 @@ type LogConfig struct {
 	Level     log.Level  `koanf:"level" validate:"validateFn=Validate"`
 	AddSource bool       `koanf:"add-source"`
 	Component string     `koanf:"component" validate:"required"`
-}
-
-type MetricsConfig struct {
-	Enabled bool `koanf:"enabled"`
 }
 
 type WebConfig struct {

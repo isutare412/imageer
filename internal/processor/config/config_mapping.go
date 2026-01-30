@@ -7,6 +7,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/processor/s3"
 	"github.com/isutare412/imageer/internal/processor/valkey"
+	"github.com/isutare412/imageer/internal/processor/web"
 	"github.com/isutare412/imageer/pkg/log"
 )
 
@@ -52,6 +53,12 @@ func (c *Config) ToValkeyImageProcessRequestHandlerConfig() valkey.ImageProcessR
 		StealInterval:        c.Valkey.Streams.ImageProcessRequest.Stealer.Interval,
 		StealMinIdleTime:     c.Valkey.Streams.ImageProcessRequest.Stealer.MinIdleTime,
 		MaxDeliveryAttempt:   c.Valkey.Streams.ImageProcessRequest.Stealer.MaxDeliveryAttempt,
+	}
+}
+
+func (c *Config) ToWebServerConfig() web.Config {
+	return web.Config{
+		Port: c.Web.Port,
 	}
 }
 

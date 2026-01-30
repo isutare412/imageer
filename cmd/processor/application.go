@@ -14,9 +14,11 @@ import (
 	"github.com/isutare412/imageer/internal/processor/s3"
 	imagesvc "github.com/isutare412/imageer/internal/processor/service/image"
 	"github.com/isutare412/imageer/internal/processor/valkey"
+	"github.com/isutare412/imageer/internal/processor/web"
 )
 
 type application struct {
+	webServer                  *web.Server
 	valkeyClient               *valkey.Client
 	imageProcessRequestHandler *valkey.ImageProcessRequestHandler
 }
@@ -50,7 +52,11 @@ func newApplication(cfg config.Config) (*application, error) {
 	imageProcessRequestHandler := valkey.NewImageProcessRequestHandler(
 		cfg.ToValkeyImageProcessRequestHandlerConfig(), valkeyClient, imageService)
 
+	slog.Info("Create web server")
+	webServer := web.NewServer(cfg.ToWebServerConfig())
+
 	return &application{
+		webServer:                  webServer,
 		valkeyClient:               valkeyClient,
 		imageProcessRequestHandler: imageProcessRequestHandler,
 	}, nil
@@ -74,17 +80,29 @@ func (a *application) initialize() error {
 }
 
 func (a *application) run() {
+	slog.Info("Run web server")
+	webServerErrs := a.webServer.Run()
+
 	slog.Info("Run image process request handler")
 	a.imageProcessRequestHandler.Run()
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	sig := <-signals
-	slog.Info("Received signal; shutdown application", "signal", sig)
+	select {
+	case sig := <-signals:
+		slog.Info("Received signal; shutdown application", "signal", sig)
+	case err := <-webServerErrs:
+		slog.Error("Web server error; shutdown application", "error", err)
+	}
 }
 
 func (a *application) shutdown() {
 	defer logDuration("Application shutdown")()
+
+	slog.Info("Shutdown web server")
+	if err := a.webServer.Shutdown(); err != nil {
+		slog.Error("Failed to shutdown web server", "error", err)
+	}
 
 	slog.Info("Shutdown image process request handler")
 	a.imageProcessRequestHandler.Shutdown()

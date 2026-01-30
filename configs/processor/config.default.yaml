@@ -4,6 +4,9 @@ log:
   add-source: false
   component: imageer-processor
 
+web:
+  port: 9090
+
 valkey:
   addresses: localhost:15410
   username: admin

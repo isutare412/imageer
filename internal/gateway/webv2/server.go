@@ -54,7 +54,6 @@ func NewServer(
 		middleware.AccessLog,
 		middleware.ObserveMetrics,
 		middleware.RecoverPanic,
-		muxhandlers.CORS(cfg.CORS.buildCORSOptions()...),
 	}
 
 	apiMiddlewares := append(baseMiddlewares,
@@ -67,11 +66,8 @@ func NewServer(
 	r.HandleFunc("/healthz/live", handler.Liveness).Methods("GET")
 	r.HandleFunc("/healthz/ready", handler.Readiness).Methods("GET")
 
-	if cfg.ShowMetrics {
-		r.Handle("/metrics", promhttp.HandlerFor(metric.Gatherer(),
-			promhttp.HandlerOpts{})).
-			Methods("GET")
-	}
+	r.Handle("/metrics", promhttp.HandlerFor(metric.Gatherer(), promhttp.HandlerOpts{})).
+		Methods("GET")
 
 	if cfg.ShowOpenAPIDocs {
 		docsRouter := r.PathPrefix("/docs").Subrouter()
@@ -103,7 +99,7 @@ func NewServer(
 		cfg: cfg,
 		server: &http.Server{
 			Addr:              fmt.Sprintf(":%d", cfg.Port),
-			Handler:           r,
+			Handler:           muxhandlers.CORS(cfg.CORS.buildCORSOptions()...)(r),
 			WriteTimeout:      cfg.WriteTimeout,
 			ReadTimeout:       cfg.ReadTimeout,
 			ReadHeaderTimeout: cfg.ReadHeaderTimeout,
