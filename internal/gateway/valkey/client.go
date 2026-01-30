@@ -1,9 +1,12 @@
 package valkey
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/valkey-io/valkey-go"
+
+	"github.com/isutare412/imageer/pkg/dbhelpers"
 )
 
 type Client struct {
@@ -30,4 +33,17 @@ func NewClient(cfg ClientConfig) (*Client, error) {
 
 func (c *Client) Shutdown() {
 	c.client.Close()
+}
+
+func (c *Client) HealthCheck(ctx context.Context) error {
+	resp := c.client.Do(ctx, c.client.B().Ping().Build())
+	if err := resp.Error(); err != nil {
+		return dbhelpers.WrapValkeyError(err, "Failed to PING")
+	}
+
+	return nil
+}
+
+func (c *Client) ComponentName() string {
+	return "ValkeyClient"
 }

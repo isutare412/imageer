@@ -154,8 +154,9 @@ func newApplication(cfg config.Config) (*application, error) {
 		imageS3DeleteRequestQueue)
 
 	slog.Info("Create web server")
-	webServer, err := webv2.NewServer(cfg.ToWebV2Config(), authSvc, serviceAccountSvc, projectSvc,
-		userSvc, imageSvc)
+	healthCheckers := []port.HealthChecker{postgresClient, valkeyClient}
+	webServer, err := webv2.NewServer(cfg.ToWebV2Config(), healthCheckers, authSvc,
+		serviceAccountSvc, projectSvc, userSvc, imageSvc)
 	if err != nil {
 		return nil, fmt.Errorf("creating web server: %w", err)
 	}

@@ -20,7 +20,7 @@ func RespondJSON(w http.ResponseWriter, code int, v any) {
 }
 
 func RespondNoContent(w http.ResponseWriter, code int) {
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(code)
 }
 
 func RespondError(w http.ResponseWriter, r *http.Request, err error) {

@@ -21,11 +21,6 @@ func WithOpenAPIValidator() mux.MiddlewareFunc {
 		panic(fmt.Errorf("getting swagger spec: %w", err))
 	}
 
-	// NOTE: Manually add docs endpoints to swagger to bypass validation
-	swagger.AddOperation("/docs", "GET", openapi3.NewOperation())
-	swagger.AddOperation("/docs/openapi.html", "GET", openapi3.NewOperation())
-	swagger.AddOperation("/docs/openapi.yaml", "GET", openapi3.NewOperation())
-
 	// Disable schema error details in responses
 	openapi3.SchemaErrorDetailsDisabled = true
 

@@ -27,17 +27,23 @@ type Server struct {
 }
 
 func NewServer(
-	cfg Config, authSvc port.AuthService, serviceAccountSvc port.ServiceAccountService,
-	projectSvc port.ProjectService, userSvc port.UserService, imageSvc port.ImageService,
+	cfg Config,
+	healthCheckers []port.HealthChecker,
+	authSvc port.AuthService,
+	serviceAccountSvc port.ServiceAccountService,
+	projectSvc port.ProjectService,
+	userSvc port.UserService,
+	imageSvc port.ImageService,
 ) (*Server, error) {
-	handler := handlers.NewHandler(authSvc, serviceAccountSvc, projectSvc, userSvc, imageSvc)
+	handler := handlers.NewHandler(healthCheckers, authSvc, serviceAccountSvc, projectSvc, userSvc,
+		imageSvc)
 
 	authenticator := auth.NewAuthenticator(cfg.APIKeyHeader, cfg.UserCookieName,
 		cfg.TokenRefreshThreshold, authSvc, serviceAccountSvc)
 
 	authorizer := auth.NewAuthorizer(serviceAccountSvc, projectSvc, imageSvc)
 
-	middlewares := []mux.MiddlewareFunc{
+	baseMiddlewares := []mux.MiddlewareFunc{
 		middleware.ProxyHeaders,
 		middleware.WithLogAttrContext,
 		middleware.WithContextBag,
@@ -48,27 +54,38 @@ func NewServer(
 		muxhandlers.CORS(cfg.CORS.buildCORSOptions()...),
 		authenticator.Authenticate,
 		authorizer.Authorize,
-		middleware.WithOpenAPIValidator(),
 	}
 
+	apiMiddlewares := append(baseMiddlewares, middleware.WithOpenAPIValidator())
+
 	r := mux.NewRouter()
-	r.Use(middlewares...)
 
-	gen.HandlerWithOptions(handler, gen.GorillaServerOptions{
-		BaseRouter:       r,
-		ErrorHandlerFunc: gen.RespondError,
-	})
+	// Health routes - NO middleware
+	r.HandleFunc("/healthz/live", handler.Liveness).Methods("GET")
+	r.HandleFunc("/healthz/ready", handler.Readiness).Methods("GET")
 
+	// Docs routes - middleware WITHOUT openapi validator
 	if cfg.ShowOpenAPIDocs {
-		r.HandleFunc("/docs", func(w http.ResponseWriter, r *http.Request) {
+		docsRouter := r.PathPrefix("/docs").Subrouter()
+		docsRouter.Use(baseMiddlewares...)
+
+		docsRouter.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/docs/openapi.html", http.StatusMovedPermanently)
 		}).Methods("GET")
 
-		r.PathPrefix("/docs/").
+		docsRouter.PathPrefix("/").
 			Handler(http.StripPrefix("/docs/",
 				http.FileServer(http.FS(staticContents)))).
 			Methods("GET")
 	}
+
+	// API routes - ALL middleware
+	apiRouter := r.PathPrefix("/").Subrouter()
+	apiRouter.Use(apiMiddlewares...)
+	gen.HandlerWithOptions(handler, gen.GorillaServerOptions{
+		BaseRouter:       apiRouter,
+		ErrorHandlerFunc: gen.RespondError,
+	})
 
 	if err := logRegisteredRoutes(r); err != nil {
 		return nil, fmt.Errorf("logging registerred routes: %w", err)

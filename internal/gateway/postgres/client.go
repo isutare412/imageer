@@ -59,6 +59,27 @@ func (c *Client) MigrateSchemas(ctx context.Context) error {
 	return nil
 }
 
+func (c *Client) HealthCheck(ctx context.Context) error {
+	sqlDB, err := c.db.DB()
+	if err != nil {
+		return apperr.NewError(apperr.CodeInternalServerError).
+			WithSummary("Failed to get generic database object").
+			WithCause(err)
+	}
+
+	if err := sqlDB.PingContext(ctx); err != nil {
+		return apperr.NewError(apperr.CodeServiceUnavailable).
+			WithSummary("Database is not reachable").
+			WithCause(err)
+	}
+
+	return nil
+}
+
+func (c *Client) ComponentName() string {
+	return "PostgresClient"
+}
+
 func newDialector(cfg ClientConfig) gorm.Dialector {
 	switch {
 	case cfg.UseInMemory:
