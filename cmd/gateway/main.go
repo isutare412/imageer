@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	gwconfig "github.com/isutare412/imageer/internal/gateway/config"
+	"github.com/isutare412/imageer/internal/gateway/metric"
 	"github.com/isutare412/imageer/pkg/config"
 	"github.com/isutare412/imageer/pkg/log"
 )
@@ -21,7 +22,11 @@ func main() {
 		slog.Error("Failed to load config", "error", err)
 		return
 	}
+
 	log.Init(cfg.ToLogConfig())
+	if cfg.Metrics.Enabled {
+		metric.Init()
+	}
 
 	slog.Debug("Loaded config", "config", cfg)
 

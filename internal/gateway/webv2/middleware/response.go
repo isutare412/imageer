@@ -7,20 +7,20 @@ import (
 	"github.com/felixge/httpsnoop"
 )
 
-type responseMetricsContextKey struct{}
+type responseRecordContextKey struct{}
 
-type ResponseMetrics struct {
+type ResponseRecord struct {
 	Status       int
 	ResponseSize int
 }
 
-func WithResponseMetrics(next http.Handler) http.Handler {
+func WithResponseRecord(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
 		// Initialize response metrics and store in context
-		metrics := &ResponseMetrics{}
-		ctx = context.WithValue(ctx, responseMetricsContextKey{}, metrics)
+		metrics := &ResponseRecord{}
+		ctx = context.WithValue(ctx, responseRecordContextKey{}, metrics)
 
 		// Wrap the ResponseWriter to capture metrics
 		w = httpsnoop.Wrap(w, httpsnoop.Hooks{
@@ -42,7 +42,7 @@ func WithResponseMetrics(next http.Handler) http.Handler {
 	})
 }
 
-func GetResponseMetrics(ctx context.Context) (*ResponseMetrics, bool) {
-	metrics, ok := ctx.Value(responseMetricsContextKey{}).(*ResponseMetrics)
+func GetResponseRecord(ctx context.Context) (*ResponseRecord, bool) {
+	metrics, ok := ctx.Value(responseRecordContextKey{}).(*ResponseRecord)
 	return metrics, ok
 }

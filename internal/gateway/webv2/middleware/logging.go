@@ -30,7 +30,7 @@ func AccessLog(next http.Handler) http.Handler {
 			status       int
 			responseSize int64
 		)
-		if metrics, ok := GetResponseMetrics(ctx); ok {
+		if metrics, ok := GetResponseRecord(ctx); ok {
 			status = metrics.Status
 			responseSize = int64(metrics.ResponseSize)
 		}

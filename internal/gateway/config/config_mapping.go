@@ -52,6 +52,7 @@ func (c *Config) ToWebConfig() web.Config {
 func (c *Config) ToWebV2Config() webv2.Config {
 	return webv2.Config{
 		Port:                  c.Web.Port,
+		ShowMetrics:           c.Metrics.Enabled,
 		ShowOpenAPIDocs:       c.Web.ShowOpenAPIDocs,
 		APIKeyHeader:          c.Auth.ServiceAccount.APIKeyHeader,
 		UserCookieName:        c.Auth.Cookies.User.Name,

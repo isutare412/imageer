@@ -10,7 +10,9 @@ import (
 
 	muxhandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	"github.com/isutare412/imageer/internal/gateway/metric"
 	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/internal/gateway/webv2/auth"
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
@@ -48,23 +50,29 @@ func NewServer(
 		middleware.WithLogAttrContext,
 		middleware.WithContextBag,
 		middleware.WithRequestID,
-		middleware.WithResponseMetrics,
+		middleware.WithResponseRecord,
 		middleware.AccessLog,
+		middleware.ObserveMetrics,
 		middleware.RecoverPanic,
 		muxhandlers.CORS(cfg.CORS.buildCORSOptions()...),
-		authenticator.Authenticate,
-		authorizer.Authorize,
 	}
 
-	apiMiddlewares := append(baseMiddlewares, middleware.WithOpenAPIValidator())
+	apiMiddlewares := append(baseMiddlewares,
+		authenticator.Authenticate,
+		authorizer.Authorize,
+		middleware.WithOpenAPIValidator())
 
 	r := mux.NewRouter()
 
-	// Health routes - NO middleware
 	r.HandleFunc("/healthz/live", handler.Liveness).Methods("GET")
 	r.HandleFunc("/healthz/ready", handler.Readiness).Methods("GET")
 
-	// Docs routes - middleware WITHOUT openapi validator
+	if cfg.ShowMetrics {
+		r.Handle("/metrics", promhttp.HandlerFor(metric.Gatherer(),
+			promhttp.HandlerOpts{})).
+			Methods("GET")
+	}
+
 	if cfg.ShowOpenAPIDocs {
 		docsRouter := r.PathPrefix("/docs").Subrouter()
 		docsRouter.Use(baseMiddlewares...)
