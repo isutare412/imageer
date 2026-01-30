@@ -12,7 +12,7 @@ import (
 // Service Account handlers
 
 // GetServiceAccountAdmin gets service account details (admin endpoint)
-func (h *handler) GetServiceAccountAdmin(
+func (h *Handler) GetServiceAccountAdmin(
 	w http.ResponseWriter, r *http.Request, serviceAccountID gen.ServiceAccountIDPath,
 ) {
 	ctx := r.Context()
@@ -27,7 +27,7 @@ func (h *handler) GetServiceAccountAdmin(
 }
 
 // ListServiceAccountsAdmin lists service accounts of a project (admin endpoint)
-func (h *handler) ListServiceAccountsAdmin(
+func (h *Handler) ListServiceAccountsAdmin(
 	w http.ResponseWriter, r *http.Request, params gen.ListServiceAccountsAdminParams,
 ) {
 	ctx := r.Context()
@@ -42,7 +42,7 @@ func (h *handler) ListServiceAccountsAdmin(
 }
 
 // CreateServiceAccountAdmin creates a new service account for a project (admin endpoint)
-func (h *handler) CreateServiceAccountAdmin(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateServiceAccountAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var req gen.CreateServiceAccountAdminRequest
@@ -63,7 +63,7 @@ func (h *handler) CreateServiceAccountAdmin(w http.ResponseWriter, r *http.Reque
 }
 
 // UpdateServiceAccountAdmin updates a service account (admin endpoint)
-func (h *handler) UpdateServiceAccountAdmin(
+func (h *Handler) UpdateServiceAccountAdmin(
 	w http.ResponseWriter, r *http.Request, serviceAccountID gen.ServiceAccountIDPath,
 ) {
 	ctx := r.Context()
@@ -87,7 +87,7 @@ func (h *handler) UpdateServiceAccountAdmin(
 }
 
 // DeleteServiceAccountAdmin deletes a service account (admin endpoint)
-func (h *handler) DeleteServiceAccountAdmin(
+func (h *Handler) DeleteServiceAccountAdmin(
 	w http.ResponseWriter, r *http.Request, serviceAccountID gen.ServiceAccountIDPath,
 ) {
 	ctx := r.Context()

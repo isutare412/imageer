@@ -12,7 +12,7 @@ import (
 // Project handlers
 
 // GetProject gets project details
-func (h *handler) GetProject(w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath) {
+func (h *Handler) GetProject(w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath) {
 	ctx := r.Context()
 
 	project, err := h.projectSvc.GetByID(ctx, projectID)
@@ -25,7 +25,7 @@ func (h *handler) GetProject(w http.ResponseWriter, r *http.Request, projectID g
 }
 
 // GetProjectAdmin gets project details (admin endpoint)
-func (h *handler) GetProjectAdmin(w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath) {
+func (h *Handler) GetProjectAdmin(w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath) {
 	ctx := r.Context()
 
 	project, err := h.projectSvc.GetByID(ctx, projectID)
@@ -40,7 +40,7 @@ func (h *handler) GetProjectAdmin(w http.ResponseWriter, r *http.Request, projec
 // Admin Project handlers
 
 // ListProjectsAdmin lists all projects (admin endpoint)
-func (h *handler) ListProjectsAdmin(w http.ResponseWriter, r *http.Request, params gen.ListProjectsAdminParams) {
+func (h *Handler) ListProjectsAdmin(w http.ResponseWriter, r *http.Request, params gen.ListProjectsAdminParams) {
 	ctx := r.Context()
 
 	projects, err := h.projectSvc.List(ctx, ListProjectsAdminParamsToDomain(params))
@@ -53,7 +53,7 @@ func (h *handler) ListProjectsAdmin(w http.ResponseWriter, r *http.Request, para
 }
 
 // CreateProjectAdmin creates a new project (admin endpoint)
-func (h *handler) CreateProjectAdmin(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateProjectAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var req gen.CreateProjectAdminRequest
@@ -74,7 +74,7 @@ func (h *handler) CreateProjectAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateProjectAdmin updates project details (admin endpoint)
-func (h *handler) UpdateProjectAdmin(w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath) {
+func (h *Handler) UpdateProjectAdmin(w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath) {
 	ctx := r.Context()
 
 	var req gen.UpdateProjectAdminRequest
@@ -95,7 +95,7 @@ func (h *handler) UpdateProjectAdmin(w http.ResponseWriter, r *http.Request, pro
 }
 
 // DeleteProjectAdmin deletes a project (admin endpoint)
-func (h *handler) DeleteProjectAdmin(w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath) {
+func (h *Handler) DeleteProjectAdmin(w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath) {
 	ctx := r.Context()
 
 	if err := h.projectSvc.Delete(ctx, projectID); err != nil {

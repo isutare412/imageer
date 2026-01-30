@@ -13,7 +13,7 @@ import (
 // Image handlers
 
 // CreateUploadURL issues a presigned URL for uploading an image
-func (h *handler) CreateUploadURL(w http.ResponseWriter, r *http.Request,
+func (h *Handler) CreateUploadURL(w http.ResponseWriter, r *http.Request,
 	projectID gen.ProjectIDPath,
 ) {
 	ctx := r.Context()
@@ -37,7 +37,7 @@ func (h *handler) CreateUploadURL(w http.ResponseWriter, r *http.Request,
 }
 
 // GetImage gets image details
-func (h *handler) GetImage(
+func (h *Handler) GetImage(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath, imageID gen.ImageIDPath,
 	params gen.GetImageParams,
 ) {
@@ -65,7 +65,7 @@ func (h *handler) GetImage(
 }
 
 // ReprocessImagesAdmin reprocesses multiple images in a project (admin endpoint)
-func (h *handler) ReprocessImagesAdmin(w http.ResponseWriter, r *http.Request,
+func (h *Handler) ReprocessImagesAdmin(w http.ResponseWriter, r *http.Request,
 	projectID gen.ProjectIDPath,
 ) {
 	gen.RespondError(w, r, apperr.NewError(apperr.CodeNotImplemented).
@@ -73,7 +73,7 @@ func (h *handler) ReprocessImagesAdmin(w http.ResponseWriter, r *http.Request,
 }
 
 // ListImagesAdmin lists all images in a project (admin endpoint)
-func (h *handler) ListImagesAdmin(
+func (h *Handler) ListImagesAdmin(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath,
 	params gen.ListImagesAdminParams,
 ) {
@@ -89,7 +89,7 @@ func (h *handler) ListImagesAdmin(
 }
 
 // DeleteImageAdmin deletes an image (admin endpoint)
-func (h *handler) DeleteImageAdmin(
+func (h *Handler) DeleteImageAdmin(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath, imageID gen.ImageIDPath,
 ) {
 	ctx := r.Context()
@@ -103,7 +103,7 @@ func (h *handler) DeleteImageAdmin(
 }
 
 // ListImages lists all images in a project
-func (h *handler) ListImages(
+func (h *Handler) ListImages(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath,
 	params gen.ListImagesParams,
 ) {
@@ -119,7 +119,7 @@ func (h *handler) ListImages(
 }
 
 // DeleteImage deletes an image
-func (h *handler) DeleteImage(
+func (h *Handler) DeleteImage(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath, imageID gen.ImageIDPath,
 ) {
 	ctx := r.Context()

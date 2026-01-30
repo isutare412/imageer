@@ -9,11 +9,11 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
 )
 
-func (h *handler) Liveness(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Liveness(w http.ResponseWriter, r *http.Request) {
 	gen.RespondNoContent(w, http.StatusOK)
 }
 
-func (h *handler) Readiness(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Readiness(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	eg, egCtx := errgroup.WithContext(ctx)

@@ -13,7 +13,7 @@ import (
 // User handlers
 
 // GetCurrentUser gets current user details
-func (h *handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	bag, ok := contextbag.BagFromContext(ctx)

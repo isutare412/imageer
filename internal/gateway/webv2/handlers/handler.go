@@ -2,8 +2,8 @@ package handlers
 
 import "github.com/isutare412/imageer/internal/gateway/port"
 
-// handler implements the ServerInterface for handling HTTP requests
-type handler struct {
+// Handler implements the ServerInterface for handling HTTP requests
+type Handler struct {
 	authSvc           port.AuthService
 	serviceAccountSvc port.ServiceAccountService
 	projectSvc        port.ProjectService
@@ -20,8 +20,8 @@ func NewHandler(
 	projectSvc port.ProjectService,
 	userSvc port.UserService,
 	imageSvc port.ImageService,
-) *handler {
-	return &handler{
+) *Handler {
+	return &Handler{
 		authSvc:           authSvc,
 		serviceAccountSvc: serviceAccountSvc,
 		projectSvc:        projectSvc,

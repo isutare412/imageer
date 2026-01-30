@@ -13,7 +13,7 @@ import (
 // Authentication handlers
 
 // StartGoogleSignIn starts Google Sign-In process
-func (h *handler) StartGoogleSignIn(w http.ResponseWriter, r *http.Request,
+func (h *Handler) StartGoogleSignIn(w http.ResponseWriter, r *http.Request,
 	params gen.StartGoogleSignInParams,
 ) {
 	ctx := r.Context()
@@ -33,7 +33,7 @@ func (h *handler) StartGoogleSignIn(w http.ResponseWriter, r *http.Request,
 }
 
 // FinishGoogleSignIn finishes Google Sign-In process
-func (h *handler) FinishGoogleSignIn(w http.ResponseWriter, r *http.Request,
+func (h *Handler) FinishGoogleSignIn(w http.ResponseWriter, r *http.Request,
 	params gen.FinishGoogleSignInParams,
 ) {
 	ctx := r.Context()
@@ -55,7 +55,7 @@ func (h *handler) FinishGoogleSignIn(w http.ResponseWriter, r *http.Request,
 }
 
 // SignOut signs out the current user by clearing the user cookie
-func (h *handler) SignOut(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	resp := h.authSvc.SignOut(ctx)
