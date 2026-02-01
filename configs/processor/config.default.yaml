@@ -4,6 +4,12 @@ log:
   add-source: false
   component: imageer-processor
 
+trace:
+  enabled: false
+  service-name: imageer-processor
+  sampling-ratio: 0.1
+  otlp-grpc-endpoint: localhost:4317
+
 web:
   port: 9090
 

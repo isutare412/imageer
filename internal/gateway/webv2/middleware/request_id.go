@@ -7,21 +7,23 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/isutare412/imageer/pkg/log"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
-const requestIDHeader = "X-Request-ID"
+const requestIDHeader = "X-Request-Id"
 
 func WithRequestID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		// Get or generate request ID
-		id := r.Header.Get(requestIDHeader)
+		span := trace.SpanFromContext(ctx)
+		spanCtx := span.SpanContext()
+
+		// Use trace ID as request ID if possible
+		id := spanCtx.TraceID().String()
 		if id == "" {
 			id = uuid.NewString()
 		}
-
-		// Add requestId to all log entries
 		log.AddAttrs(ctx, slog.String("requestId", id))
 
 		w.Header().Set(requestIDHeader, id)

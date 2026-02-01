@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Log        LogConfig        `koanf:"log"`
+	Trace      TraceConfig      `koanf:"trace"`
 	Web        WebConfig        `koanf:"web"`
 	Kubernetes KubernetesConfig `koanf:"kubernetes"`
 	Database   DatabaseConfig   `koanf:"database"`
@@ -23,6 +24,13 @@ type LogConfig struct {
 	Level     log.Level  `koanf:"level" validate:"validateFn=Validate"`
 	AddSource bool       `koanf:"add-source"`
 	Component string     `koanf:"component" validate:"required"`
+}
+
+type TraceConfig struct {
+	Enabled          bool    `koanf:"enabled"`
+	ServiceName      string  `koanf:"service-name" validate:"required"`
+	SamplingRatio    float64 `koanf:"sampling-ratio" validate:"gte=0,lte=1"`
+	OTLPGRPCEndpoint string  `koanf:"otlp-grpc-endpoint" validate:"required"`
 }
 
 type WebConfig struct {

@@ -48,6 +48,7 @@ func NewServer(
 	baseMiddlewares := []mux.MiddlewareFunc{
 		middleware.ProxyHeaders,
 		middleware.WithLogAttrContext,
+		middleware.WithTrace,
 		middleware.WithContextBag,
 		middleware.WithRequestID,
 		middleware.WithResponseRecord,

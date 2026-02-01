@@ -23,6 +23,7 @@ const (
 
 type ImageS3DeleteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	TraceContext  map[string]string      `protobuf:"bytes,4,rep,name=trace_context,json=traceContext,proto3" json:"trace_context,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	ImageId       string                 `protobuf:"bytes,1,opt,name=image_id,json=imageId,proto3" json:"image_id,omitempty"`
 	ProjectId     string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	S3Keys        []string               `protobuf:"bytes,3,rep,name=s3_keys,json=s3Keys,proto3" json:"s3_keys,omitempty"`
@@ -60,6 +61,13 @@ func (*ImageS3DeleteRequest) Descriptor() ([]byte, []int) {
 	return file_imageer_v1_storage_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *ImageS3DeleteRequest) GetTraceContext() map[string]string {
+	if x != nil {
+		return x.TraceContext
+	}
+	return nil
+}
+
 func (x *ImageS3DeleteRequest) GetImageId() string {
 	if x != nil {
 		return x.ImageId
@@ -86,12 +94,16 @@ var File_imageer_v1_storage_proto protoreflect.FileDescriptor
 const file_imageer_v1_storage_proto_rawDesc = "" +
 	"\n" +
 	"\x18imageer/v1/storage.proto\x12\n" +
-	"imageer.v1\"i\n" +
-	"\x14ImageS3DeleteRequest\x12\x19\n" +
+	"imageer.v1\"\x83\x02\n" +
+	"\x14ImageS3DeleteRequest\x12W\n" +
+	"\rtrace_context\x18\x04 \x03(\v22.imageer.v1.ImageS3DeleteRequest.TraceContextEntryR\ftraceContext\x12\x19\n" +
 	"\bimage_id\x18\x01 \x01(\tR\aimageId\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x02 \x01(\tR\tprojectId\x12\x17\n" +
-	"\as3_keys\x18\x03 \x03(\tR\x06s3KeysB\x9f\x01\n" +
+	"\as3_keys\x18\x03 \x03(\tR\x06s3Keys\x1a?\n" +
+	"\x11TraceContextEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x9f\x01\n" +
 	"\x0ecom.imageer.v1B\fStorageProtoP\x01Z6github.com/isutare412/imageer/gen/imageer/v1;imageerv1\xa2\x02\x03IXX\xaa\x02\n" +
 	"Imageer.V1\xca\x02\n" +
 	"Imageer\\V1\xe2\x02\x16Imageer\\V1\\GPBMetadata\xea\x02\vImageer::V1b\x06proto3"
@@ -108,16 +120,18 @@ func file_imageer_v1_storage_proto_rawDescGZIP() []byte {
 	return file_imageer_v1_storage_proto_rawDescData
 }
 
-var file_imageer_v1_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_imageer_v1_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_imageer_v1_storage_proto_goTypes = []any{
 	(*ImageS3DeleteRequest)(nil), // 0: imageer.v1.ImageS3DeleteRequest
+	nil,                          // 1: imageer.v1.ImageS3DeleteRequest.TraceContextEntry
 }
 var file_imageer_v1_storage_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: imageer.v1.ImageS3DeleteRequest.trace_context:type_name -> imageer.v1.ImageS3DeleteRequest.TraceContextEntry
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_imageer_v1_storage_proto_init() }
@@ -131,7 +145,7 @@ func file_imageer_v1_storage_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_imageer_v1_storage_proto_rawDesc), len(file_imageer_v1_storage_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

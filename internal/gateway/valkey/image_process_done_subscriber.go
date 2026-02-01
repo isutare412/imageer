@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/isutare412/imageer/pkg/dbhelpers/valkeypubsub"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 type ImageProcessDoneSubscriber struct {
@@ -22,6 +23,9 @@ func NewImageProcessDoneSubscriber(cfg ImageProcessDoneSubscriberConfig, c *Clie
 
 func (s *ImageProcessDoneSubscriber) Subscribe(ctx context.Context, imageID string,
 ) (<-chan struct{}, <-chan error) {
+	ctx, span := trace.StartSpan(ctx, "valkey.ImageProcessDoneSubscriber.Subscribe")
+	defer span.End()
+
 	channel := imageProcessDoneChannel(s.cfg.ChannelPrefix, imageID)
 
 	notifyCh := make(chan struct{}, 1)

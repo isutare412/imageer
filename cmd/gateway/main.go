@@ -8,6 +8,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/metric"
 	"github.com/isutare412/imageer/pkg/config"
 	"github.com/isutare412/imageer/pkg/log"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 var cfgPath = flag.String("configs", ".", "Path to config directory")
@@ -25,6 +26,13 @@ func main() {
 
 	log.Init(cfg.ToLogConfig())
 	metric.Init()
+
+	trace.Init(cfg.ToTraceConfig())
+	defer func() {
+		if err := trace.Shutdown(); err != nil {
+			slog.Error("Failed to shutdown trace", "error", err)
+		}
+	}()
 
 	slog.Debug("Loaded config", "config", cfg)
 

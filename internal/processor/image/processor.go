@@ -7,6 +7,7 @@ import (
 	"github.com/h2non/bimg"
 
 	"github.com/isutare412/imageer/internal/processor/domain"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 type Processor struct{}
@@ -17,6 +18,9 @@ func NewProcessor() *Processor {
 
 func (c *Processor) Process(ctx context.Context, input domain.RawImage, preset domain.Preset,
 ) (domain.RawImage, error) {
+	_, span := trace.StartSpan(ctx, "image.Processor.Process")
+	defer span.End()
+
 	var opt bimg.Options
 	applyPreset(&opt, preset)
 

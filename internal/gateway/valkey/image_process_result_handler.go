@@ -15,6 +15,7 @@ import (
 	"github.com/isutare412/imageer/pkg/dbhelpers/valkeystream"
 	"github.com/isutare412/imageer/pkg/log"
 	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 type ImageProcessResultHandler struct {
@@ -148,6 +149,10 @@ func (h *ImageProcessResultHandler) handleMessageData(ctx context.Context, data 
 			WithSummary("Failed to unmarshal image process result").
 			WithCause(err)
 	}
+
+	ctx = trace.ExtractFromMap(ctx, res.TraceContext)
+	ctx, span := trace.StartSpan(ctx, "valkey.ImageProcessResultHandler.handleMessageData")
+	defer span.End()
 
 	slog.InfoContext(ctx, "Received image process result", "imageId", res.ImageId,
 		"variantId", res.ImageVariantId, "presetId", res.PresetId)

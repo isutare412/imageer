@@ -7,12 +7,16 @@ import "imageer/v1/image.proto";
 import "imageer/v1/preset.proto";
 
 message ImageProcessRequest {
+  map<string, string> trace_context = 4;
+
   Image image = 1;
   ImageVariant variant = 2;
   Preset preset = 3;
 }
 
 message ImageProcessResult {
+  map<string, string> trace_context = 8;
+
   string image_id = 1;
   string image_variant_id = 2;
   string preset_id = 3;

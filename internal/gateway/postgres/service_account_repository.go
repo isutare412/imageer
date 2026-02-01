@@ -10,6 +10,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity/gen"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 type ServiceAccountRepository struct {
@@ -22,9 +23,11 @@ func NewServiceAccountRepository(client *Client) *ServiceAccountRepository {
 	}
 }
 
-func (r *ServiceAccountRepository) FindByID(
-	ctx context.Context, id string,
+func (r *ServiceAccountRepository) FindByID(ctx context.Context, id string,
 ) (domain.ServiceAccount, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ServiceAccountRepository.FindByID")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	sa, err := gorm.G[entity.ServiceAccount](tx).
@@ -39,9 +42,11 @@ func (r *ServiceAccountRepository) FindByID(
 	return sa.ToDomain(), nil
 }
 
-func (r *ServiceAccountRepository) FindByAPIKeyHash(
-	ctx context.Context, hash string,
+func (r *ServiceAccountRepository) FindByAPIKeyHash(ctx context.Context, hash string,
 ) (domain.ServiceAccount, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ServiceAccountRepository.FindByAPIKeyHash")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	sa, err := gorm.G[entity.ServiceAccount](tx).
@@ -56,9 +61,12 @@ func (r *ServiceAccountRepository) FindByAPIKeyHash(
 	return sa.ToDomain(), nil
 }
 
-func (r *ServiceAccountRepository) List(
-	ctx context.Context, params domain.ListServiceAccountsParams,
+func (r *ServiceAccountRepository) List(ctx context.Context,
+	params domain.ListServiceAccountsParams,
 ) (domain.ServiceAccounts, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ServiceAccountRepository.List")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	// Fetch service accounts
@@ -90,9 +98,11 @@ func (r *ServiceAccountRepository) List(
 	}, nil
 }
 
-func (r *ServiceAccountRepository) Create(
-	ctx context.Context, req domain.ServiceAccount,
+func (r *ServiceAccountRepository) Create(ctx context.Context, req domain.ServiceAccount,
 ) (domain.ServiceAccount, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ServiceAccountRepository.Create")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	// Create service account record
@@ -130,9 +140,12 @@ func (r *ServiceAccountRepository) Create(
 	return sa.ToDomain(), nil
 }
 
-func (r *ServiceAccountRepository) Update(
-	ctx context.Context, req domain.UpdateServiceAccountRequest,
+func (r *ServiceAccountRepository) Update(ctx context.Context,
+	req domain.UpdateServiceAccountRequest,
 ) (domain.ServiceAccount, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ServiceAccountRepository.Update")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	// Update service account fields
@@ -186,6 +199,9 @@ func (r *ServiceAccountRepository) Update(
 }
 
 func (r *ServiceAccountRepository) Delete(ctx context.Context, id string) error {
+	ctx, span := trace.StartSpan(ctx, "postgres.ServiceAccountRepository.Delete")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	if _, err := gorm.G[entity.ServiceAccount](tx).

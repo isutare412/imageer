@@ -15,6 +15,7 @@ import (
 	"github.com/isutare412/imageer/pkg/dbhelpers/valkeystream"
 	"github.com/isutare412/imageer/pkg/log"
 	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 type ImageS3DeleteRequestHandler struct {
@@ -147,6 +148,10 @@ func (h *ImageS3DeleteRequestHandler) handleMessageData(ctx context.Context, dat
 			WithSummary("Failed to unmarshal image S3 delete request").
 			WithCause(err)
 	}
+
+	ctx = trace.ExtractFromMap(ctx, req.TraceContext)
+	ctx, span := trace.StartSpan(ctx, "valkey.ImageS3DeleteRequestHandler.handleMessageData")
+	defer span.End()
 
 	if err := h.imageSvc.DeleteS3Objects(ctx, req); err != nil {
 		return fmt.Errorf("deleting S3 objects: %w", err)

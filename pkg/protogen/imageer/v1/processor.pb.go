@@ -24,6 +24,7 @@ const (
 
 type ImageProcessRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	TraceContext  map[string]string      `protobuf:"bytes,4,rep,name=trace_context,json=traceContext,proto3" json:"trace_context,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Image         *Image                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
 	Variant       *ImageVariant          `protobuf:"bytes,2,opt,name=variant,proto3" json:"variant,omitempty"`
 	Preset        *Preset                `protobuf:"bytes,3,opt,name=preset,proto3" json:"preset,omitempty"`
@@ -61,6 +62,13 @@ func (*ImageProcessRequest) Descriptor() ([]byte, []int) {
 	return file_imageer_v1_processor_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *ImageProcessRequest) GetTraceContext() map[string]string {
+	if x != nil {
+		return x.TraceContext
+	}
+	return nil
+}
+
 func (x *ImageProcessRequest) GetImage() *Image {
 	if x != nil {
 		return x.Image
@@ -84,6 +92,7 @@ func (x *ImageProcessRequest) GetPreset() *Preset {
 
 type ImageProcessResult struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
+	TraceContext   map[string]string      `protobuf:"bytes,8,rep,name=trace_context,json=traceContext,proto3" json:"trace_context,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	ImageId        string                 `protobuf:"bytes,1,opt,name=image_id,json=imageId,proto3" json:"image_id,omitempty"`
 	ImageVariantId string                 `protobuf:"bytes,2,opt,name=image_variant_id,json=imageVariantId,proto3" json:"image_variant_id,omitempty"`
 	PresetId       string                 `protobuf:"bytes,3,opt,name=preset_id,json=presetId,proto3" json:"preset_id,omitempty"`
@@ -123,6 +132,13 @@ func (x *ImageProcessResult) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ImageProcessResult.ProtoReflect.Descriptor instead.
 func (*ImageProcessResult) Descriptor() ([]byte, []int) {
 	return file_imageer_v1_processor_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ImageProcessResult) GetTraceContext() map[string]string {
+	if x != nil {
+		return x.TraceContext
+	}
+	return nil
 }
 
 func (x *ImageProcessResult) GetImageId() string {
@@ -179,12 +195,17 @@ var File_imageer_v1_processor_proto protoreflect.FileDescriptor
 const file_imageer_v1_processor_proto_rawDesc = "" +
 	"\n" +
 	"\x1aimageer/v1/processor.proto\x12\n" +
-	"imageer.v1\x1a\x1egoogle/protobuf/duration.proto\x1a\x16imageer/v1/image.proto\x1a\x17imageer/v1/preset.proto\"\x9e\x01\n" +
-	"\x13ImageProcessRequest\x12'\n" +
+	"imageer.v1\x1a\x1egoogle/protobuf/duration.proto\x1a\x16imageer/v1/image.proto\x1a\x17imageer/v1/preset.proto\"\xb7\x02\n" +
+	"\x13ImageProcessRequest\x12V\n" +
+	"\rtrace_context\x18\x04 \x03(\v21.imageer.v1.ImageProcessRequest.TraceContextEntryR\ftraceContext\x12'\n" +
 	"\x05image\x18\x01 \x01(\v2\x11.imageer.v1.ImageR\x05image\x122\n" +
 	"\avariant\x18\x02 \x01(\v2\x18.imageer.v1.ImageVariantR\avariant\x12*\n" +
-	"\x06preset\x18\x03 \x01(\v2\x12.imageer.v1.PresetR\x06preset\"\x9d\x02\n" +
-	"\x12ImageProcessResult\x12\x19\n" +
+	"\x06preset\x18\x03 \x01(\v2\x12.imageer.v1.PresetR\x06preset\x1a?\n" +
+	"\x11TraceContextEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb5\x03\n" +
+	"\x12ImageProcessResult\x12U\n" +
+	"\rtrace_context\x18\b \x03(\v20.imageer.v1.ImageProcessResult.TraceContextEntryR\ftraceContext\x12\x19\n" +
 	"\bimage_id\x18\x01 \x01(\tR\aimageId\x12(\n" +
 	"\x10image_variant_id\x18\x02 \x01(\tR\x0eimageVariantId\x12\x1b\n" +
 	"\tpreset_id\x18\x03 \x01(\tR\bpresetId\x12\x1d\n" +
@@ -193,7 +214,10 @@ const file_imageer_v1_processor_proto_rawDesc = "" +
 	"\n" +
 	"error_code\x18\x05 \x01(\x05R\terrorCode\x12#\n" +
 	"\rerror_message\x18\x06 \x01(\tR\ferrorMessage\x12B\n" +
-	"\x0fprocessing_time\x18\a \x01(\v2\x19.google.protobuf.DurationR\x0eprocessingTimeB\xa1\x01\n" +
+	"\x0fprocessing_time\x18\a \x01(\v2\x19.google.protobuf.DurationR\x0eprocessingTime\x1a?\n" +
+	"\x11TraceContextEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\xa1\x01\n" +
 	"\x0ecom.imageer.v1B\x0eProcessorProtoP\x01Z6github.com/isutare412/imageer/gen/imageer/v1;imageerv1\xa2\x02\x03IXX\xaa\x02\n" +
 	"Imageer.V1\xca\x02\n" +
 	"Imageer\\V1\xe2\x02\x16Imageer\\V1\\GPBMetadata\xea\x02\vImageer::V1b\x06proto3"
@@ -210,25 +234,29 @@ func file_imageer_v1_processor_proto_rawDescGZIP() []byte {
 	return file_imageer_v1_processor_proto_rawDescData
 }
 
-var file_imageer_v1_processor_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_imageer_v1_processor_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_imageer_v1_processor_proto_goTypes = []any{
 	(*ImageProcessRequest)(nil), // 0: imageer.v1.ImageProcessRequest
 	(*ImageProcessResult)(nil),  // 1: imageer.v1.ImageProcessResult
-	(*Image)(nil),               // 2: imageer.v1.Image
-	(*ImageVariant)(nil),        // 3: imageer.v1.ImageVariant
-	(*Preset)(nil),              // 4: imageer.v1.Preset
-	(*durationpb.Duration)(nil), // 5: google.protobuf.Duration
+	nil,                         // 2: imageer.v1.ImageProcessRequest.TraceContextEntry
+	nil,                         // 3: imageer.v1.ImageProcessResult.TraceContextEntry
+	(*Image)(nil),               // 4: imageer.v1.Image
+	(*ImageVariant)(nil),        // 5: imageer.v1.ImageVariant
+	(*Preset)(nil),              // 6: imageer.v1.Preset
+	(*durationpb.Duration)(nil), // 7: google.protobuf.Duration
 }
 var file_imageer_v1_processor_proto_depIdxs = []int32{
-	2, // 0: imageer.v1.ImageProcessRequest.image:type_name -> imageer.v1.Image
-	3, // 1: imageer.v1.ImageProcessRequest.variant:type_name -> imageer.v1.ImageVariant
-	4, // 2: imageer.v1.ImageProcessRequest.preset:type_name -> imageer.v1.Preset
-	5, // 3: imageer.v1.ImageProcessResult.processing_time:type_name -> google.protobuf.Duration
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	2, // 0: imageer.v1.ImageProcessRequest.trace_context:type_name -> imageer.v1.ImageProcessRequest.TraceContextEntry
+	4, // 1: imageer.v1.ImageProcessRequest.image:type_name -> imageer.v1.Image
+	5, // 2: imageer.v1.ImageProcessRequest.variant:type_name -> imageer.v1.ImageVariant
+	6, // 3: imageer.v1.ImageProcessRequest.preset:type_name -> imageer.v1.Preset
+	3, // 4: imageer.v1.ImageProcessResult.trace_context:type_name -> imageer.v1.ImageProcessResult.TraceContextEntry
+	7, // 5: imageer.v1.ImageProcessResult.processing_time:type_name -> google.protobuf.Duration
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_imageer_v1_processor_proto_init() }
@@ -244,7 +272,7 @@ func file_imageer_v1_processor_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_imageer_v1_processor_proto_rawDesc), len(file_imageer_v1_processor_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

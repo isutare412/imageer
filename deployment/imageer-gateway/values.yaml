@@ -135,6 +135,12 @@ config:
     add-source: false
     component: imageer-gateway
 
+  trace:
+    enabled: false
+    service-name: imageer-gateway
+    sampling-ratio: 0.1
+    otlp-grpc-endpoint: localhost:4317
+
   web:
     port: *port
     show-banner: false

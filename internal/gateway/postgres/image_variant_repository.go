@@ -10,6 +10,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity/gen"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 type ImageVariantRepository struct {
@@ -25,6 +26,9 @@ func NewImageVariantRepository(client *Client) *ImageVariantRepository {
 func (r *ImageVariantRepository) Create(
 	ctx context.Context, variant domain.ImageVariant,
 ) (domain.ImageVariant, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ImageVariantRepository.Create")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	iv := entity.NewImageVariant(variant)
@@ -57,6 +61,9 @@ func (r *ImageVariantRepository) Create(
 
 func (r *ImageVariantRepository) Update(ctx context.Context, req domain.UpdateImageVariantRequest,
 ) (domain.ImageVariant, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ImageVariantRepository.Update")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	assigners := buildImageVariantUpdateAssigners(req)
@@ -79,6 +86,9 @@ func (r *ImageVariantRepository) Update(ctx context.Context, req domain.UpdateIm
 
 func (r *ImageVariantRepository) get(ctx context.Context, tx *gorm.DB, id string,
 ) (entity.ImageVariant, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ImageVariantRepository.get")
+	defer span.End()
+
 	variant, err := gorm.G[entity.ImageVariant](tx).
 		Where(gen.ImageVariant.ID.Eq(id)).
 		Preload(gen.ImageVariant.Preset.Name(), nil).

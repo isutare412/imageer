@@ -3,6 +3,8 @@ syntax = "proto3";
 package imageer.v1;
 
 message ImageS3DeleteRequest {
+  map<string, string> trace_context = 4;
+
   string image_id = 1;
   string project_id = 2;
   repeated string s3_keys = 3;

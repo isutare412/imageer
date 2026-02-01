@@ -11,6 +11,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity/gen"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 type ImageRepository struct {
@@ -24,6 +25,9 @@ func NewImageRepository(client *Client) *ImageRepository {
 }
 
 func (r *ImageRepository) FindByID(ctx context.Context, id string) (domain.Image, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ImageRepository.FindByID")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	img, err := r.get(ctx, tx, id)
@@ -36,6 +40,9 @@ func (r *ImageRepository) FindByID(ctx context.Context, id string) (domain.Image
 
 func (r *ImageRepository) List(ctx context.Context, params domain.ListImagesParams,
 ) (domain.Images, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ImageRepository.List")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	// Fetch images
@@ -69,6 +76,9 @@ func (r *ImageRepository) List(ctx context.Context, params domain.ListImagesPara
 }
 
 func (r *ImageRepository) Create(ctx context.Context, image domain.Image) (domain.Image, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ImageRepository.Create")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	img := entity.NewImage(image)
@@ -93,6 +103,9 @@ func (r *ImageRepository) Create(ctx context.Context, image domain.Image) (domai
 
 func (r *ImageRepository) Update(ctx context.Context, req domain.UpdateImageRequest,
 ) (domain.Image, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ImageRepository.Update")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	assigners := buildImageUpdateAssigners(req)
@@ -113,6 +126,9 @@ func (r *ImageRepository) Update(ctx context.Context, req domain.UpdateImageRequ
 }
 
 func (r *ImageRepository) Delete(ctx context.Context, id string) error {
+	ctx, span := trace.StartSpan(ctx, "postgres.ImageRepository.Delete")
+	defer span.End()
+
 	tx := GetTxOrDB(ctx, r.db)
 
 	if _, err := gorm.G[entity.Image](tx).
@@ -124,6 +140,9 @@ func (r *ImageRepository) Delete(ctx context.Context, id string) error {
 }
 
 func (r *ImageRepository) get(ctx context.Context, tx *gorm.DB, id string) (entity.Image, error) {
+	ctx, span := trace.StartSpan(ctx, "postgres.ImageRepository.get")
+	defer span.End()
+
 	img, err := gorm.G[entity.Image](tx).
 		Where(gen.Image.ID.Eq(id)).
 		Preload(gen.Image.Project.Name(), nil).

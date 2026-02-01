@@ -10,6 +10,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/isutare412/imageer/pkg/awshelpers"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 type ObjectStorage struct {
@@ -32,6 +33,9 @@ func NewObjectStorage(cfg ObjectStorageConfig) (*ObjectStorage, error) {
 }
 
 func (s *ObjectStorage) DeleteObjects(ctx context.Context, keys []string) error {
+	ctx, span := trace.StartSpan(ctx, "s3.ObjectStorage.DeleteObjects")
+	defer span.End()
+
 	if len(keys) == 0 {
 		return nil
 	}

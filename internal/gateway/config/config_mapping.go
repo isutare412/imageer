@@ -18,6 +18,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/web"
 	"github.com/isutare412/imageer/internal/gateway/webv2"
 	"github.com/isutare412/imageer/pkg/log"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 func (c *Config) ToLogConfig() log.Config {
@@ -27,6 +28,10 @@ func (c *Config) ToLogConfig() log.Config {
 		AddSource: c.Log.AddSource,
 		Component: c.Log.Component,
 	}
+}
+
+func (c *Config) ToTraceConfig() trace.Config {
+	return trace.Config(c.Trace)
 }
 
 func (c *Config) ToWebConfig() web.Config {
