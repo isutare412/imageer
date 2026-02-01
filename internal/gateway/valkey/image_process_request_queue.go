@@ -29,6 +29,9 @@ func (q *ImageProcessRequestQueue) Push(ctx context.Context, req *imageerv1.Imag
 	ctx, span := trace.StartSpan(ctx, "valkey.ImageProcessRequestQueue.Push")
 	defer span.End()
 
+	if req.TraceContext == nil {
+		req.TraceContext = make(map[string]string)
+	}
 	trace.InjectToMap(ctx, req.TraceContext)
 
 	reqBytes, err := proto.Marshal(req)

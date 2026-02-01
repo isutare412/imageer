@@ -30,6 +30,9 @@ func (q *ImageS3DeleteRequestQueue) Push(ctx context.Context, req *imageerv1.Ima
 	ctx, span := trace.StartSpan(ctx, "valkey.ImageS3DeleteRequestQueue.Push")
 	defer span.End()
 
+	if req.TraceContext == nil {
+		req.TraceContext = make(map[string]string)
+	}
 	trace.InjectToMap(ctx, req.TraceContext)
 
 	reqBytes, err := proto.Marshal(req)
