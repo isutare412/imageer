@@ -78,7 +78,7 @@ func (c *Closer) closeExpiredImages() error {
 		"image.Closer.closeExpiredImages")
 	defer span.End()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	threshold := time.Now().Add(-(c.cfg.CloseThreshold + time.Minute))
