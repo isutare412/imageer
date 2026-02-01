@@ -2,6 +2,7 @@ package tracing
 
 import (
 	"context"
+	"crypto/rand"
 	"net/http"
 	"path"
 	"runtime"
@@ -29,10 +30,16 @@ func StartSpan(ctx context.Context, name string, opts ...trace.SpanStartOption,
 // useful for cases where you want to disable all descendent spans.
 func StartSpanNonSampled(ctx context.Context, name string, opts ...trace.SpanStartOption,
 ) (context.Context, trace.Span) {
-	// Create a remote SpanContext with sampled=false to indicate not sampled.
+	var tid trace.TraceID
+	_, _ = rand.Read(tid[:])
+
+	var sid trace.SpanID
+	_, _ = rand.Read(sid[:])
+
+	// Create a remote SpanContext with sampled=false to simulate non-sampled span.
 	spanCtx := trace.NewSpanContext(trace.SpanContextConfig{
-		TraceID:    trace.TraceID{1}, // fake non-zero TraceID
-		SpanID:     trace.SpanID{1},  // fake non-zero SpanID
+		TraceID:    tid,
+		SpanID:     sid,
 		TraceFlags: trace.FlagsSampled.WithSampled(false),
 		Remote:     true,
 	})

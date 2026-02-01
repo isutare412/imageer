@@ -1,10 +1,8 @@
 package middleware
 
 import (
-	"log/slog"
 	"net/http"
 
-	"github.com/isutare412/imageer/pkg/log"
 	"github.com/isutare412/imageer/pkg/tracing"
 )
 
@@ -15,12 +13,6 @@ func WithTrace(next http.Handler) http.Handler {
 
 		ctx, span := tracing.StartSpan(ctx, "web.middleware.WithTrace")
 		defer span.End()
-
-		// NOTE: If sampling decision is "not sampled", trace id will be zero-value.
-		spanCtx := span.SpanContext()
-		if traceID := spanCtx.TraceID().String(); traceID != "" {
-			log.AddAttrs(ctx, slog.String("traceId", traceID))
-		}
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

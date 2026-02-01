@@ -21,7 +21,11 @@ func init() {
 
 	logger := slog.New(
 		slogmulti.
-			Pipe(newAttrContextMiddleware()).
+			Pipe(
+				newAttrContextMiddleware(),
+				newAttrErrorMiddleware(),
+				newAttrTraceMiddleware(),
+			).
 			Handler(handler),
 	)
 
@@ -66,6 +70,7 @@ func Init(cfg Config) {
 	middlewares := []slogmulti.Middleware{
 		newAttrContextMiddleware(),
 		newAttrErrorMiddleware(),
+		newAttrTraceMiddleware(),
 	}
 	if attrs := cfg.ConstAttrs(); len(attrs) > 0 {
 		middlewares = append(middlewares, newAttrConstantMiddleware(attrs...))

@@ -36,6 +36,7 @@ func AccessLog(next http.Handler) http.Handler {
 		}
 
 		entry := slog.With(
+			slog.String("logType", "accessLog"),
 			slog.Int("status", status),
 			slog.String("method", r.Method),
 			slog.String("path", r.URL.Path),
