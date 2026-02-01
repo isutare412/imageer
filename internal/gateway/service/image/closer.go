@@ -11,6 +11,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/pkg/images"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type Closer struct {
@@ -73,6 +74,10 @@ func (c *Closer) run(ctx context.Context) {
 }
 
 func (c *Closer) closeExpiredImages() error {
+	ctx, span := tracing.StartSpanNonSampled(context.Background(),
+		"image.Closer.closeExpiredImages")
+	defer span.End()
+
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
