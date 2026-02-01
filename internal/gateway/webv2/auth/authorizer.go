@@ -8,6 +8,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type Authorizer struct {
@@ -29,7 +30,8 @@ func NewAuthorizer(serviceAccountSvc port.ServiceAccountService, projectSvc port
 
 func (a *Authorizer) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
+		ctx, span := tracing.StartSpan(r.Context(), "webv2.Authorizer.Authorize")
+		defer span.End()
 
 		var identity domain.Identity
 		if bag, ok := contextbag.BagFromContext(ctx); ok {

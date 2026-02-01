@@ -15,6 +15,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
 	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type Authenticator struct {
@@ -39,7 +40,8 @@ func NewAuthenticator(apiKeyHeader, userCookieName string, tokenRefreshThreshold
 
 func (a *Authenticator) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
+		ctx, span := tracing.StartSpan(r.Context(), "webv2.Authenticator.Authenticate")
+		defer span.End()
 
 		if ok, err := a.authenticateByHeader(ctx, r.Header); err != nil {
 			gen.RespondError(w, r, fmt.Errorf("authenticate by header: %w", err))
