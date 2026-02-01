@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/isutare412/imageer/pkg/dbhelpers/valkeypubsub"
 	"github.com/isutare412/imageer/pkg/tracing"
 )
@@ -23,7 +25,9 @@ func NewImageUploadDoneSubscriber(cfg ImageUploadDoneSubscriberConfig, c *Client
 
 func (s *ImageUploadDoneSubscriber) Subscribe(ctx context.Context, imageID string,
 ) (<-chan struct{}, <-chan error) {
-	ctx, span := tracing.StartSpan(ctx, "valkey.ImageUploadDoneSubscriber.Subscribe")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageUploadDoneSubscriber.Subscribe",
+		trace.WithSpanKind(trace.SpanKindConsumer),
+		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 
 	channel := imageUploadDoneChannel(s.cfg.ChannelPrefix, imageID)

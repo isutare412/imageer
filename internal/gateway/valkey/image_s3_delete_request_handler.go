@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/valkey-io/valkey-go"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/isutare412/imageer/internal/gateway/port"
@@ -150,7 +151,9 @@ func (h *ImageS3DeleteRequestHandler) handleMessageData(ctx context.Context, dat
 	}
 
 	ctx = tracing.ExtractFromMap(ctx, req.TraceContext)
-	ctx, span := tracing.StartSpan(ctx, "valkey.ImageS3DeleteRequestHandler.handleMessageData")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageS3DeleteRequestHandler.handleMessageData",
+		trace.WithSpanKind(trace.SpanKindConsumer),
+		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 
 	if err := h.imageSvc.DeleteS3Objects(ctx, req); err != nil {

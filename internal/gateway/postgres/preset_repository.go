@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -24,7 +25,9 @@ func NewPresetRepository(client *Client) *PresetRepository {
 }
 
 func (r *PresetRepository) FindByID(ctx context.Context, id string) (domain.Preset, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.PresetRepository.FindByID")
+	ctx, span := tracing.StartSpan(ctx, "postgres.PresetRepository.FindByID",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -41,7 +44,9 @@ func (r *PresetRepository) FindByID(ctx context.Context, id string) (domain.Pres
 
 func (r *PresetRepository) FindByName(ctx context.Context, projectID, name string,
 ) (domain.Preset, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.PresetRepository.FindByName")
+	ctx, span := tracing.StartSpan(ctx, "postgres.PresetRepository.FindByName",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -59,7 +64,9 @@ func (r *PresetRepository) FindByName(ctx context.Context, projectID, name strin
 
 func (r *PresetRepository) List(ctx context.Context, params domain.ListPresetsParams,
 ) ([]domain.Preset, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.PresetRepository.List")
+	ctx, span := tracing.StartSpan(ctx, "postgres.PresetRepository.List",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)

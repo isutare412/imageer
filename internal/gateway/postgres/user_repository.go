@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 
+	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -24,7 +25,9 @@ func NewUserRepository(client *Client) *UserRepository {
 }
 
 func (r *UserRepository) FindByID(ctx context.Context, id string) (domain.User, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.UserRepository.FindByID")
+	ctx, span := tracing.StartSpan(ctx, "postgres.UserRepository.FindByID",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -40,7 +43,9 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (domain.User, 
 }
 
 func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (domain.User, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.UserRepository.Upsert")
+	ctx, span := tracing.StartSpan(ctx, "postgres.UserRepository.Upsert",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)

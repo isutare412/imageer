@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/pkg/apperr"
@@ -153,7 +154,9 @@ func (l *ImageUploadListener) handleEvent(ctx context.Context, msgBytes []byte) 
 }
 
 func (l *ImageUploadListener) handleRecord(ctx context.Context, record events.S3EventRecord) error {
-	ctx, span := tracing.StartSpan(ctx, "sqs.ImageUploadListener.handleRecord")
+	ctx, span := tracing.StartSpan(ctx, "sqs.ImageUploadListener.handleRecord",
+		trace.WithSpanKind(trace.SpanKindConsumer),
+		trace.WithAttributes(tracing.PeerServiceAWSSQS))
 	defer span.End()
 
 	ctx, cancel := context.WithTimeout(ctx, l.cfg.HandleTimeout)

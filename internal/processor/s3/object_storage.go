@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/awshelpers"
@@ -35,7 +36,9 @@ func NewObjectStorage(cfg ObjectStorageConfig) (*ObjectStorage, error) {
 }
 
 func (s *ObjectStorage) Get(ctx context.Context, key string) ([]byte, error) {
-	ctx, span := tracing.StartSpan(ctx, "s3.ObjectStorage.Get")
+	ctx, span := tracing.StartSpan(ctx, "s3.ObjectStorage.Get",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServiceAWSS3))
 	defer span.End()
 
 	output, err := s.client.GetObject(ctx, &s3.GetObjectInput{
@@ -58,7 +61,9 @@ func (s *ObjectStorage) Get(ctx context.Context, key string) ([]byte, error) {
 func (s *ObjectStorage) Put(ctx context.Context, key string, data []byte,
 	contentType string,
 ) error {
-	ctx, span := tracing.StartSpan(ctx, "s3.ObjectStorage.Put")
+	ctx, span := tracing.StartSpan(ctx, "s3.ObjectStorage.Put",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServiceAWSS3))
 	defer span.End()
 
 	_, err := s.client.PutObject(ctx, &s3.PutObjectInput{

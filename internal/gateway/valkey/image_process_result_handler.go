@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/valkey-io/valkey-go"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/isutare412/imageer/internal/gateway/port"
@@ -151,7 +152,9 @@ func (h *ImageProcessResultHandler) handleMessageData(ctx context.Context, data 
 	}
 
 	ctx = tracing.ExtractFromMap(ctx, res.TraceContext)
-	ctx, span := tracing.StartSpan(ctx, "valkey.ImageProcessResultHandler.handleMessageData")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageProcessResultHandler.handleMessageData",
+		trace.WithSpanKind(trace.SpanKindConsumer),
+		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 
 	slog.InfoContext(ctx, "Received image process result", "imageId", res.ImageId,

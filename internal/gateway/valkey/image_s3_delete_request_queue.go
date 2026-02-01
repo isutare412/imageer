@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/valkey-io/valkey-go"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/isutare412/imageer/pkg/apperr"
@@ -27,7 +28,9 @@ func NewImageS3DeleteRequestQueue(cfg ImageS3DeleteRequestQueueConfig, c *Client
 
 func (q *ImageS3DeleteRequestQueue) Push(ctx context.Context, req *imageerv1.ImageS3DeleteRequest,
 ) error {
-	ctx, span := tracing.StartSpan(ctx, "valkey.ImageS3DeleteRequestQueue.Push")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageS3DeleteRequestQueue.Push",
+		trace.WithSpanKind(trace.SpanKindProducer),
+		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 
 	if req.TraceContext == nil {

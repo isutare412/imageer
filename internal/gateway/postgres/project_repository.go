@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -26,7 +27,9 @@ func NewProjectRepository(client *Client) *ProjectRepository {
 }
 
 func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Project, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.FindByID")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.FindByID",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -56,7 +59,9 @@ func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Pro
 func (r *ProjectRepository) List(
 	ctx context.Context, params domain.ListProjectsParams,
 ) (domain.Projects, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.List")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.List",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -101,7 +106,9 @@ func (r *ProjectRepository) List(
 }
 
 func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (domain.Project, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.Create")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.Create",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -116,7 +123,9 @@ func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (dom
 
 func (r *ProjectRepository) Update(ctx context.Context, req domain.UpdateProjectRequest,
 ) (domain.Project, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.Update")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.Update",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -151,7 +160,9 @@ func (r *ProjectRepository) Update(ctx context.Context, req domain.UpdateProject
 }
 
 func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.Delete")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.Delete",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -168,7 +179,9 @@ func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
 func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 	projectID string, upsertReqs []domain.UpsertPresetRequest,
 ) error {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.syncPresets")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.syncPresets",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	presetsToUpdate := make([]domain.UpsertPresetRequest, 0, len(upsertReqs))
@@ -230,7 +243,9 @@ func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 func (r *ProjectRepository) getImageCountsByProjectIDs(ctx context.Context, tx *gorm.DB,
 	projectIDs []string,
 ) (map[string]int64, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.getImageCountsByProjectIDs")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.getImageCountsByProjectIDs",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	if len(projectIDs) == 0 {

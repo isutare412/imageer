@@ -8,12 +8,15 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/oauth2"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/tracing"
 )
+
+var peerServiceGoogleOIDC = "google-oidc"
 
 type GoogleClient struct {
 	oidcProvider *oidc.Provider
@@ -53,7 +56,9 @@ func (c *GoogleClient) BuildAuthenticationURL(baseURL, state string) string {
 
 func (c *GoogleClient) ExchangeCode(ctx context.Context, baseURL, code string,
 ) (payload domain.IDTokenPayload, err error) {
-	ctx, span := tracing.StartSpan(ctx, "oidc.GoogleClient.ExchangeCode")
+	ctx, span := tracing.StartSpan(ctx, "oidc.GoogleClient.ExchangeCode",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServiceGoogleOIDC))
 	defer span.End()
 
 	token, err := c.oauthCfg.Exchange(ctx, code,

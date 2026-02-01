@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 
+	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -23,7 +24,9 @@ func NewImageProcessingLogRepository(client *Client) *ImageProcessingLogReposito
 
 func (r *ImageProcessingLogRepository) Create(ctx context.Context, log domain.ImageProcessingLog,
 ) (domain.ImageProcessingLog, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ImageProcessingLogRepository.Create")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ImageProcessingLogRepository.Create",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)

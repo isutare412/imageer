@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -26,7 +27,9 @@ func NewImageVariantRepository(client *Client) *ImageVariantRepository {
 func (r *ImageVariantRepository) Create(
 	ctx context.Context, variant domain.ImageVariant,
 ) (domain.ImageVariant, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ImageVariantRepository.Create")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ImageVariantRepository.Create",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -61,7 +64,9 @@ func (r *ImageVariantRepository) Create(
 
 func (r *ImageVariantRepository) Update(ctx context.Context, req domain.UpdateImageVariantRequest,
 ) (domain.ImageVariant, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ImageVariantRepository.Update")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ImageVariantRepository.Update",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -86,7 +91,9 @@ func (r *ImageVariantRepository) Update(ctx context.Context, req domain.UpdateIm
 
 func (r *ImageVariantRepository) get(ctx context.Context, tx *gorm.DB, id string,
 ) (entity.ImageVariant, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ImageVariantRepository.get")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ImageVariantRepository.get",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	variant, err := gorm.G[entity.ImageVariant](tx).

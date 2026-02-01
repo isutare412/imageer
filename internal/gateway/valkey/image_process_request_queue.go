@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/valkey-io/valkey-go"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/isutare412/imageer/pkg/apperr"
@@ -26,7 +27,9 @@ func NewImageProcessRequestQueue(cfg ImageProcessRequestQueueConfig, c *Client) 
 
 func (q *ImageProcessRequestQueue) Push(ctx context.Context, req *imageerv1.ImageProcessRequest,
 ) error {
-	ctx, span := tracing.StartSpan(ctx, "valkey.ImageProcessRequestQueue.Push")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageProcessRequestQueue.Push",
+		trace.WithSpanKind(trace.SpanKindProducer),
+		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 
 	if req.TraceContext == nil {

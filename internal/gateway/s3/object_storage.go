@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/isutare412/imageer/pkg/awshelpers"
 	"github.com/isutare412/imageer/pkg/tracing"
@@ -33,7 +34,9 @@ func NewObjectStorage(cfg ObjectStorageConfig) (*ObjectStorage, error) {
 }
 
 func (s *ObjectStorage) DeleteObjects(ctx context.Context, keys []string) error {
-	ctx, span := tracing.StartSpan(ctx, "s3.ObjectStorage.DeleteObjects")
+	ctx, span := tracing.StartSpan(ctx, "s3.ObjectStorage.DeleteObjects",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServiceAWSS3))
 	defer span.End()
 
 	if len(keys) == 0 {

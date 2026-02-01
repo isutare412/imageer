@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/valkey-io/valkey-go"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/isutare412/imageer/pkg/dbhelpers"
 	"github.com/isutare412/imageer/pkg/tracing"
@@ -24,7 +25,9 @@ func NewImageNotificationPublisher(cfg ImageNotificationPublisherConfig, c *Clie
 
 func (p *ImageNotificationPublisher) PublishUploadDone(ctx context.Context, imageID string,
 ) (receiveCount int64, err error) {
-	ctx, span := tracing.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishUploadDone")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishUploadDone",
+		trace.WithSpanKind(trace.SpanKindProducer),
+		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 
 	channel := imageUploadDoneChannel(p.cfg.UploadDoneChannelPrefix, imageID)
@@ -47,7 +50,9 @@ func (p *ImageNotificationPublisher) PublishUploadDone(ctx context.Context, imag
 
 func (p *ImageNotificationPublisher) PublishProcessDone(ctx context.Context, imageID string,
 ) (receiveCount int64, err error) {
-	ctx, span := tracing.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishProcessDone")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishProcessDone",
+		trace.WithSpanKind(trace.SpanKindProducer),
+		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 
 	channel := imageProcessDoneChannel(p.cfg.ProcessDoneChannelPrefix, imageID)

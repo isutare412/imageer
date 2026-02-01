@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -25,7 +26,9 @@ func NewServiceAccountRepository(client *Client) *ServiceAccountRepository {
 
 func (r *ServiceAccountRepository) FindByID(ctx context.Context, id string,
 ) (domain.ServiceAccount, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.FindByID")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.FindByID",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -44,7 +47,9 @@ func (r *ServiceAccountRepository) FindByID(ctx context.Context, id string,
 
 func (r *ServiceAccountRepository) FindByAPIKeyHash(ctx context.Context, hash string,
 ) (domain.ServiceAccount, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.FindByAPIKeyHash")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.FindByAPIKeyHash",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -64,7 +69,9 @@ func (r *ServiceAccountRepository) FindByAPIKeyHash(ctx context.Context, hash st
 func (r *ServiceAccountRepository) List(ctx context.Context,
 	params domain.ListServiceAccountsParams,
 ) (domain.ServiceAccounts, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.List")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.List",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -100,7 +107,9 @@ func (r *ServiceAccountRepository) List(ctx context.Context,
 
 func (r *ServiceAccountRepository) Create(ctx context.Context, req domain.ServiceAccount,
 ) (domain.ServiceAccount, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.Create")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.Create",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -143,7 +152,9 @@ func (r *ServiceAccountRepository) Create(ctx context.Context, req domain.Servic
 func (r *ServiceAccountRepository) Update(ctx context.Context,
 	req domain.UpdateServiceAccountRequest,
 ) (domain.ServiceAccount, error) {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.Update")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.Update",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -199,7 +210,9 @@ func (r *ServiceAccountRepository) Update(ctx context.Context,
 }
 
 func (r *ServiceAccountRepository) Delete(ctx context.Context, id string) error {
-	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.Delete")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ServiceAccountRepository.Delete",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServicePostgres))
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)

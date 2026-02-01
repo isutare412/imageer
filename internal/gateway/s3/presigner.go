@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/pkg/awshelpers"
@@ -36,7 +37,9 @@ func NewPresigner(cfg PresignerConfig) (*Presigner, error) {
 
 func (p *Presigner) PresignPutObject(ctx context.Context, req domain.PresignPutObjectRequest,
 ) (domain.PresignPutObjectResponse, error) {
-	ctx, span := tracing.StartSpan(ctx, "s3.Presigner.PresignPutObject")
+	ctx, span := tracing.StartSpan(ctx, "s3.Presigner.PresignPutObject",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(tracing.PeerServiceAWSS3))
 	defer span.End()
 
 	resp, err := p.client.PresignPutObject(ctx, &s3.PutObjectInput{
