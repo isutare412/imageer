@@ -5,15 +5,15 @@ import (
 	"net/http"
 
 	"github.com/isutare412/imageer/pkg/log"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 func WithTrace(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		ctx = trace.ExtractFromHTTPHeader(ctx, r.Header)
+		ctx = tracing.ExtractFromHTTPHeader(ctx, r.Header)
 
-		ctx, span := trace.StartSpan(ctx, "web.middleware.WithTrace")
+		ctx, span := tracing.StartSpan(ctx, "web.middleware.WithTrace")
 		defer span.End()
 
 		// NOTE: If sampling decision is "not sampled", trace id will be zero-value.

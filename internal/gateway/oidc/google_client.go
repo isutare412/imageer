@@ -12,7 +12,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/pkg/apperr"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type GoogleClient struct {
@@ -53,7 +53,7 @@ func (c *GoogleClient) BuildAuthenticationURL(baseURL, state string) string {
 
 func (c *GoogleClient) ExchangeCode(ctx context.Context, baseURL, code string,
 ) (payload domain.IDTokenPayload, err error) {
-	ctx, span := trace.StartSpan(ctx, "oidc.GoogleClient.ExchangeCode")
+	ctx, span := tracing.StartSpan(ctx, "oidc.GoogleClient.ExchangeCode")
 	defer span.End()
 
 	token, err := c.oauthCfg.Exchange(ctx, code,

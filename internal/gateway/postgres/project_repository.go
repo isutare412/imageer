@@ -12,7 +12,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity/gen"
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type ProjectRepository struct {
@@ -26,7 +26,7 @@ func NewProjectRepository(client *Client) *ProjectRepository {
 }
 
 func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Project, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.ProjectRepository.FindByID")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.FindByID")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -56,7 +56,7 @@ func (r *ProjectRepository) FindByID(ctx context.Context, id string) (domain.Pro
 func (r *ProjectRepository) List(
 	ctx context.Context, params domain.ListProjectsParams,
 ) (domain.Projects, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.ProjectRepository.List")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.List")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -101,7 +101,7 @@ func (r *ProjectRepository) List(
 }
 
 func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (domain.Project, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.ProjectRepository.Create")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.Create")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -116,7 +116,7 @@ func (r *ProjectRepository) Create(ctx context.Context, req domain.Project) (dom
 
 func (r *ProjectRepository) Update(ctx context.Context, req domain.UpdateProjectRequest,
 ) (domain.Project, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.ProjectRepository.Update")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.Update")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -151,7 +151,7 @@ func (r *ProjectRepository) Update(ctx context.Context, req domain.UpdateProject
 }
 
 func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
-	ctx, span := trace.StartSpan(ctx, "postgres.ProjectRepository.Delete")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.Delete")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -168,7 +168,7 @@ func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
 func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 	projectID string, upsertReqs []domain.UpsertPresetRequest,
 ) error {
-	ctx, span := trace.StartSpan(ctx, "postgres.ProjectRepository.syncPresets")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.syncPresets")
 	defer span.End()
 
 	presetsToUpdate := make([]domain.UpsertPresetRequest, 0, len(upsertReqs))
@@ -230,7 +230,7 @@ func (*ProjectRepository) syncPresets(ctx context.Context, tx *gorm.DB,
 func (r *ProjectRepository) getImageCountsByProjectIDs(ctx context.Context, tx *gorm.DB,
 	projectIDs []string,
 ) (map[string]int64, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.ProjectRepository.getImageCountsByProjectIDs")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ProjectRepository.getImageCountsByProjectIDs")
 	defer span.End()
 
 	if len(projectIDs) == 0 {

@@ -8,7 +8,7 @@ import (
 	"github.com/isutare412/imageer/internal/processor/metric"
 	"github.com/isutare412/imageer/pkg/config"
 	"github.com/isutare412/imageer/pkg/log"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 var cfgPath = flag.String("configs", ".", "Path to config directory")
@@ -27,12 +27,12 @@ func main() {
 	log.Init(cfg.ToLogConfig())
 	metric.Init()
 
-	if err := trace.Init(cfg.ToTraceConfig()); err != nil {
+	if err := tracing.Init(cfg.ToTracingConfig()); err != nil {
 		slog.Error("Failed to initialize trace", "error", err)
 		return
 	}
 	defer func() {
-		if err := trace.Shutdown(); err != nil {
+		if err := tracing.Shutdown(); err != nil {
 			slog.Error("Failed to shutdown trace", "error", err)
 		}
 	}()

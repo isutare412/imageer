@@ -12,7 +12,7 @@ import (
 
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/awshelpers"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type ObjectStorage struct {
@@ -35,7 +35,7 @@ func NewObjectStorage(cfg ObjectStorageConfig) (*ObjectStorage, error) {
 }
 
 func (s *ObjectStorage) Get(ctx context.Context, key string) ([]byte, error) {
-	ctx, span := trace.StartSpan(ctx, "s3.ObjectStorage.Get")
+	ctx, span := tracing.StartSpan(ctx, "s3.ObjectStorage.Get")
 	defer span.End()
 
 	output, err := s.client.GetObject(ctx, &s3.GetObjectInput{
@@ -58,7 +58,7 @@ func (s *ObjectStorage) Get(ctx context.Context, key string) ([]byte, error) {
 func (s *ObjectStorage) Put(ctx context.Context, key string, data []byte,
 	contentType string,
 ) error {
-	ctx, span := trace.StartSpan(ctx, "s3.ObjectStorage.Put")
+	ctx, span := tracing.StartSpan(ctx, "s3.ObjectStorage.Put")
 	defer span.End()
 
 	_, err := s.client.PutObject(ctx, &s3.PutObjectInput{

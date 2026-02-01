@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/isutare412/imageer/pkg/dbhelpers/valkeypubsub"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type ImageUploadDoneSubscriber struct {
@@ -23,7 +23,7 @@ func NewImageUploadDoneSubscriber(cfg ImageUploadDoneSubscriberConfig, c *Client
 
 func (s *ImageUploadDoneSubscriber) Subscribe(ctx context.Context, imageID string,
 ) (<-chan struct{}, <-chan error) {
-	ctx, span := trace.StartSpan(ctx, "valkey.ImageUploadDoneSubscriber.Subscribe")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageUploadDoneSubscriber.Subscribe")
 	defer span.End()
 
 	channel := imageUploadDoneChannel(s.cfg.ChannelPrefix, imageID)

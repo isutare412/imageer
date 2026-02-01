@@ -8,7 +8,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
 	"github.com/isutare412/imageer/pkg/apperr"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 // Image handlers
@@ -17,7 +17,7 @@ import (
 func (h *Handler) CreateUploadURL(w http.ResponseWriter, r *http.Request,
 	projectID gen.ProjectIDPath,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.CreateUploadURL")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.CreateUploadURL")
 	defer span.End()
 
 	var req gen.CreateUploadURLRequest
@@ -43,7 +43,7 @@ func (h *Handler) GetImage(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath, imageID gen.ImageIDPath,
 	params gen.GetImageParams,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.GetImage")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.GetImage")
 	defer span.End()
 
 	var (
@@ -80,7 +80,7 @@ func (h *Handler) ListImagesAdmin(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath,
 	params gen.ListImagesAdminParams,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.ListImagesAdmin")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.ListImagesAdmin")
 	defer span.End()
 
 	images, err := h.imageSvc.List(ctx, ListImagesAdminParamsToDomain(projectID, params))
@@ -96,7 +96,7 @@ func (h *Handler) ListImagesAdmin(
 func (h *Handler) DeleteImageAdmin(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath, imageID gen.ImageIDPath,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.DeleteImageAdmin")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.DeleteImageAdmin")
 	defer span.End()
 
 	if err := h.imageSvc.Delete(ctx, imageID); err != nil {
@@ -112,7 +112,7 @@ func (h *Handler) ListImages(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath,
 	params gen.ListImagesParams,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.ListImages")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.ListImages")
 	defer span.End()
 
 	images, err := h.imageSvc.List(ctx, ListImagesParamsToDomain(projectID, params))
@@ -128,7 +128,7 @@ func (h *Handler) ListImages(
 func (h *Handler) DeleteImage(
 	w http.ResponseWriter, r *http.Request, projectID gen.ProjectIDPath, imageID gen.ImageIDPath,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.DeleteImage")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.DeleteImage")
 	defer span.End()
 
 	if err := h.imageSvc.Delete(ctx, imageID); err != nil {

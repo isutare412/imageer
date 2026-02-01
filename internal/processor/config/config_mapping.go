@@ -9,7 +9,7 @@ import (
 	"github.com/isutare412/imageer/internal/processor/valkey"
 	"github.com/isutare412/imageer/internal/processor/web"
 	"github.com/isutare412/imageer/pkg/log"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 func (c *Config) ToLogConfig() log.Config {
@@ -21,8 +21,8 @@ func (c *Config) ToLogConfig() log.Config {
 	}
 }
 
-func (c *Config) ToTraceConfig() trace.Config {
-	return trace.Config(c.Trace)
+func (c *Config) ToTracingConfig() tracing.Config {
+	return tracing.Config(c.Trace)
 }
 
 func (c *Config) ToS3ObjectStorageConfig() s3.ObjectStorageConfig {

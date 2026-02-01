@@ -8,7 +8,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type ImageProcessingLogRepository struct {
@@ -23,7 +23,7 @@ func NewImageProcessingLogRepository(client *Client) *ImageProcessingLogReposito
 
 func (r *ImageProcessingLogRepository) Create(ctx context.Context, log domain.ImageProcessingLog,
 ) (domain.ImageProcessingLog, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.ImageProcessingLogRepository.Create")
+	ctx, span := tracing.StartSpan(ctx, "postgres.ImageProcessingLogRepository.Create")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)

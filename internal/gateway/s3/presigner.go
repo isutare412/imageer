@@ -11,7 +11,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/pkg/awshelpers"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type Presigner struct {
@@ -36,7 +36,7 @@ func NewPresigner(cfg PresignerConfig) (*Presigner, error) {
 
 func (p *Presigner) PresignPutObject(ctx context.Context, req domain.PresignPutObjectRequest,
 ) (domain.PresignPutObjectResponse, error) {
-	ctx, span := trace.StartSpan(ctx, "s3.Presigner.PresignPutObject")
+	ctx, span := tracing.StartSpan(ctx, "s3.Presigner.PresignPutObject")
 	defer span.End()
 
 	resp, err := p.client.PresignPutObject(ctx, &s3.PutObjectInput{

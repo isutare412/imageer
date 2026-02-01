@@ -15,7 +15,7 @@ import (
 	"github.com/isutare412/imageer/pkg/dbhelpers/valkeystream"
 	"github.com/isutare412/imageer/pkg/log"
 	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type ImageProcessRequestHandler struct {
@@ -150,8 +150,8 @@ func (h *ImageProcessRequestHandler) handleMessageData(ctx context.Context, data
 			WithCause(err)
 	}
 
-	ctx = trace.ExtractFromMap(ctx, req.TraceContext)
-	ctx, span := trace.StartSpan(ctx, "valkey.ImageProcessRequestHandler.handleMessageData")
+	ctx = tracing.ExtractFromMap(ctx, req.TraceContext)
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageProcessRequestHandler.handleMessageData")
 	defer span.End()
 
 	slog.InfoContext(ctx, "Received image process request", "imageId", req.Image.Id,

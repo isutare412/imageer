@@ -9,7 +9,7 @@ import (
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
 	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type ImageProcessRequestQueue struct {
@@ -26,13 +26,13 @@ func NewImageProcessRequestQueue(cfg ImageProcessRequestQueueConfig, c *Client) 
 
 func (q *ImageProcessRequestQueue) Push(ctx context.Context, req *imageerv1.ImageProcessRequest,
 ) error {
-	ctx, span := trace.StartSpan(ctx, "valkey.ImageProcessRequestQueue.Push")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageProcessRequestQueue.Push")
 	defer span.End()
 
 	if req.TraceContext == nil {
 		req.TraceContext = make(map[string]string)
 	}
-	trace.InjectToMap(ctx, req.TraceContext)
+	tracing.InjectToMap(ctx, req.TraceContext)
 
 	reqBytes, err := proto.Marshal(req)
 	if err != nil {

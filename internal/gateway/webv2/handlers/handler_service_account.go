@@ -7,7 +7,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
 	"github.com/isutare412/imageer/pkg/apperr"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 // Service Account handlers
@@ -16,7 +16,7 @@ import (
 func (h *Handler) GetServiceAccountAdmin(
 	w http.ResponseWriter, r *http.Request, serviceAccountID gen.ServiceAccountIDPath,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.GetServiceAccountAdmin")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.GetServiceAccountAdmin")
 	defer span.End()
 
 	account, err := h.serviceAccountSvc.GetByID(ctx, serviceAccountID)
@@ -32,7 +32,7 @@ func (h *Handler) GetServiceAccountAdmin(
 func (h *Handler) ListServiceAccountsAdmin(
 	w http.ResponseWriter, r *http.Request, params gen.ListServiceAccountsAdminParams,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.ListServiceAccountsAdmin")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.ListServiceAccountsAdmin")
 	defer span.End()
 
 	accounts, err := h.serviceAccountSvc.List(ctx, ListServiceAccountsAdminParamsToDomain(params))
@@ -46,7 +46,7 @@ func (h *Handler) ListServiceAccountsAdmin(
 
 // CreateServiceAccountAdmin creates a new service account for a project (admin endpoint)
 func (h *Handler) CreateServiceAccountAdmin(w http.ResponseWriter, r *http.Request) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.CreateServiceAccountAdmin")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.CreateServiceAccountAdmin")
 	defer span.End()
 
 	var req gen.CreateServiceAccountAdminRequest
@@ -70,7 +70,7 @@ func (h *Handler) CreateServiceAccountAdmin(w http.ResponseWriter, r *http.Reque
 func (h *Handler) UpdateServiceAccountAdmin(
 	w http.ResponseWriter, r *http.Request, serviceAccountID gen.ServiceAccountIDPath,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.UpdateServiceAccountAdmin")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.UpdateServiceAccountAdmin")
 	defer span.End()
 
 	var req gen.UpdateServiceAccountAdminRequest
@@ -95,7 +95,7 @@ func (h *Handler) UpdateServiceAccountAdmin(
 func (h *Handler) DeleteServiceAccountAdmin(
 	w http.ResponseWriter, r *http.Request, serviceAccountID gen.ServiceAccountIDPath,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.DeleteServiceAccountAdmin")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.DeleteServiceAccountAdmin")
 	defer span.End()
 
 	if err := h.serviceAccountSvc.Delete(ctx, serviceAccountID); err != nil {

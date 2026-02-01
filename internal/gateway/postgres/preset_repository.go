@@ -10,7 +10,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity/gen"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type PresetRepository struct {
@@ -24,7 +24,7 @@ func NewPresetRepository(client *Client) *PresetRepository {
 }
 
 func (r *PresetRepository) FindByID(ctx context.Context, id string) (domain.Preset, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.PresetRepository.FindByID")
+	ctx, span := tracing.StartSpan(ctx, "postgres.PresetRepository.FindByID")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -41,7 +41,7 @@ func (r *PresetRepository) FindByID(ctx context.Context, id string) (domain.Pres
 
 func (r *PresetRepository) FindByName(ctx context.Context, projectID, name string,
 ) (domain.Preset, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.PresetRepository.FindByName")
+	ctx, span := tracing.StartSpan(ctx, "postgres.PresetRepository.FindByName")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -59,7 +59,7 @@ func (r *PresetRepository) FindByName(ctx context.Context, projectID, name strin
 
 func (r *PresetRepository) List(ctx context.Context, params domain.ListPresetsParams,
 ) ([]domain.Preset, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.PresetRepository.List")
+	ctx, span := tracing.StartSpan(ctx, "postgres.PresetRepository.List")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)

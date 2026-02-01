@@ -17,7 +17,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/pkg/apperr"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type ImageUploadListener struct {
@@ -153,7 +153,7 @@ func (l *ImageUploadListener) handleEvent(ctx context.Context, msgBytes []byte) 
 }
 
 func (l *ImageUploadListener) handleRecord(ctx context.Context, record events.S3EventRecord) error {
-	ctx, span := trace.StartSpan(ctx, "sqs.ImageUploadListener.handleRecord")
+	ctx, span := tracing.StartSpan(ctx, "sqs.ImageUploadListener.handleRecord")
 	defer span.End()
 
 	ctx, cancel := context.WithTimeout(ctx, l.cfg.HandleTimeout)

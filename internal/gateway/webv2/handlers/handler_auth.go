@@ -8,7 +8,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 // Authentication handlers
@@ -17,7 +17,7 @@ import (
 func (h *Handler) StartGoogleSignIn(w http.ResponseWriter, r *http.Request,
 	params gen.StartGoogleSignInParams,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.StartGoogleSignIn")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.StartGoogleSignIn")
 	defer span.End()
 
 	req := domain.StartGoogleSignInRequest{
@@ -38,7 +38,7 @@ func (h *Handler) StartGoogleSignIn(w http.ResponseWriter, r *http.Request,
 func (h *Handler) FinishGoogleSignIn(w http.ResponseWriter, r *http.Request,
 	params gen.FinishGoogleSignInParams,
 ) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.FinishGoogleSignIn")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.FinishGoogleSignIn")
 	defer span.End()
 
 	req := domain.FinishGoogleSignInRequest{
@@ -59,7 +59,7 @@ func (h *Handler) FinishGoogleSignIn(w http.ResponseWriter, r *http.Request,
 
 // SignOut signs out the current user by clearing the user cookie
 func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.SignOut")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.SignOut")
 	defer span.End()
 
 	resp := h.authSvc.SignOut(ctx)

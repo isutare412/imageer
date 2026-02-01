@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/isutare412/imageer/pkg/log"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 const requestIDHeader = "X-Request-Id"
@@ -16,7 +16,7 @@ func WithRequestID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		span := trace.SpanFromContext(ctx)
+		span := tracing.SpanFromContext(ctx)
 		spanCtx := span.SpanContext()
 
 		// Use trace ID as request ID if possible

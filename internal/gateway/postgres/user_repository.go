@@ -10,7 +10,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity"
 	"github.com/isutare412/imageer/internal/gateway/postgres/entity/gen"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type UserRepository struct {
@@ -24,7 +24,7 @@ func NewUserRepository(client *Client) *UserRepository {
 }
 
 func (r *UserRepository) FindByID(ctx context.Context, id string) (domain.User, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.UserRepository.FindByID")
+	ctx, span := tracing.StartSpan(ctx, "postgres.UserRepository.FindByID")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)
@@ -40,7 +40,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (domain.User, 
 }
 
 func (r *UserRepository) Upsert(ctx context.Context, user domain.User) (domain.User, error) {
-	ctx, span := trace.StartSpan(ctx, "postgres.UserRepository.Upsert")
+	ctx, span := tracing.StartSpan(ctx, "postgres.UserRepository.Upsert")
 	defer span.End()
 
 	tx := GetTxOrDB(ctx, r.db)

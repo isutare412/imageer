@@ -8,14 +8,14 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
 	"github.com/isutare412/imageer/pkg/apperr"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 // User handlers
 
 // GetCurrentUser gets current user details
 func (h *Handler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
-	ctx, span := trace.StartSpan(r.Context(), "web.handlers.GetCurrentUser")
+	ctx, span := tracing.StartSpan(r.Context(), "web.handlers.GetCurrentUser")
 	defer span.End()
 
 	bag, ok := contextbag.BagFromContext(ctx)

@@ -9,7 +9,7 @@ import (
 	"github.com/isutare412/imageer/pkg/apperr"
 	"github.com/isutare412/imageer/pkg/dbhelpers"
 	imageerv1 "github.com/isutare412/imageer/pkg/protogen/imageer/v1"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type ImageS3DeleteRequestQueue struct {
@@ -27,13 +27,13 @@ func NewImageS3DeleteRequestQueue(cfg ImageS3DeleteRequestQueueConfig, c *Client
 
 func (q *ImageS3DeleteRequestQueue) Push(ctx context.Context, req *imageerv1.ImageS3DeleteRequest,
 ) error {
-	ctx, span := trace.StartSpan(ctx, "valkey.ImageS3DeleteRequestQueue.Push")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageS3DeleteRequestQueue.Push")
 	defer span.End()
 
 	if req.TraceContext == nil {
 		req.TraceContext = make(map[string]string)
 	}
-	trace.InjectToMap(ctx, req.TraceContext)
+	tracing.InjectToMap(ctx, req.TraceContext)
 
 	reqBytes, err := proto.Marshal(req)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 	"github.com/valkey-io/valkey-go"
 
 	"github.com/isutare412/imageer/pkg/dbhelpers"
-	"github.com/isutare412/imageer/pkg/trace"
+	"github.com/isutare412/imageer/pkg/tracing"
 )
 
 type ImageNotificationPublisher struct {
@@ -24,7 +24,7 @@ func NewImageNotificationPublisher(cfg ImageNotificationPublisherConfig, c *Clie
 
 func (p *ImageNotificationPublisher) PublishUploadDone(ctx context.Context, imageID string,
 ) (receiveCount int64, err error) {
-	ctx, span := trace.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishUploadDone")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishUploadDone")
 	defer span.End()
 
 	channel := imageUploadDoneChannel(p.cfg.UploadDoneChannelPrefix, imageID)
@@ -47,7 +47,7 @@ func (p *ImageNotificationPublisher) PublishUploadDone(ctx context.Context, imag
 
 func (p *ImageNotificationPublisher) PublishProcessDone(ctx context.Context, imageID string,
 ) (receiveCount int64, err error) {
-	ctx, span := trace.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishProcessDone")
+	ctx, span := tracing.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishProcessDone")
 	defer span.End()
 
 	channel := imageProcessDoneChannel(p.cfg.ProcessDoneChannelPrefix, imageID)
