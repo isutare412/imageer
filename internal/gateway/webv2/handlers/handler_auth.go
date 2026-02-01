@@ -8,6 +8,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 // Authentication handlers
@@ -16,7 +17,8 @@ import (
 func (h *Handler) StartGoogleSignIn(w http.ResponseWriter, r *http.Request,
 	params gen.StartGoogleSignInParams,
 ) {
-	ctx := r.Context()
+	ctx, span := trace.StartSpan(r.Context(), "web.handlers.StartGoogleSignIn")
+	defer span.End()
 
 	req := domain.StartGoogleSignInRequest{
 		HTTPReq:      r,
@@ -36,7 +38,8 @@ func (h *Handler) StartGoogleSignIn(w http.ResponseWriter, r *http.Request,
 func (h *Handler) FinishGoogleSignIn(w http.ResponseWriter, r *http.Request,
 	params gen.FinishGoogleSignInParams,
 ) {
-	ctx := r.Context()
+	ctx, span := trace.StartSpan(r.Context(), "web.handlers.FinishGoogleSignIn")
+	defer span.End()
 
 	req := domain.FinishGoogleSignInRequest{
 		HTTPReq:  r,
@@ -56,7 +59,8 @@ func (h *Handler) FinishGoogleSignIn(w http.ResponseWriter, r *http.Request,
 
 // SignOut signs out the current user by clearing the user cookie
 func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	ctx, span := trace.StartSpan(r.Context(), "web.handlers.SignOut")
+	defer span.End()
 
 	resp := h.authSvc.SignOut(ctx)
 

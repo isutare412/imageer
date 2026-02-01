@@ -7,6 +7,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/webv2/gen"
 	"github.com/isutare412/imageer/pkg/apperr"
+	"github.com/isutare412/imageer/pkg/trace"
 )
 
 // Service Account handlers
@@ -15,7 +16,8 @@ import (
 func (h *Handler) GetServiceAccountAdmin(
 	w http.ResponseWriter, r *http.Request, serviceAccountID gen.ServiceAccountIDPath,
 ) {
-	ctx := r.Context()
+	ctx, span := trace.StartSpan(r.Context(), "web.handlers.GetServiceAccountAdmin")
+	defer span.End()
 
 	account, err := h.serviceAccountSvc.GetByID(ctx, serviceAccountID)
 	if err != nil {
@@ -30,7 +32,8 @@ func (h *Handler) GetServiceAccountAdmin(
 func (h *Handler) ListServiceAccountsAdmin(
 	w http.ResponseWriter, r *http.Request, params gen.ListServiceAccountsAdminParams,
 ) {
-	ctx := r.Context()
+	ctx, span := trace.StartSpan(r.Context(), "web.handlers.ListServiceAccountsAdmin")
+	defer span.End()
 
 	accounts, err := h.serviceAccountSvc.List(ctx, ListServiceAccountsAdminParamsToDomain(params))
 	if err != nil {
@@ -43,7 +46,8 @@ func (h *Handler) ListServiceAccountsAdmin(
 
 // CreateServiceAccountAdmin creates a new service account for a project (admin endpoint)
 func (h *Handler) CreateServiceAccountAdmin(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	ctx, span := trace.StartSpan(r.Context(), "web.handlers.CreateServiceAccountAdmin")
+	defer span.End()
 
 	var req gen.CreateServiceAccountAdminRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -66,7 +70,8 @@ func (h *Handler) CreateServiceAccountAdmin(w http.ResponseWriter, r *http.Reque
 func (h *Handler) UpdateServiceAccountAdmin(
 	w http.ResponseWriter, r *http.Request, serviceAccountID gen.ServiceAccountIDPath,
 ) {
-	ctx := r.Context()
+	ctx, span := trace.StartSpan(r.Context(), "web.handlers.UpdateServiceAccountAdmin")
+	defer span.End()
 
 	var req gen.UpdateServiceAccountAdminRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -90,7 +95,8 @@ func (h *Handler) UpdateServiceAccountAdmin(
 func (h *Handler) DeleteServiceAccountAdmin(
 	w http.ResponseWriter, r *http.Request, serviceAccountID gen.ServiceAccountIDPath,
 ) {
-	ctx := r.Context()
+	ctx, span := trace.StartSpan(r.Context(), "web.handlers.DeleteServiceAccountAdmin")
+	defer span.End()
 
 	if err := h.serviceAccountSvc.Delete(ctx, serviceAccountID); err != nil {
 		gen.RespondError(w, r, fmt.Errorf("deleting service account: %w", err))
