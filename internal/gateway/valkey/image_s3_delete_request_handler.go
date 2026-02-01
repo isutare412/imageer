@@ -152,8 +152,7 @@ func (h *ImageS3DeleteRequestHandler) handleMessageData(ctx context.Context, dat
 
 	ctx = tracing.ExtractFromMap(ctx, req.TraceContext)
 	ctx, span := tracing.StartSpan(ctx, "valkey.ImageS3DeleteRequestHandler.handleMessageData",
-		trace.WithSpanKind(trace.SpanKindConsumer),
-		trace.WithAttributes(tracing.PeerServiceValkey))
+		trace.WithSpanKind(trace.SpanKindConsumer))
 	defer span.End()
 
 	if err := h.imageSvc.DeleteS3Objects(ctx, req); err != nil {

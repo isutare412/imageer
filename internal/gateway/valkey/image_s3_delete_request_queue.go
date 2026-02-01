@@ -29,8 +29,7 @@ func NewImageS3DeleteRequestQueue(cfg ImageS3DeleteRequestQueueConfig, c *Client
 func (q *ImageS3DeleteRequestQueue) Push(ctx context.Context, req *imageerv1.ImageS3DeleteRequest,
 ) error {
 	ctx, span := tracing.StartSpan(ctx, "valkey.ImageS3DeleteRequestQueue.Push",
-		trace.WithSpanKind(trace.SpanKindProducer),
-		trace.WithAttributes(tracing.PeerServiceValkey))
+		trace.WithSpanKind(trace.SpanKindProducer))
 	defer span.End()
 
 	if req.TraceContext == nil {

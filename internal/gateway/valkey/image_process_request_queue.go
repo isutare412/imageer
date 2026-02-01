@@ -28,8 +28,7 @@ func NewImageProcessRequestQueue(cfg ImageProcessRequestQueueConfig, c *Client) 
 func (q *ImageProcessRequestQueue) Push(ctx context.Context, req *imageerv1.ImageProcessRequest,
 ) error {
 	ctx, span := tracing.StartSpan(ctx, "valkey.ImageProcessRequestQueue.Push",
-		trace.WithSpanKind(trace.SpanKindProducer),
-		trace.WithAttributes(tracing.PeerServiceValkey))
+		trace.WithSpanKind(trace.SpanKindProducer))
 	defer span.End()
 
 	if req.TraceContext == nil {

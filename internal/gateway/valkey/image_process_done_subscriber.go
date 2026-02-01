@@ -26,7 +26,7 @@ func NewImageProcessDoneSubscriber(cfg ImageProcessDoneSubscriberConfig, c *Clie
 func (s *ImageProcessDoneSubscriber) Subscribe(ctx context.Context, imageID string,
 ) (<-chan struct{}, <-chan error) {
 	ctx, span := tracing.StartSpan(ctx, "valkey.ImageProcessDoneSubscriber.Subscribe",
-		trace.WithSpanKind(trace.SpanKindConsumer),
+		trace.WithSpanKind(trace.SpanKindClient),
 		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 

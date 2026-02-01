@@ -153,8 +153,7 @@ func (h *ImageProcessRequestHandler) handleMessageData(ctx context.Context, data
 
 	ctx = tracing.ExtractFromMap(ctx, req.TraceContext)
 	ctx, span := tracing.StartSpan(ctx, "valkey.ImageProcessRequestHandler.handleMessageData",
-		trace.WithSpanKind(trace.SpanKindConsumer),
-		trace.WithAttributes(tracing.PeerServiceValkey))
+		trace.WithSpanKind(trace.SpanKindConsumer))
 	defer span.End()
 
 	slog.InfoContext(ctx, "Received image process request", "imageId", req.Image.Id,

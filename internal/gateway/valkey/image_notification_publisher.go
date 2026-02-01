@@ -26,7 +26,7 @@ func NewImageNotificationPublisher(cfg ImageNotificationPublisherConfig, c *Clie
 func (p *ImageNotificationPublisher) PublishUploadDone(ctx context.Context, imageID string,
 ) (receiveCount int64, err error) {
 	ctx, span := tracing.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishUploadDone",
-		trace.WithSpanKind(trace.SpanKindProducer),
+		trace.WithSpanKind(trace.SpanKindClient),
 		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 
@@ -51,7 +51,7 @@ func (p *ImageNotificationPublisher) PublishUploadDone(ctx context.Context, imag
 func (p *ImageNotificationPublisher) PublishProcessDone(ctx context.Context, imageID string,
 ) (receiveCount int64, err error) {
 	ctx, span := tracing.StartSpan(ctx, "valkey.ImageNotificationPublisher.PublishProcessDone",
-		trace.WithSpanKind(trace.SpanKindProducer),
+		trace.WithSpanKind(trace.SpanKindClient),
 		trace.WithAttributes(tracing.PeerServiceValkey))
 	defer span.End()
 
