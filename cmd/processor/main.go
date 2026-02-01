@@ -27,7 +27,10 @@ func main() {
 	log.Init(cfg.ToLogConfig())
 	metric.Init()
 
-	trace.Init(cfg.ToTraceConfig())
+	if err := trace.Init(cfg.ToTraceConfig()); err != nil {
+		slog.Error("Failed to initialize trace", "error", err)
+		return
+	}
 	defer func() {
 		if err := trace.Shutdown(); err != nil {
 			slog.Error("Failed to shutdown trace", "error", err)
