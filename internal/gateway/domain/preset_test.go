@@ -3,7 +3,6 @@ package domain
 import (
 	"testing"
 
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 
 	"github.com/isutare412/imageer/pkg/validation"
@@ -18,36 +17,36 @@ func TestUpsertPresetRequest_Validation(t *testing.T) {
 		{
 			name: "create request with all fields set",
 			req: UpsertPresetRequest{
-				Name:    lo.ToPtr("w100h100"),
-				Default: lo.ToPtr(true),
-				Width:   lo.ToPtr[int64](100),
-				Height:  lo.ToPtr[int64](100),
+				Name:    new("w100h100"),
+				Default: new(true),
+				Width:   new(int64(100)),
+				Height:  new(int64(100)),
 			},
 			wantErr: false,
 		},
 		{
 			name: "invalid preset dimensions",
 			req: UpsertPresetRequest{
-				Name:    lo.ToPtr("w100h100"),
-				Default: lo.ToPtr(true),
-				Width:   lo.ToPtr[int64](0), // invalid width
-				Height:  lo.ToPtr[int64](100),
+				Name:    new("w100h100"),
+				Default: new(true),
+				Width:   new(int64(0)), // invalid width
+				Height:  new(int64(100)),
 			},
 			wantErr: true,
 		},
 		{
 			name: "update request",
 			req: UpsertPresetRequest{
-				Name:    lo.ToPtr("w100h100"),
-				Default: lo.ToPtr(true),
+				Name:    new("w100h100"),
+				Default: new(true),
 			},
 			wantErr: false,
 		},
 		{
 			name: "invalid name format",
 			req: UpsertPresetRequest{
-				ID:   lo.ToPtr("preset-1"),
-				Name: lo.ToPtr("W100H100"),
+				ID:   new("preset-1"),
+				Name: new("W100H100"),
 			},
 			wantErr: true,
 		},

@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/samber/lo"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -344,7 +343,7 @@ func (s *Service) StartImageProcessingOnUpload(ctx context.Context, s3Key string
 		// Update image state to "ready"
 		image, err = s.imageRepo.Update(ctx, domain.UpdateImageRequest{
 			ID:    imageID,
-			State: lo.ToPtr(images.StateReady),
+			State: new(images.StateReady),
 		})
 		if err != nil {
 			return fmt.Errorf("updating image: %w", err)
@@ -355,7 +354,7 @@ func (s *Service) StartImageProcessingOnUpload(ctx context.Context, s3Key string
 			// Update image variant state to "processing"
 			variant, err := s.imageVarRepo.Update(ctx, domain.UpdateImageVariantRequest{
 				ID:    variant.ID,
-				State: lo.ToPtr(images.VariantStateProcessing),
+				State: new(images.VariantStateProcessing),
 			})
 			if err != nil {
 				return fmt.Errorf("updating image variant: %w", err)

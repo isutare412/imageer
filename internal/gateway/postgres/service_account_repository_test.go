@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -161,10 +160,10 @@ func TestServiceAccountRepository_List(t *testing.T) {
 		{
 			name: "normal case",
 			req: domain.ListServiceAccountsParams{
-				Offset: lo.ToPtr(20),
-				Limit:  lo.ToPtr(20),
+				Offset: new(20),
+				Limit:  new(20),
 				SearchFilter: domain.ServiceAccountSearchFilter{
-					Name: lo.ToPtr("account-1"),
+					Name: new("account-1"),
 				},
 				SortFilter: domain.ServiceAccountSortFilter{
 					UpdatedAt: true,
@@ -241,7 +240,7 @@ func TestServiceAccountRepository_Create(t *testing.T) {
 		{
 			name: "normal case",
 			req: domain.ServiceAccount{
-				ExpireAt:    lo.ToPtr(time.Now().Add(24 * time.Hour)),
+				ExpireAt:    new(time.Now().Add(24 * time.Hour)),
 				Name:        "account-name-1",
 				AccessScope: serviceaccounts.AccessScopeFull,
 				APIKeyHash:  "test-api-key",
@@ -325,13 +324,13 @@ func TestServiceAccountRepository_Update(t *testing.T) {
 			name: "normal case",
 			req: domain.UpdateServiceAccountRequest{
 				ID:          "account-1",
-				Name:        lo.ToPtr("account-name-1"),
-				AccessScope: lo.ToPtr(serviceaccounts.AccessScopeProject),
+				Name:        new("account-name-1"),
+				AccessScope: new(serviceaccounts.AccessScopeProject),
 				ProjectIDs: []string{
 					"project-1",
 					"project-2",
 				},
-				ExpireAt: lo.ToPtr(time.Now().Add(time.Hour)),
+				ExpireAt: new(time.Now().Add(time.Hour)),
 			},
 			setup: func(t *testing.T, tt *testSet) {
 				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)

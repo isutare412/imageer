@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -93,10 +92,10 @@ func TestProjectRepository_List(t *testing.T) {
 		{
 			name: "normal case",
 			req: domain.ListProjectsParams{
-				Offset: lo.ToPtr(20),
-				Limit:  lo.ToPtr(20),
+				Offset: new(20),
+				Limit:  new(20),
 				SearchFilter: domain.ProjectSearchFilter{
-					Name: lo.ToPtr("project-1"),
+					Name: new("project-1"),
 				},
 				SortFilter: domain.ProjectSortFilter{
 					UpdatedAt: true,
@@ -178,20 +177,20 @@ func TestProjectRepository_Create(t *testing.T) {
 						Default: false,
 						Quality: images.Quality(90),
 						Format:  images.FormatWebp,
-						Fit:     lo.ToPtr(images.FitCover),
-						Anchor:  lo.ToPtr(images.AnchorSmart),
-						Width:   lo.ToPtr[int64](100),
-						Height:  lo.ToPtr[int64](100),
+						Fit:     new(images.FitCover),
+						Anchor:  new(images.AnchorSmart),
+						Width:   new(int64(100)),
+						Height:  new(int64(100)),
 					},
 					{
 						Name:    "preset-name-2",
 						Default: false,
 						Format:  images.FormatWebp,
 						Quality: images.Quality(90),
-						Fit:     lo.ToPtr(images.FitCover),
-						Anchor:  lo.ToPtr(images.AnchorSmart),
-						Width:   lo.ToPtr[int64](200),
-						Height:  lo.ToPtr[int64](200),
+						Fit:     new(images.FitCover),
+						Anchor:  new(images.AnchorSmart),
+						Width:   new(int64(200)),
+						Height:  new(int64(200)),
 					},
 				},
 			},
@@ -253,21 +252,21 @@ func TestProjectRepository_Update(t *testing.T) {
 			name: "normal case",
 			req: domain.UpdateProjectRequest{
 				ID:   "project-1",
-				Name: lo.ToPtr("project-1"),
+				Name: new("project-1"),
 				Presets: []domain.UpsertPresetRequest{
 					{
 						// Update request
-						ID:     lo.ToPtr("preset-1"),
-						Name:   lo.ToPtr("preset-1"),
-						Width:  lo.ToPtr[int64](100),
-						Height: lo.ToPtr[int64](100),
+						ID:     new("preset-1"),
+						Name:   new("preset-1"),
+						Width:  new(int64(100)),
+						Height: new(int64(100)),
 					},
 					{
 						// Create request
-						Name:    lo.ToPtr("preset-2"),
-						Default: lo.ToPtr(true),
-						Width:   lo.ToPtr[int64](100),
-						Height:  lo.ToPtr[int64](100),
+						Name:    new("preset-2"),
+						Default: new(true),
+						Width:   new(int64(100)),
+						Height:  new(int64(100)),
 					},
 				},
 			},

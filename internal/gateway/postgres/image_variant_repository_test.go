@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -116,7 +115,7 @@ func TestImageVariantRepository_Update(t *testing.T) {
 			name: "normal case",
 			req: domain.UpdateImageVariantRequest{
 				ID:    "variant-1",
-				State: lo.ToPtr(images.VariantStateReady),
+				State: new(images.VariantStateReady),
 			},
 			setup: func(t *testing.T, tt *testSet) {
 				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)

@@ -51,7 +51,7 @@ func (s *ObjectStorage) DeleteObjects(ctx context.Context, keys []string) error 
 		Bucket: &s.cfg.Bucket,
 		Delete: &types.Delete{
 			Objects: objects,
-			Quiet:   lo.ToPtr(true),
+			Quiet:   new(true),
 		},
 	})
 	if err != nil {

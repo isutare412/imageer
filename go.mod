@@ -1,6 +1,6 @@
 module github.com/isutare412/imageer
 
-go 1.25.0
+go 1.26.0
 
 tool (
 	github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen

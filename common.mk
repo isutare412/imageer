@@ -51,10 +51,9 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 .PHONY: golangci-lint
 golangci-lint: ## Check and install golangci-lint if needed
-	@GOPATH_BIN=$$(go env GOPATH)/bin; \
-	if [ ! -f "$(GOLANGCI_LINT)" ]; then \
+	@if [ ! -f "$(GOLANGCI_LINT)" ]; then \
 		echo "⚠️ golangci-lint not found in $$LOCALBIN. Installing..."; \
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(LOCALBIN) v2.8.0 && \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(LOCALBIN) v2.9.0 && \
 		echo "✅ golangci-lint installed successfully."; \
 	else \
 		echo "✅ golangci-lint is already installed."; \

@@ -44,10 +44,10 @@ func (p Preset) ToProto() *imageerv1.Preset {
 		preset.Anchor = p.Anchor.ToProto()
 	}
 	if p.Width != nil {
-		preset.Width = lo.ToPtr(int32(*p.Width))
+		preset.Width = new(int32(*p.Width))
 	}
 	if p.Height != nil {
-		preset.Height = lo.ToPtr(int32(*p.Height))
+		preset.Height = new(int32(*p.Height))
 	}
 
 	return preset

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -30,8 +29,8 @@ func TestImageProcessingLogRepository_Create(t *testing.T) {
 			name: "normal case",
 			req: domain.ImageProcessingLog{
 				IsSuccess:      false,
-				ErrorCode:      lo.ToPtr(42),
-				ErrorMessage:   lo.ToPtr("Some error occurred"),
+				ErrorCode:      new(42),
+				ErrorMessage:   new("Some error occurred"),
 				ElapsedTime:    812 * time.Millisecond,
 				ImageVariantID: "variant-1",
 			},

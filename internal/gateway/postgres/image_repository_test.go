@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -101,10 +100,10 @@ func TestImageRepository_List(t *testing.T) {
 		{
 			name: "normal case",
 			req: domain.ListImagesParams{
-				Offset: lo.ToPtr(10),
-				Limit:  lo.ToPtr(20),
+				Offset: new(10),
+				Limit:  new(20),
 				SearchFilter: domain.ImageSearchFilter{
-					State:           lo.ToPtr(images.StateUploadPending),
+					State:           new(images.StateUploadPending),
 					UpdatedAtBefore: &updatedAtBefore,
 				},
 				SortFilter: domain.ImageSortFilter{
@@ -153,7 +152,7 @@ func TestImageRepository_List(t *testing.T) {
 			name: "filter by project id",
 			req: domain.ListImagesParams{
 				SearchFilter: domain.ImageSearchFilter{
-					ProjectID: lo.ToPtr("project-1"),
+					ProjectID: new("project-1"),
 				},
 				SortFilter: domain.ImageSortFilter{
 					CreatedAt: true,
@@ -312,7 +311,7 @@ func TestImageRepository_Update(t *testing.T) {
 			name: "normal case",
 			req: domain.UpdateImageRequest{
 				ID:    "image-1",
-				State: lo.ToPtr(images.StateReady),
+				State: new(images.StateReady),
 			},
 			setup: func(t *testing.T, tt *testSet) {
 				postgresClient, transactioner, mock := postgres.NewClientWithMock(t)

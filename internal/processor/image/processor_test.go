@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 
 	"github.com/isutare412/imageer/internal/processor/domain"
@@ -44,10 +43,10 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitCover),
-				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](400),
+				Fit:     new(images.FitCover),
+				Anchor:  new(images.AnchorSmart),
+				Width:   new(int32(400)),
+				Height:  new(int32(400)),
 			},
 		},
 		{
@@ -64,7 +63,7 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Width:   lo.ToPtr[int32](400),
+				Width:   new(int32(400)),
 			},
 		},
 		{
@@ -97,9 +96,9 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitFill),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](400),
+				Fit:     new(images.FitFill),
+				Width:   new(int32(400)),
+				Height:  new(int32(400)),
 			},
 		},
 		{
@@ -116,9 +115,9 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitContain),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](400),
+				Fit:     new(images.FitContain),
+				Width:   new(int32(400)),
+				Height:  new(int32(400)),
 			},
 		},
 		{
@@ -135,10 +134,10 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitCover),
-				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](400),
+				Fit:     new(images.FitCover),
+				Anchor:  new(images.AnchorSmart),
+				Width:   new(int32(400)),
+				Height:  new(int32(400)),
 			},
 		},
 		{
@@ -155,9 +154,9 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitFill),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](400),
+				Fit:     new(images.FitFill),
+				Width:   new(int32(400)),
+				Height:  new(int32(400)),
 			},
 		},
 		{
@@ -174,9 +173,9 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitContain),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](400),
+				Fit:     new(images.FitContain),
+				Width:   new(int32(400)),
+				Height:  new(int32(400)),
 			},
 		},
 		{
@@ -193,10 +192,10 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitCover),
-				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int32](800),
-				Height:  lo.ToPtr[int32](800),
+				Fit:     new(images.FitCover),
+				Anchor:  new(images.AnchorSmart),
+				Width:   new(int32(800)),
+				Height:  new(int32(800)),
 			},
 		},
 		{
@@ -213,10 +212,10 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitCover),
-				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](300),
+				Fit:     new(images.FitCover),
+				Anchor:  new(images.AnchorSmart),
+				Width:   new(int32(400)),
+				Height:  new(int32(300)),
 			},
 		},
 		{
@@ -233,9 +232,9 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitContain),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](300),
+				Fit:     new(images.FitContain),
+				Width:   new(int32(400)),
+				Height:  new(int32(300)),
 			},
 		},
 		{
@@ -252,9 +251,9 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitFill),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](300),
+				Fit:     new(images.FitFill),
+				Width:   new(int32(400)),
+				Height:  new(int32(300)),
 			},
 		},
 		{
@@ -271,10 +270,10 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitCover),
-				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](400),
+				Fit:     new(images.FitCover),
+				Anchor:  new(images.AnchorSmart),
+				Width:   new(int32(400)),
+				Height:  new(int32(400)),
 			},
 		},
 		{
@@ -291,10 +290,10 @@ func TestProcessor_Process(t *testing.T) {
 			preset: domain.Preset{
 				Format:  images.FormatWebp,
 				Quality: images.Quality(90),
-				Fit:     lo.ToPtr(images.FitContain),
-				Anchor:  lo.ToPtr(images.AnchorSmart),
-				Width:   lo.ToPtr[int32](400),
-				Height:  lo.ToPtr[int32](400),
+				Fit:     new(images.FitContain),
+				Anchor:  new(images.AnchorSmart),
+				Width:   new(int32(400)),
+				Height:  new(int32(400)),
 			},
 		},
 	}

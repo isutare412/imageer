@@ -6,8 +6,6 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/samber/lo"
-
 	"github.com/isutare412/imageer/internal/gateway/domain"
 	"github.com/isutare412/imageer/internal/gateway/port"
 	"github.com/isutare412/imageer/pkg/images"
@@ -85,9 +83,9 @@ func (c *Closer) closeExpiredImages() error {
 
 	// Find expired images
 	params := domain.ListImagesParams{
-		Limit: lo.ToPtr(-1),
+		Limit: new(-1),
 		SearchFilter: domain.ImageSearchFilter{
-			State:           lo.ToPtr(images.StateUploadPending),
+			State:           new(images.StateUploadPending),
 			UpdatedAtBefore: &threshold,
 		},
 	}
@@ -104,7 +102,7 @@ func (c *Closer) closeExpiredImages() error {
 		err := c.transactioner.WithTx(ctx, func(txCtx context.Context) error {
 			_, err := c.imageRepo.Update(txCtx, domain.UpdateImageRequest{
 				ID:    img.ID,
-				State: lo.ToPtr(images.StateUploadExpired),
+				State: new(images.StateUploadExpired),
 			})
 			if err != nil {
 				return fmt.Errorf("updating image: %w", err)
@@ -113,7 +111,7 @@ func (c *Closer) closeExpiredImages() error {
 			for _, variant := range img.Variants {
 				_, err := c.imageVarRepo.Update(txCtx, domain.UpdateImageVariantRequest{
 					ID:    variant.ID,
-					State: lo.ToPtr(images.VariantStateUploadExpired),
+					State: new(images.VariantStateUploadExpired),
 				})
 				if err != nil {
 					return fmt.Errorf("updating image variant %s: %w", variant.ID, err)

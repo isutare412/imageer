@@ -11,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/knadh/koanf/providers/parameterstore/v2"
 	"github.com/knadh/koanf/v2"
-	"github.com/samber/lo"
 )
 
 func loadFromAWSParameterStore(k *koanf.Koanf, appName string) error {
@@ -28,9 +27,9 @@ func loadFromAWSParameterStore(k *koanf.Koanf, appName string) error {
 	ssmClient := ssm.NewFromConfig(awsCfg)
 	ssmCfg := parameterstore.Config[ssm.GetParametersByPathInput]{
 		Input: ssm.GetParametersByPathInput{
-			Path:           lo.ToPtr(ssmPathPrefix(appName)),
-			Recursive:      lo.ToPtr(true),
-			WithDecryption: lo.ToPtr(true),
+			Path:           new(ssmPathPrefix(appName)),
+			Recursive:      new(true),
+			WithDecryption: new(true),
 		},
 		Delim: "/",
 		Callback: func(key, val string) (string, any) {

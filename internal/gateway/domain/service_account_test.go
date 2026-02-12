@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 
 	"github.com/isutare412/imageer/pkg/serviceaccounts"
@@ -21,10 +20,10 @@ func TestUpdateServiceAccountRequest_Validation(t *testing.T) {
 			name: "all fields set",
 			req: UpdateServiceAccountRequest{
 				ID:          "test-id",
-				Name:        lo.ToPtr("test-name"),
-				AccessScope: lo.ToPtr(serviceaccounts.AccessScopeProject),
+				Name:        new("test-name"),
+				AccessScope: new(serviceaccounts.AccessScopeProject),
 				ProjectIDs:  []string{"project-1", "project-2"},
-				ExpireAt:    lo.ToPtr(time.Now().Add(time.Hour)),
+				ExpireAt:    new(time.Now().Add(time.Hour)),
 			},
 			wantErr: false,
 		},
@@ -39,7 +38,7 @@ func TestUpdateServiceAccountRequest_Validation(t *testing.T) {
 			name: "expireAt set to past",
 			req: UpdateServiceAccountRequest{
 				ID:       "test-id",
-				ExpireAt: lo.ToPtr(time.Now().Add(-time.Hour)),
+				ExpireAt: new(time.Now().Add(-time.Hour)),
 			},
 			wantErr: true,
 		},
@@ -47,7 +46,7 @@ func TestUpdateServiceAccountRequest_Validation(t *testing.T) {
 			name: "invalid access scope",
 			req: UpdateServiceAccountRequest{
 				ID:          "test-id",
-				AccessScope: lo.ToPtr(serviceaccounts.AccessScope("INVALID")),
+				AccessScope: new(serviceaccounts.AccessScope("INVALID")),
 			},
 			wantErr: true,
 		},

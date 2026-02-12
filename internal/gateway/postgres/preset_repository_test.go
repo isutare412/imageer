@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 
 	"github.com/isutare412/imageer/internal/gateway/domain"
@@ -143,10 +142,10 @@ func TestPresetRepository_List(t *testing.T) {
 		{
 			name: "normal case",
 			req: domain.ListPresetsParams{
-				Offset: lo.ToPtr(20),
-				Limit:  lo.ToPtr(20),
+				Offset: new(20),
+				Limit:  new(20),
 				SearchFilter: domain.PresetSearchFilter{
-					ProjectID: lo.ToPtr("project-1"),
+					ProjectID: new("project-1"),
 					Names:     []string{"preset-name-1", "preset-name-2"},
 				},
 				SortFilter: domain.PresetSortFilter{
