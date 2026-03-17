@@ -16,8 +16,6 @@ import (
 	"github.com/isutare412/imageer/pkg/tracing"
 )
 
-var peerServiceGoogleOIDC = "google-oidc"
-
 type GoogleClient struct {
 	oidcProvider *oidc.Provider
 	oidcVerifier *oidc.IDTokenVerifier
