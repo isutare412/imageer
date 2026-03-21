@@ -186,44 +186,6 @@ config:
     username: admin
     password: complex_password
 
-    streams:
-      image-process-request:
-        stream-key: imageer:prod:image-process-request-stream
-        stream-size: 1000
-
-      image-process-result:
-        stream-key: imageer:prod:image-process-result-stream
-        group-name: gateway
-        handler:
-          concurrency: 5
-          timeout: 30s
-        reader:
-          batch-size: 10
-          block-timeout: 30s
-        stealer:
-          interval: 30s
-          min-idle-time: 1m
-          max-delivery-attempt: 3
-        reaper:
-          min-idle-time: 1h
-
-      image-s3-delete-request:
-        stream-key: imageer:prod:image-s3-delete-request-stream
-        stream-size: 1000
-        group-name: gateway
-        handler:
-          concurrency: 5
-          timeout: 30s
-        reader:
-          batch-size: 10
-          block-timeout: 30s
-        stealer:
-          interval: 30s
-          min-idle-time: 1m
-          max-delivery-attempt: 3
-        reaper:
-          min-idle-time: 1h
-
     pubsub:
       image-upload-done:
         channel-prefix: "imageer:prod:image-upload-done:"
@@ -231,6 +193,32 @@ config:
       image-process-done:
         channel-prefix: "imageer:prod:image-process-done:"
         max-retries: 3
+
+  kafka:
+    addresses: localhost:9092
+    username: admin
+    password: complex_password
+    consumer-group: imageer-gateway
+
+    topics:
+      image-process-request:
+        topic: imageer.image.process.request
+
+      image-process-result:
+        topic: imageer.image.process.result
+        retry-topic: imageer.image.process.result.retry
+        handler:
+          timeout: 30s
+          max-retry-attempt: 3
+          retry-base-delay: 100ms
+
+      image-s3-delete-request:
+        topic: imageer.image.s3.delete.request
+        retry-topic: imageer.image.s3.delete.request.retry
+        handler:
+          timeout: 30s
+          max-retry-attempt: 3
+          retry-base-delay: 100ms
 
   auth:
     cookies:

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"os"
@@ -11,16 +10,16 @@ import (
 
 	"github.com/isutare412/imageer/internal/processor/config"
 	"github.com/isutare412/imageer/internal/processor/image"
+	"github.com/isutare412/imageer/internal/processor/kafka"
 	"github.com/isutare412/imageer/internal/processor/s3"
 	imagesvc "github.com/isutare412/imageer/internal/processor/service/image"
-	"github.com/isutare412/imageer/internal/processor/valkey"
 	"github.com/isutare412/imageer/internal/processor/web"
 )
 
 type application struct {
-	webServer                  *web.Server
-	valkeyClient               *valkey.Client
-	imageProcessRequestHandler *valkey.ImageProcessRequestHandler
+	webServer     *web.Server
+	kafkaClient   *kafka.Client
+	kafkaConsumer *kafka.Consumer
 }
 
 func newApplication(cfg config.Config) (*application, error) {
@@ -35,56 +34,50 @@ func newApplication(cfg config.Config) (*application, error) {
 		return nil, fmt.Errorf("creating s3 object storage: %w", err)
 	}
 
-	slog.Info("Create valkey client")
-	valkeyClient, err := valkey.NewClient(cfg.ToValkeyClientConfig())
+	slog.Info("Create Kafka client")
+	kafkaClient, err := kafka.NewClient(cfg.ToKafkaClientConfig())
 	if err != nil {
-		return nil, fmt.Errorf("creating valkey client: %w", err)
+		return nil, fmt.Errorf("creating kafka client: %w", err)
 	}
 
-	slog.Info("Create valkey image process result queue")
-	imageProcessResultQueue := valkey.NewImageProcessResultQueue(
-		cfg.ToValkeyImageProcessResultQueueConfig(), valkeyClient)
+	slog.Info("Create Kafka image process result queue")
+	imageProcessResultQueue := kafka.NewImageProcessResultQueue(
+		cfg.ToKafkaImageProcessResultQueueConfig(), kafkaClient)
 
 	slog.Info("Create image service")
 	imageService := imagesvc.NewService(imageProcessor, objectStorage, imageProcessResultQueue)
 
-	slog.Info("Create valkey image process request handler")
-	imageProcessRequestHandler := valkey.NewImageProcessRequestHandler(
-		cfg.ToValkeyImageProcessRequestHandlerConfig(), valkeyClient, imageService)
+	slog.Info("Create Kafka image process request handler")
+	imageProcessRequestHandler := kafka.NewImageProcessRequestHandler(
+		cfg.ToKafkaImageProcessRequestHandlerConfig(), imageService)
+
+	slog.Info("Create Kafka consumer")
+	kafkaConsumer := kafka.NewConsumer(kafkaClient, map[string]kafka.Handler{
+		cfg.Kafka.Topics.ImageProcessRequest.Topic:      imageProcessRequestHandler,
+		cfg.Kafka.Topics.ImageProcessRequest.RetryTopic: imageProcessRequestHandler,
+	})
+	imageProcessRequestHandler.SetConsumer(kafkaConsumer)
 
 	slog.Info("Create web server")
 	webServer := web.NewServer(cfg.ToWebServerConfig())
 
 	return &application{
-		webServer:                  webServer,
-		valkeyClient:               valkeyClient,
-		imageProcessRequestHandler: imageProcessRequestHandler,
+		webServer:     webServer,
+		kafkaClient:   kafkaClient,
+		kafkaConsumer: kafkaConsumer,
 	}, nil
 }
 
 func (a *application) initialize() error {
-	defer logDuration("Application initialization")()
-
-	ctx, cancelTimeout := context.WithTimeout(context.Background(), time.Minute)
-	defer cancelTimeout()
-
-	ctx, cancelSignal := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	defer cancelSignal()
-
-	slog.Info("Initialize image process request handler")
-	if err := a.imageProcessRequestHandler.Initialize(ctx); err != nil {
-		return fmt.Errorf("initializing image process request handler: %w", err)
-	}
-
 	return nil
 }
 
 func (a *application) run() {
+	slog.Info("Run Kafka consumer")
+	a.kafkaConsumer.Run()
+
 	slog.Info("Run web server")
 	webServerErrs := a.webServer.Run()
-
-	slog.Info("Run image process request handler")
-	a.imageProcessRequestHandler.Run()
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -104,11 +97,11 @@ func (a *application) shutdown() {
 		slog.Error("Failed to shutdown web server", "error", err)
 	}
 
-	slog.Info("Shutdown image process request handler")
-	a.imageProcessRequestHandler.Shutdown()
+	slog.Info("Shutdown Kafka consumer")
+	a.kafkaConsumer.Shutdown()
 
-	slog.Info("Shutdown valkey client")
-	a.valkeyClient.Shutdown()
+	slog.Info("Shutdown Kafka client")
+	a.kafkaClient.Shutdown()
 }
 
 func logDuration(operation string) func() {

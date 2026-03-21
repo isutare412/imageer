@@ -5,8 +5,8 @@ import (
 
 	"github.com/samber/lo"
 
+	"github.com/isutare412/imageer/internal/processor/kafka"
 	"github.com/isutare412/imageer/internal/processor/s3"
-	"github.com/isutare412/imageer/internal/processor/valkey"
 	"github.com/isutare412/imageer/internal/processor/web"
 	"github.com/isutare412/imageer/pkg/log"
 	"github.com/isutare412/imageer/pkg/tracing"
@@ -31,33 +31,31 @@ func (c *Config) ToS3ObjectStorageConfig() s3.ObjectStorageConfig {
 	}
 }
 
-func (c *Config) ToValkeyClientConfig() valkey.ClientConfig {
-	return valkey.ClientConfig{
-		Addresses: parseCSV(c.Valkey.Addresses, ","),
-		Username:  c.Valkey.Username,
-		Password:  c.Valkey.Password,
+func (c *Config) ToKafkaClientConfig() kafka.ClientConfig {
+	return kafka.ClientConfig{
+		Addrs:         parseCSV(c.Kafka.Addresses, ","),
+		User:          c.Kafka.Username,
+		Password:      c.Kafka.Password,
+		ConsumerGroup: c.Kafka.ConsumerGroup,
+		ConsumeTopics: []string{
+			c.Kafka.Topics.ImageProcessRequest.Topic,
+			c.Kafka.Topics.ImageProcessRequest.RetryTopic,
+		},
 	}
 }
 
-func (c *Config) ToValkeyImageProcessResultQueueConfig() valkey.ImageProcessResultQueueConfig {
-	return valkey.ImageProcessResultQueueConfig{
-		StreamKey:  c.Valkey.Streams.ImageProcessResult.StreamKey,
-		StreamSize: c.Valkey.Streams.ImageProcessResult.StreamSize,
+func (c *Config) ToKafkaImageProcessRequestHandlerConfig() kafka.ImageProcessRequestHandlerConfig {
+	return kafka.ImageProcessRequestHandlerConfig{
+		RetryTopic:      c.Kafka.Topics.ImageProcessRequest.RetryTopic,
+		HandleTimeout:   c.Kafka.Topics.ImageProcessRequest.Handler.Timeout,
+		MaxRetryAttempt: c.Kafka.Topics.ImageProcessRequest.Handler.MaxRetryAttempt,
+		RetryBaseDelay:  c.Kafka.Topics.ImageProcessRequest.Handler.RetryBaseDelay,
 	}
 }
 
-func (c *Config) ToValkeyImageProcessRequestHandlerConfig() valkey.ImageProcessRequestHandlerConfig {
-	return valkey.ImageProcessRequestHandlerConfig{
-		StreamKey:            c.Valkey.Streams.ImageProcessRequest.StreamKey,
-		GroupName:            c.Valkey.Streams.ImageProcessRequest.GroupName,
-		HandleConcurrency:    c.Valkey.Streams.ImageProcessRequest.Handler.Concurrency,
-		HandleTimeout:        c.Valkey.Streams.ImageProcessRequest.Handler.Timeout,
-		ReadBlockTimeout:     c.Valkey.Streams.ImageProcessRequest.Reader.BlockTimeout,
-		ReadBatchSize:        c.Valkey.Streams.ImageProcessRequest.Reader.BatchSize,
-		ReapConsumerIdleTime: c.Valkey.Streams.ImageProcessRequest.Reaper.MinIdleTime,
-		StealInterval:        c.Valkey.Streams.ImageProcessRequest.Stealer.Interval,
-		StealMinIdleTime:     c.Valkey.Streams.ImageProcessRequest.Stealer.MinIdleTime,
-		MaxDeliveryAttempt:   c.Valkey.Streams.ImageProcessRequest.Stealer.MaxDeliveryAttempt,
+func (c *Config) ToKafkaImageProcessResultQueueConfig() kafka.ImageProcessResultQueueConfig {
+	return kafka.ImageProcessResultQueueConfig{
+		Topic: c.Kafka.Topics.ImageProcessResult.Topic,
 	}
 }
 

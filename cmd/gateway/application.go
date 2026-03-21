@@ -12,6 +12,7 @@ import (
 	"github.com/isutare412/imageer/internal/gateway/config"
 	"github.com/isutare412/imageer/internal/gateway/crypt"
 	"github.com/isutare412/imageer/internal/gateway/jwt"
+	"github.com/isutare412/imageer/internal/gateway/kafka"
 	"github.com/isutare412/imageer/internal/gateway/kubernetes"
 	"github.com/isutare412/imageer/internal/gateway/oidc"
 	"github.com/isutare412/imageer/internal/gateway/port"
@@ -28,13 +29,13 @@ import (
 )
 
 type application struct {
-	webServer                   *webv2.Server
-	imageUploadListener         *sqs.ImageUploadListener
-	postgresClient              *postgres.Client
-	valkeyClient                *valkey.Client
-	imageProcessResultHandler   *valkey.ImageProcessResultHandler
-	imageS3DeleteRequestHandler *valkey.ImageS3DeleteRequestHandler
-	leaderElector               leaderElector
+	webServer           *webv2.Server
+	imageUploadListener *sqs.ImageUploadListener
+	postgresClient      *postgres.Client
+	valkeyClient        *valkey.Client
+	kafkaClient         *kafka.Client
+	kafkaConsumer       *kafka.Consumer
+	leaderElector       leaderElector
 
 	cfg config.Config
 }
@@ -114,13 +115,19 @@ func newApplication(cfg config.Config) (*application, error) {
 		return nil, fmt.Errorf("creating valkey client: %w", err)
 	}
 
-	slog.Info("Create valkey image process request queue")
-	imageProcRequestQueue := valkey.NewImageProcessRequestQueue(
-		cfg.ToValkeyImageProcessRequestQueueConfig(), valkeyClient)
+	slog.Info("Create Kafka client")
+	kafkaClient, err := kafka.NewClient(cfg.ToKafkaClientConfig())
+	if err != nil {
+		return nil, fmt.Errorf("creating kafka client: %w", err)
+	}
 
-	slog.Info("Create valkey image S3 delete request queue")
-	imageS3DeleteRequestQueue := valkey.NewImageS3DeleteRequestQueue(
-		cfg.ToValkeyImageS3DeleteRequestQueueConfig(), valkeyClient)
+	slog.Info("Create Kafka image process request queue")
+	imageProcRequestQueue := kafka.NewImageProcessRequestQueue(
+		cfg.ToKafkaImageProcessRequestQueueConfig(), kafkaClient)
+
+	slog.Info("Create Kafka image S3 delete request queue")
+	imageS3DeleteRequestQueue := kafka.NewImageS3DeleteRequestQueue(
+		cfg.ToKafkaImageS3DeleteRequestQueueConfig(), kafkaClient)
 
 	slog.Info("Create valkey image notification publisher")
 	imageNotificationPublisher := valkey.NewImageNotificationPublisher(
@@ -168,13 +175,23 @@ func newApplication(cfg config.Config) (*application, error) {
 		return nil, fmt.Errorf("creating SQS image upload listener: %w", err)
 	}
 
-	slog.Info("Create valkey image process result handler")
-	imageProcessResultHandler := valkey.NewImageProcessResultHandler(
-		cfg.ToValkeyImageProcessResultHandlerConfig(), valkeyClient, imageSvc)
+	slog.Info("Create Kafka image process result handler")
+	imageProcessResultHandler := kafka.NewImageProcessResultHandler(
+		cfg.ToKafkaImageProcessResultHandlerConfig(), imageSvc)
 
-	slog.Info("Create valkey image S3 delete request handler")
-	imageS3DeleteRequestHandler := valkey.NewImageS3DeleteRequestHandler(
-		cfg.ToValkeyImageS3DeleteRequestHandlerConfig(), valkeyClient, imageSvc)
+	slog.Info("Create Kafka image S3 delete request handler")
+	imageS3DeleteRequestHandler := kafka.NewImageS3DeleteRequestHandler(
+		cfg.ToKafkaImageS3DeleteRequestHandlerConfig(), imageSvc)
+
+	slog.Info("Create Kafka consumer")
+	kafkaConsumer := kafka.NewConsumer(kafkaClient, map[string]kafka.Handler{
+		cfg.Kafka.Topics.ImageProcessResult.Topic:        imageProcessResultHandler,
+		cfg.Kafka.Topics.ImageProcessResult.RetryTopic:   imageProcessResultHandler,
+		cfg.Kafka.Topics.ImageS3DeleteRequest.Topic:      imageS3DeleteRequestHandler,
+		cfg.Kafka.Topics.ImageS3DeleteRequest.RetryTopic: imageS3DeleteRequestHandler,
+	})
+	imageProcessResultHandler.SetConsumer(kafkaConsumer)
+	imageS3DeleteRequestHandler.SetConsumer(kafkaConsumer)
 
 	slog.Info("Create image closer")
 	imageCloser := image.NewCloser(cfg.ToImageCloserConfig(), transactioner, imageRepo,
@@ -202,14 +219,14 @@ func newApplication(cfg config.Config) (*application, error) {
 	}
 
 	return &application{
-		webServer:                   webServer,
-		imageUploadListener:         imageUploadListener,
-		postgresClient:              postgresClient,
-		valkeyClient:                valkeyClient,
-		imageProcessResultHandler:   imageProcessResultHandler,
-		imageS3DeleteRequestHandler: imageS3DeleteRequestHandler,
-		leaderElector:               elector,
-		cfg:                         cfg,
+		webServer:           webServer,
+		imageUploadListener: imageUploadListener,
+		postgresClient:      postgresClient,
+		valkeyClient:        valkeyClient,
+		kafkaClient:         kafkaClient,
+		kafkaConsumer:       kafkaConsumer,
+		leaderElector:       elector,
+		cfg:                 cfg,
 	}, nil
 }
 
@@ -227,16 +244,6 @@ func (a *application) initialize() error {
 		return fmt.Errorf("migrating database schemas: %w", err)
 	}
 
-	slog.Info("Initialize image process result handler")
-	if err := a.imageProcessResultHandler.Initialize(ctx); err != nil {
-		return fmt.Errorf("initializing image process result handler: %w", err)
-	}
-
-	slog.Info("Initialize image S3 delete request handler")
-	if err := a.imageS3DeleteRequestHandler.Initialize(ctx); err != nil {
-		return fmt.Errorf("initializing image S3 delete request handler: %w", err)
-	}
-
 	return nil
 }
 
@@ -244,11 +251,8 @@ func (a *application) run() {
 	slog.Info("Run image upload listener")
 	a.imageUploadListener.Run()
 
-	slog.Info("Run image process result handler")
-	a.imageProcessResultHandler.Run()
-
-	slog.Info("Run image S3 delete request handler")
-	a.imageS3DeleteRequestHandler.Run()
+	slog.Info("Run Kafka consumer")
+	a.kafkaConsumer.Run()
 
 	slog.Info("Run kubernetes leader elector")
 	a.leaderElector.Run()
@@ -280,11 +284,11 @@ func (a *application) shutdown() {
 	slog.Info("Shutdown image upload listener")
 	a.imageUploadListener.Shutdown()
 
-	slog.Info("Shutdown image process result handler")
-	a.imageProcessResultHandler.Shutdown()
+	slog.Info("Shutdown Kafka consumer")
+	a.kafkaConsumer.Shutdown()
 
-	slog.Info("Shutdown image S3 delete request handler")
-	a.imageS3DeleteRequestHandler.Shutdown()
+	slog.Info("Shutdown Kafka client")
+	a.kafkaClient.Shutdown()
 
 	slog.Info("Shutdown valkey client")
 	a.valkeyClient.Shutdown()

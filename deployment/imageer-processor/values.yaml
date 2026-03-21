@@ -142,30 +142,23 @@ config:
   web:
     port: *port
 
-  valkey:
-    addresses: localhost:6379
+  kafka:
+    addresses: localhost:9092
     username: admin
     password: complex_password
+    consumer-group: imageer-processor
 
-    streams:
+    topics:
       image-process-request:
-        stream-key: imageer:prod:image-process-request-stream
-        group-name: processor
+        topic: imageer.image.process.request
+        retry-topic: imageer.image.process.request.retry
         handler:
-          concurrency: 8
           timeout: 30s
-        reader:
-          batch-size: 10
-          block-timeout: 30s
-        stealer:
-          interval: 30s
-          min-idle-time: 1m
-          max-delivery-attempt: 3
-        reaper:
-          min-idle-time: 1h
+          max-retry-attempt: 3
+          retry-base-delay: 100ms
+
       image-process-result:
-        stream-key: imageer:prod:image-process-result-stream
-        stream-size: 1000
+        topic: imageer.image.process.result
 
   aws:
     s3:

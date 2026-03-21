@@ -7,6 +7,7 @@ import (
 
 	"github.com/isutare412/imageer/internal/gateway/crypt"
 	"github.com/isutare412/imageer/internal/gateway/jwt"
+	"github.com/isutare412/imageer/internal/gateway/kafka"
 	"github.com/isutare412/imageer/internal/gateway/kubernetes"
 	"github.com/isutare412/imageer/internal/gateway/oidc"
 	"github.com/isutare412/imageer/internal/gateway/postgres"
@@ -112,50 +113,6 @@ func (c *Config) ToValkeyClientConfig() valkey.ClientConfig {
 	}
 }
 
-func (c *Config) ToValkeyImageProcessRequestQueueConfig() valkey.ImageProcessRequestQueueConfig {
-	return valkey.ImageProcessRequestQueueConfig{
-		StreamKey:  c.Valkey.Streams.ImageProcessRequest.StreamKey,
-		StreamSize: c.Valkey.Streams.ImageProcessRequest.StreamSize,
-	}
-}
-
-func (c *Config) ToValkeyImageS3DeleteRequestQueueConfig() valkey.ImageS3DeleteRequestQueueConfig {
-	return valkey.ImageS3DeleteRequestQueueConfig{
-		StreamKey:  c.Valkey.Streams.ImageS3DeleteRequest.StreamKey,
-		StreamSize: c.Valkey.Streams.ImageS3DeleteRequest.StreamSize,
-	}
-}
-
-func (c *Config) ToValkeyImageProcessResultHandlerConfig() valkey.ImageProcessResultHandlerConfig {
-	return valkey.ImageProcessResultHandlerConfig{
-		StreamKey:            c.Valkey.Streams.ImageProcessResult.StreamKey,
-		GroupName:            c.Valkey.Streams.ImageProcessResult.GroupName,
-		HandleConcurrency:    c.Valkey.Streams.ImageProcessResult.Handler.Concurrency,
-		HandleTimeout:        c.Valkey.Streams.ImageProcessResult.Handler.Timeout,
-		ReadBlockTimeout:     c.Valkey.Streams.ImageProcessResult.Reader.BlockTimeout,
-		ReadBatchSize:        c.Valkey.Streams.ImageProcessResult.Reader.BatchSize,
-		ReapConsumerIdleTime: c.Valkey.Streams.ImageProcessResult.Reaper.MinIdleTime,
-		StealInterval:        c.Valkey.Streams.ImageProcessResult.Stealer.Interval,
-		StealMinIdleTime:     c.Valkey.Streams.ImageProcessResult.Stealer.MinIdleTime,
-		MaxDeliveryAttempt:   c.Valkey.Streams.ImageProcessResult.Stealer.MaxDeliveryAttempt,
-	}
-}
-
-func (c *Config) ToValkeyImageS3DeleteRequestHandlerConfig() valkey.ImageS3DeleteRequestHandlerConfig {
-	return valkey.ImageS3DeleteRequestHandlerConfig{
-		StreamKey:            c.Valkey.Streams.ImageS3DeleteRequest.StreamKey,
-		GroupName:            c.Valkey.Streams.ImageS3DeleteRequest.GroupName,
-		HandleConcurrency:    c.Valkey.Streams.ImageS3DeleteRequest.Handler.Concurrency,
-		HandleTimeout:        c.Valkey.Streams.ImageS3DeleteRequest.Handler.Timeout,
-		ReadBlockTimeout:     c.Valkey.Streams.ImageS3DeleteRequest.Reader.BlockTimeout,
-		ReadBatchSize:        c.Valkey.Streams.ImageS3DeleteRequest.Reader.BatchSize,
-		ReapConsumerIdleTime: c.Valkey.Streams.ImageS3DeleteRequest.Reaper.MinIdleTime,
-		StealInterval:        c.Valkey.Streams.ImageS3DeleteRequest.Stealer.Interval,
-		StealMinIdleTime:     c.Valkey.Streams.ImageS3DeleteRequest.Stealer.MinIdleTime,
-		MaxDeliveryAttempt:   c.Valkey.Streams.ImageS3DeleteRequest.Stealer.MaxDeliveryAttempt,
-	}
-}
-
 func (c *Config) ToValkeyImageNotificationPublisherConfig() valkey.ImageNotificationPublisherConfig {
 	return valkey.ImageNotificationPublisherConfig{
 		UploadDoneChannelPrefix:  c.Valkey.PubSub.ImageUploadDone.ChannelPrefix,
@@ -174,6 +131,51 @@ func (c *Config) ToValkeyImageProcessDoneSubscriberConfig() valkey.ImageProcessD
 	return valkey.ImageProcessDoneSubscriberConfig{
 		ChannelPrefix: c.Valkey.PubSub.ImageProcessDone.ChannelPrefix,
 		MaxRetries:    c.Valkey.PubSub.ImageProcessDone.MaxRetries,
+	}
+}
+
+func (c *Config) ToKafkaClientConfig() kafka.ClientConfig {
+	return kafka.ClientConfig{
+		Addrs:         parseCSV(c.Kafka.Addresses, ","),
+		User:          c.Kafka.Username,
+		Password:      c.Kafka.Password,
+		ConsumerGroup: c.Kafka.ConsumerGroup,
+		ConsumeTopics: []string{
+			c.Kafka.Topics.ImageProcessResult.Topic,
+			c.Kafka.Topics.ImageProcessResult.RetryTopic,
+			c.Kafka.Topics.ImageS3DeleteRequest.Topic,
+			c.Kafka.Topics.ImageS3DeleteRequest.RetryTopic,
+		},
+	}
+}
+
+func (c *Config) ToKafkaImageProcessRequestQueueConfig() kafka.ImageProcessRequestQueueConfig {
+	return kafka.ImageProcessRequestQueueConfig{
+		Topic: c.Kafka.Topics.ImageProcessRequest.Topic,
+	}
+}
+
+func (c *Config) ToKafkaImageProcessResultHandlerConfig() kafka.ImageProcessResultHandlerConfig {
+	return kafka.ImageProcessResultHandlerConfig{
+		RetryTopic:      c.Kafka.Topics.ImageProcessResult.RetryTopic,
+		HandleTimeout:   c.Kafka.Topics.ImageProcessResult.Handler.Timeout,
+		MaxRetryAttempt: c.Kafka.Topics.ImageProcessResult.Handler.MaxRetryAttempt,
+		RetryBaseDelay:  c.Kafka.Topics.ImageProcessResult.Handler.RetryBaseDelay,
+	}
+}
+
+func (c *Config) ToKafkaImageS3DeleteRequestQueueConfig() kafka.ImageS3DeleteRequestQueueConfig {
+	return kafka.ImageS3DeleteRequestQueueConfig{
+		Topic: c.Kafka.Topics.ImageS3DeleteRequest.Topic,
+	}
+}
+
+func (c *Config) ToKafkaImageS3DeleteRequestHandlerConfig() kafka.ImageS3DeleteRequestHandlerConfig {
+	return kafka.ImageS3DeleteRequestHandlerConfig{
+		RetryTopic:      c.Kafka.Topics.ImageS3DeleteRequest.RetryTopic,
+		HandleTimeout:   c.Kafka.Topics.ImageS3DeleteRequest.Handler.Timeout,
+		MaxRetryAttempt: c.Kafka.Topics.ImageS3DeleteRequest.Handler.MaxRetryAttempt,
+		RetryBaseDelay:  c.Kafka.Topics.ImageS3DeleteRequest.Handler.RetryBaseDelay,
 	}
 }
 

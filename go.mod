@@ -45,6 +45,7 @@ require (
 	github.com/samber/lo v1.53.0
 	github.com/samber/slog-multi v1.7.1
 	github.com/stretchr/testify v1.11.1
+	github.com/twmb/franz-go v1.20.7
 	github.com/valkey-io/valkey-go v1.0.73
 	go.opentelemetry.io/otel v1.42.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.42.0
@@ -120,6 +121,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
@@ -136,6 +138,7 @@ require (
 	github.com/oasdiff/yaml v0.0.1 // indirect
 	github.com/oasdiff/yaml3 v0.0.1 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
+	github.com/pierrec/lz4/v4 v4.1.25 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.67.5 // indirect
@@ -145,6 +148,7 @@ require (
 	github.com/speakeasy-api/openapi-overlay v0.10.2 // indirect
 	github.com/spf13/cobra v1.9.1 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/twmb/franz-go/pkg/kmsg v1.12.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect
