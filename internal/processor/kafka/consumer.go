@@ -97,15 +97,17 @@ func (c *Consumer) scheduleRetry(handler Handler, record *kgo.Record, retryCount
 			},
 		}
 
-		results := c.client.ProduceSync(context.Background(), retryRecord)
-		if err := results.FirstErr(); err != nil {
-			slog.Error("Failed to produce retry record",
-				"topic", handler.RetryTopic(), "retryCount", retryCount,
-				"error", kafkahelpers.WrapKafkaError(err, "Failed to produce retry"))
-		}
+		c.client.Produce(context.Background(), retryRecord, func(_ *kgo.Record, err error) {
+			if err != nil {
+				err = kafkahelpers.WrapKafkaError(err, "Failed to produce retry record")
+				slog.Error("Failed to produce retry record",
+					"topic", handler.RetryTopic(), "retryCount", retryCount, "error", err)
+				return
+			}
 
-		slog.Info("Produced kafka retry record",
-			"topic", handler.RetryTopic(), "retryCount", retryCount)
+			slog.Info("Produced kafka retry record",
+				"topic", handler.RetryTopic(), "retryCount", retryCount)
+		})
 	})
 }
 

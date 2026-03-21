@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/twmb/franz-go/pkg/kgo"
 	"go.opentelemetry.io/otel/trace"
@@ -49,10 +50,13 @@ func (q *ImageS3DeleteRequestQueue) Push(ctx context.Context, req *imageerv1.Ima
 		Value: data,
 	}
 
-	results := q.client.ProduceSync(ctx, record)
-	if err := results.FirstErr(); err != nil {
-		return kafkahelpers.WrapKafkaError(err, "Failed to produce image S3 delete request")
-	}
+	q.client.Produce(ctx, record, func(_ *kgo.Record, err error) {
+		if err != nil {
+			err = kafkahelpers.WrapKafkaError(err, "Failed to produce image S3 delete request")
+			slog.Error("Failed to produce image S3 delete request",
+				"topic", q.cfg.Topic, "error", err)
+		}
+	})
 
 	return nil
 }

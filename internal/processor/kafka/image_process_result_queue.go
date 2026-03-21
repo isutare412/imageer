@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/twmb/franz-go/pkg/kgo"
 	"go.opentelemetry.io/otel/trace"
@@ -49,10 +50,13 @@ func (q *ImageProcessResultQueue) Push(ctx context.Context, res *imageerv1.Image
 		Value: data,
 	}
 
-	results := q.client.ProduceSync(ctx, record)
-	if err := results.FirstErr(); err != nil {
-		return kafkahelpers.WrapKafkaError(err, "Failed to produce image process result")
-	}
+	q.client.Produce(ctx, record, func(_ *kgo.Record, err error) {
+		if err != nil {
+			err = kafkahelpers.WrapKafkaError(err, "Failed to produce image process result")
+			slog.Error("Failed to produce image process result",
+				"topic", q.cfg.Topic, "error", err)
+		}
+	})
 
 	return nil
 }
