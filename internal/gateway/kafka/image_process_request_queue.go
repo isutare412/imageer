@@ -29,6 +29,7 @@ func NewImageProcessRequestQueue(cfg ImageProcessRequestQueueConfig, client *Cli
 
 func (q *ImageProcessRequestQueue) Push(ctx context.Context, req *imageerv1.ImageProcessRequest,
 ) error {
+	ctx = context.WithoutCancel(ctx)
 	ctx, span := tracing.StartSpan(ctx, "kafka.ImageProcessRequestQueue.Push",
 		trace.WithSpanKind(trace.SpanKindProducer))
 	defer span.End()

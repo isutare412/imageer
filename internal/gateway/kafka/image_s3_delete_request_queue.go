@@ -29,6 +29,7 @@ func NewImageS3DeleteRequestQueue(cfg ImageS3DeleteRequestQueueConfig, client *C
 
 func (q *ImageS3DeleteRequestQueue) Push(ctx context.Context, req *imageerv1.ImageS3DeleteRequest,
 ) error {
+	ctx = context.WithoutCancel(ctx)
 	ctx, span := tracing.StartSpan(ctx, "kafka.ImageS3DeleteRequestQueue.Push",
 		trace.WithSpanKind(trace.SpanKindProducer))
 	defer span.End()
