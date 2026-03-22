@@ -37,6 +37,7 @@ func (c *Config) ToKafkaClientConfig() kafka.ClientConfig {
 		User:          c.Kafka.Username,
 		Password:      c.Kafka.Password,
 		ConsumerGroup: c.Kafka.ConsumerGroup,
+		Partitioner:   c.Kafka.Partitioner,
 		ConsumeTopics: []string{
 			c.Kafka.Topics.ImageProcessRequest.Topic,
 			c.Kafka.Topics.ImageProcessRequest.RetryTopic,

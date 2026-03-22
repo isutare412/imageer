@@ -147,6 +147,7 @@ config:
     username: admin
     password: complex_password
     consumer-group: imageer-processor
+    partitioner: uniform-bytes # "" (uniform-bytes) / uniform-bytes / round-robin
 
     topics:
       image-process-request:

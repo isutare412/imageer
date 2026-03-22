@@ -68,6 +68,7 @@ kafka:
   username: admin
   password: complex_password
   consumer-group: imageer-gateway
+  partitioner: "" # "" (uniform-bytes) / uniform-bytes / round-robin
 
   topics:
     image-process-request:

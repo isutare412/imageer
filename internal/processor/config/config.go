@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/isutare412/imageer/internal/processor/kafka"
 	"github.com/isutare412/imageer/pkg/log"
 )
 
@@ -33,10 +34,11 @@ type WebConfig struct {
 }
 
 type KafkaConfig struct {
-	Addresses     string `koanf:"addresses" validate:"required"`
-	Username      string `koanf:"username" validate:"required"`
-	Password      string `koanf:"password" validate:"required"`
-	ConsumerGroup string `koanf:"consumer-group" validate:"required"`
+	Addresses     string            `koanf:"addresses" validate:"required"`
+	Username      string            `koanf:"username" validate:"required"`
+	Password      string            `koanf:"password" validate:"required"`
+	ConsumerGroup string            `koanf:"consumer-group" validate:"required"`
+	Partitioner   kafka.Partitioner `koanf:"partitioner" validate:"omitempty,validateFn=Validate"`
 
 	Topics struct {
 		ImageProcessRequest struct {
