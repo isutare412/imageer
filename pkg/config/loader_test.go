@@ -21,7 +21,8 @@ type configModel struct {
 }
 
 type nestedConfig struct {
-	Age int `validate:"gt=0"`
+	Age      int `validate:"gt=0"`
+	MaxValue int `koanf:"max-value"`
 }
 
 func copyTestFile(t *testing.T, src, dst string) {
@@ -66,13 +67,14 @@ func TestLoadValidated(t *testing.T) {
 			name: "config with environment variables",
 			want: configModel{
 				Name:   "env-app",
-				Nested: nestedConfig{Age: 35},
+				Nested: nestedConfig{Age: 35, MaxValue: 50},
 			},
 			wantErr: false,
 			setup: func(t *testing.T, dir string) {
 				copyTestFile(t, "testdata/valid_config.yaml", filepath.Join(dir, "config.default.yaml"))
-				t.Setenv("APP_NAME", "env-app")
-				t.Setenv("APP_NESTED_AGE", "35")
+				t.Setenv("APP__NAME", "env-app")
+				t.Setenv("APP__NESTED__AGE", "35")
+				t.Setenv("APP__NESTED__MAX_VALUE", "50")
 			},
 		},
 		{

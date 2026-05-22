@@ -12,8 +12,8 @@ import (
 
 // Load loads configuration into a struct of type T from multiple sources.
 // Order of precedence (highest to lowest):
-//  1. Environment variables (prefixed with {appName}_)
-//  2. AWS SSM Parameter Store (if enabled via {appName}_SSM_ENABLED env var)
+//  1. Environment variables (prefixed with {appName}__)
+//  2. AWS SSM Parameter Store (if enabled via {appName}__SSM_ENABLED env var)
 //  3. Configuration files in the specified dir directory in the following order:
 //     config.local.yaml, config.yaml, config.default.yaml
 func Load[T any](appName, dir string) (cfg T, err error) {
@@ -57,5 +57,5 @@ func appNamePrefixedKey(appName, key string) string {
 	appName = cmp.Or(appName, "APP") // default to APP if empty
 	appName = strings.ReplaceAll(appName, "-", "_")
 	appName = strings.ToUpper(appName)
-	return fmt.Sprintf("%s_%s", appName, key)
+	return fmt.Sprintf("%s__%s", appName, key)
 }
