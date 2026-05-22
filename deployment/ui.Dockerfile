@@ -4,10 +4,10 @@ FROM node:24-slim AS builder
 WORKDIR /app
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare 'pnpm@>=11 <12' --activate
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Copy package files and pnpm install policy
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -26,10 +26,10 @@ FROM node:24-slim AS production
 WORKDIR /app
 
 # Install pnpm for production dependencies
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare 'pnpm@>=11 <12' --activate
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Copy package files and pnpm install policy
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
