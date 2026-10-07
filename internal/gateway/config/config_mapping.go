@@ -139,6 +139,7 @@ func (c *Config) ToKafkaClientConfig() kafka.ClientConfig {
 		Addrs:         parseCSV(c.Kafka.Addresses, ","),
 		User:          c.Kafka.Username,
 		Password:      c.Kafka.Password,
+		SASLMechanism: c.Kafka.SASLMechanism,
 		ConsumerGroup: c.Kafka.ConsumerGroup,
 		Partitioner:   c.Kafka.Partitioner,
 		ConsumeTopics: []string{
