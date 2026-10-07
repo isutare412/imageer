@@ -19,6 +19,7 @@ kafka:
   password: complex_password
   consumer-group: imageer-processor
   partitioner: "" # "" (uniform-bytes) / uniform-bytes / round-robin
+  sasl-mechanism: plain # "" (plain) / plain / scram-sha-512
 
   topics:
     image-process-request:

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/twmb/franz-go/pkg/kgo"
-	"github.com/twmb/franz-go/pkg/sasl/plain"
 )
 
 type Client struct {
@@ -14,10 +13,7 @@ type Client struct {
 func NewClient(cfg ClientConfig) (*Client, error) {
 	opts := []kgo.Opt{
 		kgo.SeedBrokers(cfg.Addrs...),
-		kgo.SASL(plain.Auth{
-			User: cfg.User,
-			Pass: cfg.Password,
-		}.AsMechanism()),
+		kgo.SASL(cfg.SASLMechanism.Mechanism(cfg.User, cfg.Password)),
 		kgo.ConsumerGroup(cfg.ConsumerGroup),
 		kgo.ConsumeTopics(cfg.ConsumeTopics...),
 	}
