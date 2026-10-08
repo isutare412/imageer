@@ -45,9 +45,10 @@ const (
 	SASLMechanismScramSHA512 SASLMechanism = "scram-sha-512"
 )
 
+// Validate accepts an empty value, which means PLAIN.
 func (m SASLMechanism) Validate() error {
 	switch m {
-	case SASLMechanismPlain:
+	case "", SASLMechanismPlain:
 	case SASLMechanismScramSHA512:
 	default:
 		return fmt.Errorf("unexpected sasl mechanism %q", m)

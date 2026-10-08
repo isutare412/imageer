@@ -37,7 +37,7 @@ type KafkaConfig struct {
 	Addresses     string              `koanf:"addresses" validate:"required"`
 	Username      string              `koanf:"username" validate:"required"`
 	Password      string              `koanf:"password" validate:"required"`
-	SASLMechanism kafka.SASLMechanism `koanf:"sasl-mechanism" validate:"omitempty,validateFn=Validate"`
+	SASLMechanism kafka.SASLMechanism `koanf:"sasl-mechanism" validate:"validateFn=Validate"`
 	ConsumerGroup string              `koanf:"consumer-group" validate:"required"`
 	Partitioner   kafka.Partitioner   `koanf:"partitioner" validate:"omitempty,validateFn=Validate"`
 

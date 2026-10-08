@@ -14,7 +14,7 @@ func TestSASLMechanism_Validate(t *testing.T) {
 	}{
 		{name: "plain", mechanism: SASLMechanismPlain, expectErr: false},
 		{name: "scram-sha-512", mechanism: SASLMechanismScramSHA512, expectErr: false},
-		{name: "empty", mechanism: "", expectErr: true},
+		{name: "empty defaults to plain", mechanism: "", expectErr: false},
 		{name: "upper case", mechanism: "SCRAM-SHA-512", expectErr: true},
 		{name: "unsupported scram variant", mechanism: "scram-sha-256", expectErr: true},
 	}
