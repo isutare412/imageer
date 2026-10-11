@@ -110,9 +110,10 @@ volumeMounts: []
 #   mountPath: "/etc/foo"
 #   readOnly: true
 
-# Environment variables for the container.
+# Environment variables for the container (list of EnvVar, valueFrom allowed).
 envs:
-  PUBLIC_API_BASE_URL: "https://api.example.com"
+  - name: PUBLIC_API_BASE_URL
+    value: "https://api.example.com"
 
 nodeSelector: {}
 

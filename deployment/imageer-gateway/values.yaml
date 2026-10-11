@@ -119,8 +119,8 @@ volumeMounts: []
 #   mountPath: "/etc/foo"
 #   readOnly: true
 
-# Environment variables for the container.
-envs: {}
+# Environment variables for the container (list of EnvVar, valueFrom allowed).
+envs: []
 
 nodeSelector: {}
 

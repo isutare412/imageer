@@ -60,12 +60,9 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.envs }}
+          {{- with .Values.envs }}
           env:
-            {{- range $key, $value := .Values.envs }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{- end }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
             - name: config
