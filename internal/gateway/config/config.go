@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/isutare412/imageer/internal/gateway/kafka"
+	"github.com/isutare412/imageer/internal/gateway/postgres"
 	"github.com/isutare412/imageer/pkg/log"
 )
 
@@ -78,11 +79,12 @@ type DatabaseConfig struct {
 }
 
 type PostgresConfig struct {
-	Host     string `koanf:"host" validate:"required"`
-	Port     int    `koanf:"port" validate:"required,gt=0,lte=65535"`
-	User     string `koanf:"user" validate:"required"`
-	Password string `koanf:"password" validate:"required"`
-	Database string `koanf:"database" validate:"required"`
+	Host     string           `koanf:"host" validate:"required"`
+	Port     int              `koanf:"port" validate:"required,gt=0,lte=65535"`
+	User     string           `koanf:"user" validate:"required"`
+	Password string           `koanf:"password" validate:"required"`
+	Database string           `koanf:"database" validate:"required"`
+	SSLMode  postgres.SSLMode `koanf:"ssl-mode" validate:"validateFn=Validate"`
 }
 
 type ValkeyConfig struct {

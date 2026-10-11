@@ -100,6 +100,7 @@ func (c *Config) ToRepositoryClientConfig() postgres.ClientConfig {
 		User:        c.Database.Postgres.User,
 		Password:    c.Database.Postgres.Password,
 		Database:    c.Database.Postgres.Database,
+		SSLMode:     c.Database.Postgres.SSLMode,
 		TraceLog:    c.Database.TraceLog,
 		UseInMemory: c.Database.UseInMemory,
 	}

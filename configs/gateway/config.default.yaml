@@ -49,6 +49,7 @@ database:
     user: user
     password: password
     database: database_name
+    ssl-mode: "" # "" (disable) / disable / allow / prefer / require
 
 valkey:
   addresses: localhost:15410

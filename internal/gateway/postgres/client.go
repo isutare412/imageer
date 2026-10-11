@@ -86,8 +86,11 @@ func newDialector(cfg ClientConfig) gorm.Dialector {
 		return sqlite.Open("file::memory:?_foreign_key=true&mode=memory")
 
 	default:
-		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-			cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database)
-		return postgres.Open(dsn)
+		return postgres.Open(buildDSN(cfg))
 	}
+}
+
+func buildDSN(cfg ClientConfig) string {
+	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database, cfg.SSLMode.Value())
 }
