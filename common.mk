@@ -15,6 +15,18 @@ generate: ## Generate code
 .PHONY: check
 check: format lint test ## Run format, lint, and tests
 
+CHECK_IMAGE ?= imageer-check
+
+.PHONY: check-docker
+check-docker: ## Run check in a container with libvips (for hosts without libvips)
+	@docker build -q -t $(CHECK_IMAGE) - < deployment/check.Dockerfile >/dev/null && \
+	docker run --rm --user $$(id -u):$$(id -g) \
+		-v $(CURDIR):/src -w /src \
+		-v imageer-check-cache:/cache \
+		-e HOME=/cache/home -e GOMODCACHE=/cache/mod -e GOCACHE=/cache/build \
+		-e GOLANGCI_LINT_CACHE=/cache/lint -e GOFLAGS=-buildvcs=false \
+		$(CHECK_IMAGE) make check
+
 .PHONY: test
 test: ## Run Go tests
 	@echo "🧪 Running Go tests..." && \
