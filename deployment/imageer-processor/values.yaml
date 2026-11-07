@@ -120,6 +120,11 @@ volumeMounts: []
 # Environment variables for the container (list of EnvVar, valueFrom allowed).
 envs: []
 
+# Environment variables that hold credentials (map of name to value). They are
+# rendered into the Secret <fullname>-env and loaded with envFrom, so they stay
+# out of the Deployment spec. A name also listed in envs takes the envs value.
+secretEnvs: {}
+
 nodeSelector: {}
 
 tolerations: []
